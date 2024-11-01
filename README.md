@@ -1,2 +1,2 @@
-# frontend-excursionsLists
+# frontend-excursions
 фронт для проекта
