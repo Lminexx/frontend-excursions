@@ -1,0 +1,58 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "a36d50ab0c451c15cbaf652d23fd0bbd",
+    "entities": [
+      {
+        "tableName": "Excursion",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`exId` INTEGER NOT NULL, `Название экскурсии` TEXT NOT NULL, `Список мест экскурсии` TEXT NOT NULL, `Автор экскурсии` TEXT NOT NULL, `Рейтинг` REAL NOT NULL, PRIMARY KEY(`exId`))",
+        "fields": [
+          {
+            "fieldPath": "exId",
+            "columnName": "exId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exName",
+            "columnName": "Название экскурсии",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "places",
+            "columnName": "Список мест экскурсии",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "author",
+            "columnName": "Автор экскурсии",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "Рейтинг",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "exId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a36d50ab0c451c15cbaf652d23fd0bbd')"
+    ]
+  }
+}
