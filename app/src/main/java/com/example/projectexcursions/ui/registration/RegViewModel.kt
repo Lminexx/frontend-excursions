@@ -15,6 +15,6 @@ class RegViewModel: ViewModel() {
     }
 
     fun clickRegister() {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
     }
 }
