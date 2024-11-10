@@ -19,10 +19,10 @@ class RegActivity: AppCompatActivity() {
     }
 
     private fun initCallback() {
-        TODO("Not yet implemented")
+        //TODO implement
     }
 
     private fun subscribe() {
-        TODO("JOPA")
+        //todo
     }
 }
