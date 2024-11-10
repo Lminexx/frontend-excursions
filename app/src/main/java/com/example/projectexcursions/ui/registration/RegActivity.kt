@@ -1,9 +1,14 @@
 package com.example.projectexcursions.ui.registration
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import com.example.projectexcursions.databinding.ActivityRegBinding
+import com.example.projectexcursions.ui.auth.AuthActivity
+import com.google.android.material.textfield.TextInputEditText
 
 class RegActivity: AppCompatActivity() {
 
@@ -16,13 +21,27 @@ class RegActivity: AppCompatActivity() {
         setContentView(binding.root)
         initCallback()
         subscribe()
+
+        binding.inputLogin.addTextChangedListener { editable ->
+            val loginText = editable?.toString() ?: ""
+            viewModel.updateInputLogin(loginText)
+        }
     }
 
     private fun initCallback() {
-        //TODO implement
+        binding.buttReg.setOnClickListener { viewModel.clickRegister() }
+        binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
     }
 
     private fun subscribe() {
-        //todo
+        viewModel.wantComeBack.observe(this) {wannaComeBack ->
+            if (wannaComeBack) {
+                startActivity(Intent(this@RegActivity, AuthActivity::class.java))
+                viewModel.cameBack()
+            }
+        }
+        viewModel.inputLogin.observe(this) {login ->
+            println(login)
+        }
     }
 }
