@@ -1,11 +1,8 @@
 package com.example.projectexcursions.ui.registration
 
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.textfield.TextInputEditText
 
 
 class RegViewModel: ViewModel() {
@@ -15,7 +12,7 @@ class RegViewModel: ViewModel() {
     val inputLogin: LiveData<String> get() = _inputLogin
 
     private val _regStatus = MutableLiveData<Boolean>()
-    val regStatus: LiveData<Boolean> get() = _regStatus
+    val regStatus: LiveData<Boolean> get() = _regStatus //в случае успешной регистрации меняем статус на true, если статус true - отсылаем в окно авторизации
 
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
@@ -39,4 +36,6 @@ class RegViewModel: ViewModel() {
     fun updateInputLogin(login: String) {
         _inputLogin.value = login
     }
+
+
 }

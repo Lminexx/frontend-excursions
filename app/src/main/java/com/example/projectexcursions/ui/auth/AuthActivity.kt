@@ -21,8 +21,8 @@ class AuthActivity: AppCompatActivity() {
     }
 
     private fun subscribe() {
-        viewModel.loginStatus.observe(this) { value ->
-            Toast.makeText(this, value.toString(), Toast.LENGTH_SHORT).show()
+        viewModel.loginStatus.observe(this) {
+            Toast.makeText(this, viewModel.message.value, Toast.LENGTH_SHORT).show()
         }
         viewModel.wantReg.observe(this) { value ->
             if (value) {
