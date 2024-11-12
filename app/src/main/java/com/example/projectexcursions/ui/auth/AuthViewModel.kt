@@ -20,7 +20,7 @@ class AuthViewModel: ViewModel() {
     }
 
     fun clickAuth() {
-
+        _loginStatus.value = true
     }
 
     fun clickRegister() {
