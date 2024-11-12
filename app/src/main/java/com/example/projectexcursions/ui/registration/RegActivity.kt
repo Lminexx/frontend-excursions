@@ -2,15 +2,11 @@ package com.example.projectexcursions.ui.registration
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityRegBinding
 import com.example.projectexcursions.ui.auth.AuthActivity
-import com.example.projectexcursions.user.User
 
 class RegActivity: AppCompatActivity() {
 
@@ -27,27 +23,13 @@ class RegActivity: AppCompatActivity() {
 
     private fun initCallback() {
         binding.buttReg.setOnClickListener {
+            val login = binding.inputLogin.text.toString().trim()
+            val password = binding.inputPass.text.toString().trim()
+            val repPass = binding.repeatPass.text.toString().trim()
 
-            val userLogin: EditText = findViewById(R.id.input_login)
-            val userPassword: EditText = findViewById(R.id.input_pass)
-            val userRepeatPass: EditText = findViewById(R.id.repeat_pass)
-            val login = userLogin.text.toString().trim()
-            val password = userPassword.text.toString().trim()
-            val repPass = userRepeatPass.text.toString().trim()
-
-            if (login == "" || login == " ")
-                Toast.makeText(this, "Введите логин", Toast.LENGTH_SHORT).show()
-            else if (password == "" || password == " ")
-                Toast.makeText(this, "Введите пароль", Toast.LENGTH_SHORT).show()
-            else if (repPass == "" || repPass == " ")
-                Toast.makeText(this, "Повторите пароль", Toast.LENGTH_SHORT).show()
-            else if (password != repPass)
-                Toast.makeText(this, "Пароли не совпадают", Toast.LENGTH_SHORT).show()
-            else {
-                viewModel.reg(login, password)
-            }
+            viewModel.validateAndRegister(login, password, repPass)
         }
-            binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
+        binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
     }
 
     private fun subscribe() {
@@ -58,8 +40,20 @@ class RegActivity: AppCompatActivity() {
             }
         }
 
-        viewModel.inputLogin.observe(this) {login ->
-            println(login)
+        viewModel.regStatus.observe(this) { isSuccessful ->
+            if (isSuccessful) {
+                Toast.makeText(this, "Регистрация успешна", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, AuthActivity::class.java))
+            } else {
+                Toast.makeText(this, "Ошибка регистрации", Toast.LENGTH_SHORT).show()
+            }
+        }
+        viewModel.validationMessage.observe(this) { message ->
+            message?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            } ?: run {
+                Toast.makeText(this, "Регистрация успешна", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

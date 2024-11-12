@@ -11,14 +11,27 @@ import retrofit2.Response
 class RegViewModel: ViewModel() {
     //TODO обзяательная проверка логина и пароля, если такие существуют - выдать исключение с сообщшением или просто сообщение с ошибкой
 
-    private val _inputLogin = MutableLiveData<String>()
-    val inputLogin: LiveData<String> get() = _inputLogin
+    private val _validationMessage = MutableLiveData<String?>()
+    val validationMessage: LiveData<String?> get() = _validationMessage
 
     private val _regStatus = MutableLiveData<Boolean>()
-    val regStatus: LiveData<Boolean> get() = _regStatus //в случае успешной регистрации меняем статус на true, если статус true - отсылаем в окно авторизации
+    val regStatus: LiveData<Boolean> get() = _regStatus
 
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
+
+    fun validateAndRegister(login: String, password: String, repeatPassword: String) {
+        when {
+            login.isBlank() -> _validationMessage.value = "Введите логин"
+            password.isBlank() -> _validationMessage.value = "Введите пароль"
+            repeatPassword.isBlank() -> _validationMessage.value = "Повторите пароль"
+            password != repeatPassword -> _validationMessage.value = "Пароли не совпадают"
+            else -> {
+                _validationMessage.value = null
+                reg(login, password)
+            }
+        }
+    }
 
     fun reg(login: String, password: String) {
         val user = User(login, password)
@@ -46,9 +59,5 @@ class RegViewModel: ViewModel() {
 
     fun cameBack() {
         _wantComeBack.value = false
-    }
-
-    fun updateInputLogin(login: String) {
-        _inputLogin.value = login
     }
 }
