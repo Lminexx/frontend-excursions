@@ -1,7 +1,5 @@
 package com.example.projectexcursions.ui.auth
 
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,34 +15,6 @@ class AuthViewModel: ViewModel() {
     val message: LiveData<String> get() = _message
     private val user:User = User("","")
 
-    val loginTextWatcher: TextWatcher get() = object:TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            user.setLogin(s.toString())
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            TODO("Not yet implemented")
-        }
-
-        override fun afterTextChanged(s: Editable?) {
-            TODO("Not yet implemented")
-        }
-
-    }
-    val passwordTextWatcher: TextWatcher get() = object:TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            user.setPass(s.toString())
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            TODO("Not yet implemented")
-        }
-
-        override fun afterTextChanged(s: Editable?) {
-            TODO("Not yet implemented")
-        }
-
-    }
     fun login(login: String, password: String) {
         //todo скинуть логин и пароль бекенду
     }

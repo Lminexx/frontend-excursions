@@ -24,8 +24,8 @@ class AuthActivity: AppCompatActivity() {
         viewModel.loginStatus.observe(this) {
             Toast.makeText(this, viewModel.message.value, Toast.LENGTH_SHORT).show()
         }
-        viewModel.wantReg.observe(this) { value ->
-            if (value) {
+        viewModel.wantReg.observe(this) { wannaReg ->
+            if (wannaReg) {
                 startActivity(Intent(this@AuthActivity, RegActivity::class.java))
                 viewModel.goneToReg()
             }
@@ -36,6 +36,6 @@ class AuthActivity: AppCompatActivity() {
 
     private fun initCallback() {
         binding.buttAuth.setOnClickListener { viewModel.clickAuth() }
-        binding.buttReg.setOnClickListener { viewModel.clickRegister() }
+        binding.goToRegButt.setOnClickListener { viewModel.clickRegister() }
     }
 }

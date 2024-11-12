@@ -68,11 +68,16 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
-    implementation(libs.androidx.library)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.android.volley)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+
 
     kapt(libs.room.compiler)
 
