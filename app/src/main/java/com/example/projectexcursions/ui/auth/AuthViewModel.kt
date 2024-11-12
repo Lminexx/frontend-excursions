@@ -13,17 +13,14 @@ class AuthViewModel: ViewModel() {
     val wantReg: LiveData<Boolean> get() = _wantReg
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
-    private val user:User = User("","")
+
 
     fun login(login: String, password: String) {
         //todo скинуть логин и пароль бекенду
     }
 
     fun clickAuth() {
-        if (user.isDataValid)
-            _message.value = "Вход выполнен успешно"
-        else
-            _message.value = "Ошибка входа: проверьте данные"
+
     }
 
     fun clickRegister() {

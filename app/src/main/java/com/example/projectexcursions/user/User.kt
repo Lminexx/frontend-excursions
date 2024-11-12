@@ -1,24 +1,16 @@
 package com.example.projectexcursions.user
 
-import android.text.TextUtils
+import kotlinx.serialization.Serializable
 
-class User(private var login: String, private var password: String){
+@Serializable
+data class User(
+    val login: String,
+    val password: String
+)
 
-    var isDataValid: Boolean = false
-
-    fun getPassword(): String {
-        return password
-    }
-
-    fun getLogin(): String {
-        return login
-    }
-
-    fun setLogin(login: String) {
-        this.login = login
-    }
-
-    fun setPass(password: String) {
-        this.password = password
-    }
-}
+@Serializable
+data class RegistrationResponse(
+    val success: Boolean,
+    val message: String,
+    val userId: Int? = null
+)
