@@ -1,9 +1,12 @@
 package com.example.projectexcursions.ui.registration
 
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.projectexcursions.net.ApiClient
+import retrofit2.Callback
+import com.example.projectexcursions.user.User
+import retrofit2.Response
 
 class RegViewModel: ViewModel() {
     //TODO обзяательная проверка логина и пароля, если такие существуют - выдать исключение с сообщшением или просто сообщение с ошибкой
@@ -18,7 +21,19 @@ class RegViewModel: ViewModel() {
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
     fun reg(login: String, password: String) {
-        //todo скинуть логин и пароль бекенду
+        val user = User(login, password)
+        ApiClient.instance.registerUser(user).enqueue(object : Callback<Void> {
+            override fun onResponse(call: retrofit2.Call<Void>, response: Response<Void>) {
+                when(response.isSuccessful) {
+                    true -> _regStatus.value = true
+                    false -> _regStatus.value = false
+                }
+            }
+
+            override fun onFailure(call: retrofit2.Call<Void>, t: Throwable) {
+                _regStatus.value = false
+            }
+        })
     }
 
     fun clickRegButton() {

@@ -27,15 +27,14 @@ class RegActivity: AppCompatActivity() {
 
     private fun initCallback() {
         binding.buttReg.setOnClickListener {
-            viewModel.clickRegButton()
+
             val userLogin: EditText = findViewById(R.id.input_login)
             val userPassword: EditText = findViewById(R.id.input_pass)
             val userRepeatPass: EditText = findViewById(R.id.repeat_pass)
-            val regButton: Button = findViewById(R.id.butt_reg)
-
             val login = userLogin.text.toString().trim()
             val password = userPassword.text.toString().trim()
             val repPass = userRepeatPass.text.toString().trim()
+
             if (login == "" || login == " ")
                 Toast.makeText(this, "Введите логин", Toast.LENGTH_SHORT).show()
             else if (password == "" || password == " ")
@@ -45,8 +44,7 @@ class RegActivity: AppCompatActivity() {
             else if (password != repPass)
                 Toast.makeText(this, "Пароли не совпадают", Toast.LENGTH_SHORT).show()
             else {
-                val user = User(login, password)
-                user.isDataValid = true
+                viewModel.reg(login, password)
             }
         }
             binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
@@ -59,6 +57,7 @@ class RegActivity: AppCompatActivity() {
                 viewModel.cameBack()
             }
         }
+
         viewModel.inputLogin.observe(this) {login ->
             println(login)
         }
