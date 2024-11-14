@@ -17,12 +17,12 @@ object ApiClient {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    val instance: apiService by lazy {
+    val instance: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
-            .create(apiService::class.java)
+            .create(ApiService::class.java)
     }
 }
