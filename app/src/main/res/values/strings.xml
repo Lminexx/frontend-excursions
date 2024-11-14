@@ -6,4 +6,8 @@
     <string name="reg_string">Зарегестрироваться</string>
     <string name="repeat_password_hint">Повторите пароль</string>
     <string name="comeback_text">Вернуться назад</string>
+    <string name="list">Список</string>
+    <string name="map">Карта</string>
+    <string name="favorites">Избранное</string>
+    <string name="profile">Профиль</string>
 </resources>

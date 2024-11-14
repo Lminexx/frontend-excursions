@@ -48,6 +48,7 @@ class RegActivity: AppCompatActivity() {
                 Toast.makeText(this, "Ошибка регистрации", Toast.LENGTH_SHORT).show()
             }
         }
+
         viewModel.validationMessage.observe(this) { message ->
             message?.let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
