@@ -23,6 +23,10 @@ class AuthViewModel: ViewModel() {
         _loginStatus.value = true
     }
 
+    fun sucAuth() {
+        _loginStatus.value = false
+    }
+
     fun clickRegister() {
         _wantReg.value = true
     }

@@ -49,12 +49,12 @@ class RegActivity: AppCompatActivity() {
             }
         }
 
-        viewModel.validationMessage.observe(this) { message ->
-            message?.let {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-            } ?: run {
-                Toast.makeText(this, "Регистрация успешна", Toast.LENGTH_SHORT).show()
-            }
+        viewModel.validationMessage.observe(this) {message ->
+            message?.let { Toast.makeText(this, it, Toast.LENGTH_SHORT).show() }
+                ?: run {
+                    startActivity(Intent(this@RegActivity, AuthActivity::class.java))
+                    viewModel.cameBack()
+                }
         }
     }
 }

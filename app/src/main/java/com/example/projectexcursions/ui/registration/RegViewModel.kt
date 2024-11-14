@@ -35,15 +35,13 @@ class RegViewModel: ViewModel() {
 
     fun reg(login: String, password: String) {
         val user = User(login, password)
-        ApiClient.instance.registerUser(user).enqueue(object : Callback<Void> {
-            override fun onResponse(call: retrofit2.Call<Void>, response: Response<Void>) {
-                when(response.isSuccessful) {
-                    true -> _regStatus.value = true
-                    false -> _regStatus.value = false
-                }
+        ApiClient.instance.registerUser(user).enqueue(object : Callback<String> {
+            override fun onResponse(call: retrofit2.Call<String>, response: Response<String>) {
+                if (response.isSuccessful)
+                    _regStatus.value = true
             }
 
-            override fun onFailure(call: retrofit2.Call<Void>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<String>, t: Throwable) {
                 _regStatus.value = false
             }
         })
