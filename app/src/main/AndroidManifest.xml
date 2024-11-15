@@ -9,7 +9,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ProjectExcursions">
+        android:theme="@style/Theme.ProjectExcursions"
+        android:usesCleartextTraffic="false"
+        android:hardwareAccelerated="true">
         <activity
             android:name="com.example.projectexcursions.ui.auth.AuthActivity"
             android:exported="true">
@@ -22,6 +24,10 @@
             android:name="com.example.projectexcursions.ui.registration.RegActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name="com.example.projectexcursions.ui.main.MainActivity"
+            android:exported="true">
+        </activity>
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
