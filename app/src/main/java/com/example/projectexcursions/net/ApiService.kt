@@ -10,6 +10,6 @@ import retrofit2.http.Path
 
 interface ApiService {
     @POST("/api/v1/user/register")
-    fun registerUser(@Body user: User): Call<String>
+    fun registerUser(@Body user: User): Call<RegistrationResponse>
     //todo отображение ошибок, которые отправляют нам бекенд
 }
