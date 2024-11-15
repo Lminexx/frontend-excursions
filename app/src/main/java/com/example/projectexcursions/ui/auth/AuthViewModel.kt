@@ -3,21 +3,28 @@ package com.example.projectexcursions.ui.auth
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.projectexcursions.user.User
 
 class AuthViewModel: ViewModel() {
 
     private val _loginStatus = MutableLiveData<Boolean>()
     val loginStatus: LiveData<Boolean> get() = _loginStatus
-
     private val _wantReg = MutableLiveData<Boolean>()
     val wantReg: LiveData<Boolean> get() = _wantReg
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> get() = _message
+
 
     fun login(login: String, password: String) {
         //todo скинуть логин и пароль бекенду
     }
 
     fun clickAuth() {
-        _loginStatus.value = _loginStatus.value?.not() ?: false
+        _loginStatus.value = true
+    }
+
+    fun sucAuth() {
+        _loginStatus.value = false
     }
 
     fun clickRegister() {

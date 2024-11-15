@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.databinding.ActivityAuthBinding
+import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.registration.RegActivity
 
 class AuthActivity: AppCompatActivity() {
@@ -21,11 +22,20 @@ class AuthActivity: AppCompatActivity() {
     }
 
     private fun subscribe() {
-        viewModel.loginStatus.observe(this) { value ->
-            Toast.makeText(this, value.toString(), Toast.LENGTH_SHORT).show()
+        viewModel.loginStatus.observe(this) {successAuth ->
+            when(successAuth) {
+                true -> {
+                    Toast.makeText(this, "Авторизация успешна", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@AuthActivity, MainActivity::class.java))
+                    viewModel.sucAuth()
+                }
+                false -> {
+                    Toast.makeText(this, "Ошибка авторизации", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
-        viewModel.wantReg.observe(this) { value ->
-            if (value) {
+        viewModel.wantReg.observe(this) { wannaReg ->
+            if (wannaReg) {
                 startActivity(Intent(this@AuthActivity, RegActivity::class.java))
                 viewModel.goneToReg()
             }
@@ -36,6 +46,6 @@ class AuthActivity: AppCompatActivity() {
 
     private fun initCallback() {
         binding.buttAuth.setOnClickListener { viewModel.clickAuth() }
-        binding.buttReg.setOnClickListener { viewModel.clickRegister() }
+        binding.goToRegButt.setOnClickListener { viewModel.clickRegister() }
     }
 }

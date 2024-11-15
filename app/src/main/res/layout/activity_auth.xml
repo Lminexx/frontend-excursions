@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingHorizontal="48dp">
-
-    <com.google.android.material.textfield.TextInputEditText
+    <EditText
         android:id="@+id/input_pass"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -17,14 +17,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_login" />
 
-    <com.google.android.material.textfield.TextInputEditText
+    <EditText
         android:id="@+id/input_login"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:hint="@string/login_hint"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/logo" />
 
@@ -34,13 +33,12 @@
         android:layout_height="140dp"
         android:layout_marginTop="92dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_launcher_foreground" />
 
     <Button
-        android:id="@+id/butt_reg"
+        android:id="@+id/go_to_reg_butt"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -48,7 +46,7 @@
         android:layout_marginEnd="4dp"
         android:text="@string/reg_string"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/butt_auth" />
 
@@ -60,9 +58,8 @@
         android:text="@string/login_string"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_pass"
-        app:layout_constraintVertical_bias="0.131" />
+        app:layout_constraintVertical_bias="0.189" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
