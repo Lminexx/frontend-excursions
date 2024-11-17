@@ -1,11 +1,13 @@
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapters.ExcursionAdapter
 import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.ui.main.MainActivity
 
 class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -15,13 +17,13 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val excursions = listOf(
-            Excursion("Excursion 1", "Description for excursion 1"),
-            Excursion("Excursion 2", "Description for excursion 2"),
-            Excursion("Excursion 3", "Description for excursion 3")
+            Excursion("Batman in Chicago", "Places for detonators"),
+            Excursion("Chill", "Для души..."),
+            Excursion("Я не придумал", "Я не придумал")
         )
 
         val adapter = ExcursionAdapter(excursions) { excursion ->
-            println("Clicked on: ${excursion.title}")
+            Toast.makeText(requireContext(), "Открывается " + excursion.title + ": \n" + excursion.description, Toast.LENGTH_SHORT).show()
         }
 
         recyclerView.adapter = adapter

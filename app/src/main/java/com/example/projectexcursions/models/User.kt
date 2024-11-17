@@ -1,4 +1,4 @@
-package com.example.projectexcursions.user
+package com.example.projectexcursions.models
 
 import kotlinx.serialization.Serializable
 
