@@ -9,10 +9,10 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.models.Excursion
 
 class ExcursionAdapter(
-    private var excursions: List<Excursion>,
-    private val listener: (Excursion) -> Unit
+    private var excursions: List<Excursion>
 ) : RecyclerView.Adapter<ExcursionAdapter.ExcursionViewHolder>() {
 
+    private var itemClickListener: ((Excursion) -> Unit)? = null
     inner class ExcursionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_excursion_title)
         private val descriptionTextView: TextView = itemView.findViewById(R.id.tv_excursion_description)
@@ -22,7 +22,7 @@ class ExcursionAdapter(
             descriptionTextView.text = excursion.description
 
             itemView.setOnClickListener {
-                listener(excursion)
+                itemClickListener?.invoke(excursion)
             }
         }
     }
@@ -41,5 +41,8 @@ class ExcursionAdapter(
     fun updateData(newExcursions: List<Excursion>) {
         excursions = newExcursions
         notifyDataSetChanged()
+    }
+    fun setOnItemClickListener(listener: (Excursion) -> Unit) {
+        itemClickListener = listener
     }
 }

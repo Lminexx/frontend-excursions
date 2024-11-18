@@ -28,6 +28,7 @@ class RegActivity: AppCompatActivity() {
             val repPass = binding.repeatPass.text.toString().trim()
 
             viewModel.validateAndRegister(login, password, repPass)
+            viewModel.clickRegButton()
         }
         binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
     }

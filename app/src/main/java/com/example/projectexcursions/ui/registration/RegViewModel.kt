@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectexcursions.net.ApiClient
-import com.example.projectexcursions.net.RegistrationResponse
 import retrofit2.Callback
 import com.example.projectexcursions.models.User
 import retrofit2.Response
@@ -36,13 +35,13 @@ class RegViewModel: ViewModel() {
 
     fun reg(login: String, password: String) {
         val user = User(login, password)
-        ApiClient.instance.registerUser(user).enqueue(object : Callback<RegistrationResponse> {
-            override fun onResponse(call: retrofit2.Call<RegistrationResponse>, response: Response<RegistrationResponse>) {
+        ApiClient.instance.registerUser(user).enqueue(object : Callback<String> {
+            override fun onResponse(call: retrofit2.Call<String>, response: Response<String>) {
                 if (response.isSuccessful)
                     _regStatus.value = true
             }
 
-            override fun onFailure(call: retrofit2.Call<RegistrationResponse>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<String>, t: Throwable) {
                 _regStatus.value = false
             }
         })
