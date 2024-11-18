@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Excursion(
+    val id: Int,
     val title: String,
     val description: String
 )
