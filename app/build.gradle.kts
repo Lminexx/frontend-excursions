@@ -77,10 +77,10 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
-    implementation(libs.material.v120)
-
-    kapt(libs.room.compiler)
-
     implementation(libs.retrofit)
     implementation(libs.room.runtime)
+    implementation(libs.shimmer)
+    implementation(libs.glide)
+
+    kapt(libs.room.compiler)
 }

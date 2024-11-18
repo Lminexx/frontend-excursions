@@ -9,7 +9,7 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.models.Excursion
 
 class ExcursionAdapter(
-    private val excursions: List<Excursion>,
+    private var excursions: List<Excursion>,
     private val listener: (Excursion) -> Unit
 ) : RecyclerView.Adapter<ExcursionAdapter.ExcursionViewHolder>() {
 
@@ -37,4 +37,9 @@ class ExcursionAdapter(
     }
 
     override fun getItemCount(): Int = excursions.size
+
+    fun updateData(newExcursions: List<Excursion>) {
+        excursions = newExcursions
+        notifyDataSetChanged()
+    }
 }

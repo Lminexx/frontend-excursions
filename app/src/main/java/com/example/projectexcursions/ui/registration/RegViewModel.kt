@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.projectexcursions.net.ApiClient
 import com.example.projectexcursions.net.RegistrationResponse
 import retrofit2.Callback
-import com.example.projectexcursions.user.User
+import com.example.projectexcursions.models.User
 import retrofit2.Response
 
 class RegViewModel: ViewModel() {
