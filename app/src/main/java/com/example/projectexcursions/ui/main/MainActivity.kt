@@ -1,10 +1,9 @@
 package com.example.projectexcursions.ui.main
 
-import ExListFragment
+import com.example.projectexcursions.ui.excursionslist.ExListFragment
 import FavFragment
 import MapFragment
 import ProfileFragment
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
