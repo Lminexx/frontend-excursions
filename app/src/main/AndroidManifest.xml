@@ -2,18 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
     <application
+        android:name=".MyApplication"
+        android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjectExcursions"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true">
         <activity
-            android:name="com.example.projectexcursions.ui.auth.AuthActivity"
+            android:name="com.example.projectexcursions.ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +25,7 @@
             android:exported="true">
         </activity>
         <activity
-            android:name="com.example.projectexcursions.ui.main.MainActivity"
+            android:name="com.example.projectexcursions.ui.auth.AuthActivity"
             android:exported="true">
         </activity>
     </application>
