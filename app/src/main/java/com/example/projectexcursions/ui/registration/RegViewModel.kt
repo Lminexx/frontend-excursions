@@ -1,9 +1,11 @@
 package com.example.projectexcursions.ui.registration
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectexcursions.net.ApiClient
+import com.example.projectexcursions.net.RegistrationResponse
 import retrofit2.Callback
 import com.example.projectexcursions.models.User
 import retrofit2.Response
@@ -34,15 +36,23 @@ class RegViewModel: ViewModel() {
     }
 
     fun reg(login: String, password: String) {
+        Log.d("RegViewModel", "Attempting to register user: $login")
         val user = User(login, password)
-        ApiClient.instance.registerUser(user).enqueue(object : Callback<String> {
-            override fun onResponse(call: retrofit2.Call<String>, response: Response<String>) {
-                if (response.isSuccessful)
-                    _regStatus.value = true
+        ApiClient.instance.registerUser(user).enqueue(object : Callback<Void> {
+            override fun onResponse(call: retrofit2.Call<Void>, response: Response<Void>) {
+                Log.d("RegViewModel", "Response received: ${response.code()}")
+                if(response.isSuccessful){
+                    Log.d("RegViewModel", "User registered successfully!")
+                    _regStatus.value = true;
+                }else{
+                    _regStatus.value=false;
+                    Log.e("RegViewModel", "Registration failed: ${response.errorBody()?.string()}")
+                }
             }
 
-            override fun onFailure(call: retrofit2.Call<String>, t: Throwable) {
+            override fun onFailure(call: retrofit2.Call<Void>, t: Throwable) {
                 _regStatus.value = false
+                Log.e("RegViewModel", "Request failed: ${t.message}")
             }
         })
     }

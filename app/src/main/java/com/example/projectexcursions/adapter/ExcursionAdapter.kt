@@ -4,25 +4,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.Excursion
 
 class ExcursionAdapter(
-    private var excursions: List<Excursion>
-) : RecyclerView.Adapter<ExcursionAdapter.ExcursionViewHolder>() {
+    private val listener: (Excursion) -> Unit
+) : PagingDataAdapter<Excursion, ExcursionAdapter.ExcursionViewHolder>(ExcursionDiffCallback) {
 
-    private var itemClickListener: ((Excursion) -> Unit)? = null
     inner class ExcursionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_excursion_title)
         private val descriptionTextView: TextView = itemView.findViewById(R.id.tv_excursion_description)
 
-        fun bind(excursion: Excursion) {
-            titleTextView.text = excursion.title
-            descriptionTextView.text = excursion.description
+        fun bind(excursion: Excursion?) {
+            if (excursion != null) {
+                titleTextView.text = excursion.title
+                descriptionTextView.text = excursion.description
 
-            itemView.setOnClickListener {
-                itemClickListener?.invoke(excursion)
+                itemView.setOnClickListener { listener(excursion) }
             }
         }
     }
@@ -33,16 +34,16 @@ class ExcursionAdapter(
     }
 
     override fun onBindViewHolder(holder: ExcursionViewHolder, position: Int) {
-        holder.bind(excursions[position])
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount(): Int = excursions.size
+    object ExcursionDiffCallback : DiffUtil.ItemCallback<Excursion>() {
+        override fun areItemsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
+            return oldItem.id == newItem.id
+        }
 
-    fun updateData(newExcursions: List<Excursion>) {
-        excursions = newExcursions
-        notifyDataSetChanged()
-    }
-    fun setOnItemClickListener(listener: (Excursion) -> Unit) {
-        itemClickListener = listener
+        override fun areContentsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
+            return oldItem == newItem
+        }
     }
 }
