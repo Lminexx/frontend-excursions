@@ -10,9 +10,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.Excursion
 
-class ExcursionAdapter(
-    private val listener: (Excursion) -> Unit
-) : PagingDataAdapter<Excursion, ExcursionAdapter.ExcursionViewHolder>(ExcursionDiffCallback) {
+class ExcursionAdapter : PagingDataAdapter<Excursion, ExcursionAdapter.ExcursionViewHolder>(ExcursionDiffCallback) {
+
+    var onExcursionClickListener: OnExcursionClickListener? = null
+    interface OnExcursionClickListener {
+        fun onExcursionClick(excursion: Excursion)
+    }
+    object ExcursionDiffCallback : DiffUtil.ItemCallback<Excursion>() {
+        override fun areItemsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
+            return oldItem == newItem
+        }
+    }
 
     inner class ExcursionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_excursion_title)
@@ -23,7 +35,9 @@ class ExcursionAdapter(
                 titleTextView.text = excursion.title
                 descriptionTextView.text = excursion.description
 
-                itemView.setOnClickListener { listener(excursion) }
+                itemView.setOnClickListener {
+                    onExcursionClickListener?.onExcursionClick(excursion)
+                }
             }
         }
     }
@@ -35,15 +49,5 @@ class ExcursionAdapter(
 
     override fun onBindViewHolder(holder: ExcursionViewHolder, position: Int) {
         holder.bind(getItem(position))
-    }
-
-    object ExcursionDiffCallback : DiffUtil.ItemCallback<Excursion>() {
-        override fun areItemsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
-            return oldItem == newItem
-        }
     }
 }

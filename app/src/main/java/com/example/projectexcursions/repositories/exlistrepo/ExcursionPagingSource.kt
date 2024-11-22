@@ -13,7 +13,7 @@ class ExcursionPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Excursion> {
         val position = params.key ?: 0
         return try {
-            val response = apiService.getExcursions(offset = position, limit = params.loadSize)
+            val response = apiService.getExcursions(page = position, limit = params.loadSize)
             if (response.isSuccessful) {
                 val excursions = response.body()?.content ?: emptyList()
                 val pageInfo = response.body()?.page

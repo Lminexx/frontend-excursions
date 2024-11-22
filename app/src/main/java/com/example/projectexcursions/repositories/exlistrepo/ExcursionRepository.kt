@@ -1,7 +1,7 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
 import androidx.paging.PagingSource
-import com.example.projectexcursions.databases.excursionsdb.ExcursionDao
+import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
@@ -15,7 +15,7 @@ class ExcursionRepository(
         return ExcursionPagingSource(apiService)
     }
 
-    fun getAllExcursionsFromDB(): List<Excursion> {
+    suspend fun getAllExcursionsFromDB(): List<Excursion> {
         return excursionDao.getAllExcursions()
     }
 
