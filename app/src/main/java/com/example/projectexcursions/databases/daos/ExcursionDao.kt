@@ -1,6 +1,5 @@
-package com.example.projectexcursions.databases.excursionsdb
+package com.example.projectexcursions.databases.daos
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -12,6 +11,6 @@ interface ExcursionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(excursions: List<Excursion>)
 
-    @Query("select * from excursions")
-    fun getAllExcursions(): List<Excursion>
+    @Query("select * from excursion")
+    suspend fun getAllExcursions(): List<Excursion>
 }

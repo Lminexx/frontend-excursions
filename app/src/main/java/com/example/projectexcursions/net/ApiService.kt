@@ -13,8 +13,8 @@ interface ApiService {
     fun registerUser(@Body user: User): Call<Void>
     //todo отображение ошибок, которые отправляют нам бекенд
     @GET("excursion")
-    fun getExcursions(
-        @Query("offset") offset: Int,
+    suspend fun getExcursions(
+        @Query("offset") page: Int,
         @Query("limit") limit: Int
     ): Response<ExcursionResponse>
     @POST("user/login")

@@ -21,10 +21,7 @@ class ExListViewModel(private val apiService: ApiService, private val repository
             enablePlaceholders = false
         ),
         pagingSourceFactory = { ExcursionPagingSource(apiService) }
-    ).flow
-        .cachedIn(viewModelScope)
-
-    val excursionsFromDatabase: List<Excursion> = repository.getAllExcursionsFromDB()
+    ).flow.cachedIn(viewModelScope)
 
     fun saveExcursionsToDatabase(excursions: List<Excursion>) {
         viewModelScope.launch {

@@ -13,6 +13,7 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapters.ExcursionAdapter
 import com.example.projectexcursions.databases.OpenWorldDB
 import com.example.projectexcursions.databinding.FragmentExcursionsListBinding
+import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiClient
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.ui.excursionslist.ExListViewModelFactory
@@ -43,11 +44,13 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
     }
 
     private fun initCallback() {
-        adapter = ExcursionAdapter { excursion ->
-            Toast.makeText(
-                requireContext(),
-                "Вы выбрали экскурсию: ${excursion.title}\n ${excursion.description}",
-                Toast.LENGTH_SHORT).show()
+        adapter = ExcursionAdapter()
+        adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
+            override fun onExcursionClick(excursion: Excursion) {
+                Toast.makeText(requireContext(),
+                    "Мы работаем над открытием ${excursion.title}: \n ${excursion.description}",
+                    Toast.LENGTH_SHORT).show()
+            }
         }
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
