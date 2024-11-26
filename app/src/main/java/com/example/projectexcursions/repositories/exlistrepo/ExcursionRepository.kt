@@ -6,18 +6,15 @@ import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
 import retrofit2.Response
+import javax.inject.Inject
 
-class ExcursionRepository(
+class ExcursionRepository @Inject constructor(
     private val apiService: ApiService,
     private val excursionDao: ExcursionDao
 ) {
-    fun getExcursionsPaging(): PagingSource<Int, Excursion> {
-        return ExcursionPagingSource(apiService)
-    }
+    fun getExcursionsPaging() = ExcursionPagingSource(apiService)
 
-    suspend fun getAllExcursionsFromDB(): List<Excursion> {
-        return excursionDao.getAllExcursions()
-    }
+    suspend fun getAllExcursionsFromDB() = excursionDao.getAllExcursions()
 
     suspend fun saveExcursionsToDB(excursions: List<Excursion>) {
         excursionDao.insertAll(excursions)

@@ -3,16 +3,16 @@ package com.example.projectexcursions.ui.auth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.registration.RegActivity
+import dagger.hilt.android.AndroidEntryPoint
 
-
-class AuthActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class AuthActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthBinding
     private val viewModel: AuthViewModel by viewModels()
@@ -29,7 +29,6 @@ class AuthActivity : AppCompatActivity() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
                 viewModel.token.observe(this) { token ->
-                    Log.d("logViewModel", "Нажал кнопочку войти")
                     saveToken(token)
                     startActivity(Intent(this@AuthActivity, MainActivity::class.java))
                 }

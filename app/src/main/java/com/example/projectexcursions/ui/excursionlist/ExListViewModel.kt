@@ -7,20 +7,21 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.projectexcursions.models.Excursion
-import com.example.projectexcursions.net.ApiService
-import com.example.projectexcursions.repositories.exlistrepo.ExcursionPagingSource
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ExListViewModel(private val apiService: ApiService, private val repository: ExcursionRepository) : ViewModel() {
+@HiltViewModel
+class ExListViewModel @Inject constructor(private val repository: ExcursionRepository) : ViewModel() {
 
     val excursionsFromApi: Flow<PagingData<Excursion>> = Pager(
         config = PagingConfig(
             pageSize = 10,
             enablePlaceholders = false
         ),
-        pagingSourceFactory = { ExcursionPagingSource(apiService) }
+        pagingSourceFactory = { repository.getExcursionsPaging() }
     ).flow.cachedIn(viewModelScope)
 
     fun saveExcursionsToDatabase(excursions: List<Excursion>) {

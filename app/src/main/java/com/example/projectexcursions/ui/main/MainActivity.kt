@@ -9,8 +9,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -25,7 +26,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.startMainActivity()
         initCallBack()
         subscribe()
     }
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initCallBack() {
-        binding.botNavView.setOnNavigationItemSelectedListener { item ->
+        binding.botNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.list -> viewModel.clickExList()
                 R.id.fav -> viewModel.clickFav()

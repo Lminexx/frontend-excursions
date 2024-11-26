@@ -6,12 +6,16 @@ import androidx.lifecycle.ViewModel
 import com.example.projectexcursions.net.ApiClient
 import com.example.projectexcursions.net.AuthResponse
 import com.example.projectexcursions.models.User
+import com.example.projectexcursions.net.ApiService
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-
-
-class AuthViewModel : ViewModel() {
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val apiService: ApiService
+): ViewModel() {
 
     private val _loginStatus = MutableLiveData<Boolean>()
     val loginStatus: LiveData<Boolean> get() = _loginStatus
@@ -41,7 +45,7 @@ class AuthViewModel : ViewModel() {
 
     fun login(login: String, password: String) {
         val user = User(login, password)
-        ApiClient.instance.authUser(user).enqueue(object : Callback<AuthResponse> {
+        apiService.authUser(user).enqueue(object : Callback<AuthResponse> {
             override fun onResponse(call: retrofit2.Call<AuthResponse>, response: Response<AuthResponse>) {
                 if (response.isSuccessful && response.body() != null) {
                     val token = response.body()!!.token

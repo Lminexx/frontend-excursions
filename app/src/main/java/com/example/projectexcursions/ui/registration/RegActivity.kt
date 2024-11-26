@@ -7,7 +7,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.databinding.ActivityRegBinding
 import com.example.projectexcursions.ui.auth.AuthActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RegActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityRegBinding

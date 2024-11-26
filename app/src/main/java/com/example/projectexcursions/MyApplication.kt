@@ -1,7 +1,9 @@
 package com.example.projectexcursions;
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class MyApplication : Application() {
 
     companion object {
@@ -21,6 +23,7 @@ class MyApplication : Application() {
             getInstance().getSharedPreferences("auth_prefs", MODE_PRIVATE)
                     .edit().putString("auth_token", token).apply()
         }
+
     }
 
     override fun onCreate() {
