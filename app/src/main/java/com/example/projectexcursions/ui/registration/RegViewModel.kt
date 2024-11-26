@@ -5,13 +5,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectexcursions.net.ApiClient
-import com.example.projectexcursions.net.RegistrationResponse
 import retrofit2.Callback
 import com.example.projectexcursions.models.User
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Response
+import javax.inject.Inject
 
-class RegViewModel: ViewModel() {
-    //TODO обзяательная проверка логина и пароля, если такие существуют - выдать исключение с сообщшением или просто сообщение с ошибкой
+@HiltViewModel
+class RegViewModel @Inject constructor(
+    private val apiClient: ApiClient
+): ViewModel() {
 
     private val _validationMessage = MutableLiveData<String?>()
     val validationMessage: LiveData<String?> get() = _validationMessage
@@ -52,7 +55,7 @@ class RegViewModel: ViewModel() {
 
             override fun onFailure(call: retrofit2.Call<Void>, t: Throwable) {
                 _regStatus.value = false
-                Log.e("RegViewModel", "Request failed: ${t.message}")
+
             }
         })
     }

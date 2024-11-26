@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
     kotlin("plugin.serialization")
+    id("com.google.dagger.hilt.android")
 }
 
 
@@ -26,6 +27,7 @@ android {
         arguments {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
+        correctErrorTypes = true
     }
 
 buildTypes {
@@ -90,9 +92,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.room.ktx)
-
-    kapt(libs.room.compiler)
-
+    implementation(libs.hilt.android)
     implementation(libs.retrofit)
     implementation(libs.room.runtime)
+
+    kapt(libs.hilt.android.compiler)
+    kapt(libs.room.compiler)
 }

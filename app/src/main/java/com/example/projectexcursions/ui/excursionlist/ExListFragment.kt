@@ -11,25 +11,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapters.ExcursionAdapter
-import com.example.projectexcursions.databases.OpenWorldDB
 import com.example.projectexcursions.databinding.FragmentExcursionsListBinding
 import com.example.projectexcursions.models.Excursion
-import com.example.projectexcursions.net.ApiClient
-import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
-import com.example.projectexcursions.ui.excursionslist.ExListViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
 
     private lateinit var binding: FragmentExcursionsListBinding
+
     private lateinit var adapter: ExcursionAdapter
-    private val viewModel: ExListViewModel by viewModels {
-        val apiClient = ApiClient
-        val dao = OpenWorldDB.getDatabase(requireContext()).excursionDao()
-        val repository = ExcursionRepository(apiClient.instance, dao)
-        ExListViewModelFactory(apiClient, repository)
-    }
+
+    private val viewModel: ExListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,7 +43,7 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
             override fun onExcursionClick(excursion: Excursion) {
                 Toast.makeText(requireContext(),
-                    "Мы работаем над открытием ${excursion.title}: \n ${excursion.description}",
+                    "Мы работаем над открытием ${excursion.title}: \n${excursion.description}",
                     Toast.LENGTH_SHORT).show()
             }
         }

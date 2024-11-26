@@ -3,7 +3,7 @@
     <string name="login_hint">Логин</string>
     <string name="password_hint">Пароль</string>
     <string name="login_string">Войти</string>
-    <string name="reg_string">Зарегестрироваться</string>
+    <string name="reg_string">Зарегистрироваться</string>
     <string name="repeat_password_hint">Повторите пароль</string>
     <string name="comeback_text">Вернуться назад</string>
     <string name="list">Список</string>
