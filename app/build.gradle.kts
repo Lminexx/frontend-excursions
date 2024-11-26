@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+
 android {
     namespace = "com.example.projectexcursions"
     compileSdk = 34
@@ -21,8 +22,13 @@ android {
             useSupportLibrary = true
         }
     }
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+    }
 
-    buildTypes {
+buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -58,6 +64,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     buildToolsVersion = "34.0.0"
 }
 
@@ -77,10 +84,16 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
-    implementation(libs.retrofit)
-    implementation(libs.room.runtime)
-    implementation(libs.shimmer)
-    implementation(libs.glide)
+    implementation(libs.material.v120)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.room.ktx)
 
     kapt(libs.room.compiler)
+
+    implementation(libs.retrofit)
+    implementation(libs.room.runtime)
+    implementation("com.auth0:java-jwt:3.18.2")
 }

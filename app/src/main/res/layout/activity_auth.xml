@@ -62,4 +62,14 @@
         app:layout_constraintTop_toBottomOf="@id/input_pass"
         app:layout_constraintVertical_bias="0.189" />
 
+    <Button
+        android:id="@+id/buttonBack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:text="@string/comeback_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/go_to_reg_butt" />
 </androidx.constraintlayout.widget.ConstraintLayout>

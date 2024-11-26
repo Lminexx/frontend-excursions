@@ -4,25 +4,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.Excursion
 
-class ExcursionAdapter(
-    private var excursions: List<Excursion>,
-    private val listener: (Excursion) -> Unit
-) : RecyclerView.Adapter<ExcursionAdapter.ExcursionViewHolder>() {
+class ExcursionAdapter : PagingDataAdapter<Excursion, ExcursionAdapter.ExcursionViewHolder>(ExcursionDiffCallback) {
+
+    var onExcursionClickListener: OnExcursionClickListener? = null
+    interface OnExcursionClickListener {
+        fun onExcursionClick(excursion: Excursion)
+    }
+    object ExcursionDiffCallback : DiffUtil.ItemCallback<Excursion>() {
+        override fun areItemsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
+            return oldItem == newItem
+        }
+    }
 
     inner class ExcursionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleTextView: TextView = itemView.findViewById(R.id.tv_excursion_title)
         private val descriptionTextView: TextView = itemView.findViewById(R.id.tv_excursion_description)
 
-        fun bind(excursion: Excursion) {
-            titleTextView.text = excursion.title
-            descriptionTextView.text = excursion.description
+        fun bind(excursion: Excursion?) {
+            if (excursion != null) {
+                titleTextView.text = excursion.title
+                descriptionTextView.text = excursion.description
 
-            itemView.setOnClickListener {
-                listener(excursion)
+                itemView.setOnClickListener {
+                    onExcursionClickListener?.onExcursionClick(excursion)
+                }
             }
         }
     }
@@ -33,13 +48,6 @@ class ExcursionAdapter(
     }
 
     override fun onBindViewHolder(holder: ExcursionViewHolder, position: Int) {
-        holder.bind(excursions[position])
-    }
-
-    override fun getItemCount(): Int = excursions.size
-
-    fun updateData(newExcursions: List<Excursion>) {
-        excursions = newExcursions
-        notifyDataSetChanged()
+        holder.bind(getItem(position))
     }
 }
