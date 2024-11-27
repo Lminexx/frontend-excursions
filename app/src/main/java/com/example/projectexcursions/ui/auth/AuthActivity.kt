@@ -6,28 +6,37 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.registration.RegActivity
-
+import com.example.projectexcursions.token_bd.TokenRepository
 
 class AuthActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthBinding
-    private val viewModel: AuthViewModel by viewModels()
+    private lateinit var viewModel: AuthViewModel
     private lateinit var backButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Создание tokenRepository
+        val tokenRepository = TokenRepository(this)
+
+        // Создание ViewModel с помощью фабрики
+        val factory = AuthViewModelFactory(tokenRepository)
+        viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
+
         binding.buttonBack.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
+
         initCallback()
         subscribe()
     }

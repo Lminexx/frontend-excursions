@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
     kotlin("plugin.serialization")
+    kotlin("kapt")
 }
 
 
@@ -96,4 +97,11 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.room.runtime)
     implementation("com.auth0:java-jwt:3.18.2")
+    implementation("androidx.room:room-runtime:2.4.2")
+    kapt("androidx.room:room-compiler:2.4.2")
+    implementation("com.auth0.android:jwtdecode:2.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+
+
 }

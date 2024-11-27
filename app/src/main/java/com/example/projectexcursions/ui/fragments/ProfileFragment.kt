@@ -20,16 +20,11 @@ class ProfileFragment:Fragment(R.layout.fragment_profile) {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
-        val token = getAuthToken()
-        if (!token.isNullOrEmpty()) {
-            if (isUserAuthenticated(token)) {
+        if (isUserAuthenticated()) {
 
 
-            } else {
-
-                startAuthActivity()
-            }
         } else {
+
 
             startAuthActivity()
         }
@@ -37,9 +32,8 @@ class ProfileFragment:Fragment(R.layout.fragment_profile) {
         return view
     }
 
-    private fun isUserAuthenticated(token: String): Boolean {
+    private fun isUserAuthenticated(): Boolean {
         return false
-
     }
 
     private fun startAuthActivity() {
