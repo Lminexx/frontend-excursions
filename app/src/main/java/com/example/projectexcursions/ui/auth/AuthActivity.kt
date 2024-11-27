@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.registration.RegActivity
@@ -33,7 +34,7 @@ class AuthActivity: AppCompatActivity() {
                     startActivity(Intent(this@AuthActivity, MainActivity::class.java))
                 }
             } else {
-                Toast.makeText(this, "Ошибка авторизации", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -55,7 +56,7 @@ class AuthActivity: AppCompatActivity() {
             val login = binding.inputLogin.text.toString().trim()
             val password = binding.inputPass.text.toString().trim()
 
-            viewModel.validateAndLogin(login, password)
+            viewModel.validateAndLogin(this ,login, password)
         }
         binding.goToRegButt.setOnClickListener { viewModel.clickRegister() }
     }

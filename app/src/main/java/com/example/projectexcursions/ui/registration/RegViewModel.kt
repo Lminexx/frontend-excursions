@@ -4,16 +4,20 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.projectexcursions.net.ApiClient
 import retrofit2.Callback
 import com.example.projectexcursions.models.User
+import com.example.projectexcursions.net.ApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
 class RegViewModel @Inject constructor(
-    private val apiClient: ApiClient
+    private val apiService: ApiService
 ): ViewModel() {
 
     private val _validationMessage = MutableLiveData<String?>()
@@ -39,25 +43,34 @@ class RegViewModel @Inject constructor(
     }
 
     fun reg(login: String, password: String) {
-        Log.d("RegViewModel", "Attempting to register user: $login")
-        val user = User(login, password)
-        ApiClient.instance.registerUser(user).enqueue(object : Callback<Void> {
-            override fun onResponse(call: retrofit2.Call<Void>, response: Response<Void>) {
-                Log.d("RegViewModel", "Response received: ${response.code()}")
-                if(response.isSuccessful){
-                    Log.d("RegViewModel", "User registered successfully!")
-                    _regStatus.value = true;
-                }else{
-                    _regStatus.value=false;
-                    Log.e("RegViewModel", "Registration failed: ${response.errorBody()?.string()}")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val user = User(login, password)
+                val response = apiService.registerUser(user)
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body?.code == 200) {
+                            Log.d("RegViewModel", "User registered successfully")
+                            _regStatus.value = true
+                        } else {
+                            Log.e("RegViewModel", "Registration failed: ${body?.code}")
+                            _regStatus.value = false
+                        }
+                    } else {
+                        val errorMessage = response.errorBody()?.string()
+                        Log.e("RegViewModel", "Server error: $errorMessage")
+                        _regStatus.value = false
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e("RegViewModel", "Network error", e)
+                    _regStatus.value = false
                 }
             }
-
-            override fun onFailure(call: retrofit2.Call<Void>, t: Throwable) {
-                _regStatus.value = false
-
-            }
-        })
+        }
     }
 
     fun clickRegButton() {

@@ -1,5 +1,6 @@
 package com.example.projectexcursions.databases.daos
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -13,4 +14,10 @@ interface ExcursionDao {
 
     @Query("select * from excursion")
     suspend fun getAllExcursions(): List<Excursion>
+
+    @Query("select * from excursion")
+    fun getPagingSource(): PagingSource<Int, Excursion>
+
+    @Query("delete from excursion")
+    suspend fun clearAll()
 }

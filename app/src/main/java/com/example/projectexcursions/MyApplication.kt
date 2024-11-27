@@ -17,13 +17,6 @@ class MyApplication : Application() {
         return getInstance().getSharedPreferences("auth_prefs", MODE_PRIVATE)
                 .getString("auth_token", null)
         }
-
-
-        fun saveAuthToken(token: String) {
-            getInstance().getSharedPreferences("auth_prefs", MODE_PRIVATE)
-                    .edit().putString("auth_token", token).apply()
-        }
-
     }
 
     override fun onCreate() {
