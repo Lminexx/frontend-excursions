@@ -1,9 +1,10 @@
 package com.example.projectexcursions.ui.auth
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.projectexcursions.net.ApiClient
+import com.example.projectexcursions.R
 import com.example.projectexcursions.net.AuthResponse
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
@@ -32,18 +33,18 @@ class AuthViewModel @Inject constructor(
     private val _validationMessage = MutableLiveData<String?>()
     val value : LiveData<String?> get() = _validationMessage
 
-    fun validateAndLogin(login: String, password: String) {
+    fun validateAndLogin(context: Context, login: String, password: String) {
         when {
-            login.isBlank() -> _validationMessage.value = "Введите логин"
-            password.isBlank() -> _validationMessage.value = "Введите пароль"
+            login.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_login)
+            password.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_password)
             else -> {
                 _validationMessage.value = null
-                login(login, password)
+                login(context, login, password)
             }
         }
     }
 
-    fun login(login: String, password: String) {
+    private fun login(context: Context, login: String, password: String) {
         val user = User(login, password)
         apiService.authUser(user).enqueue(object : Callback<AuthResponse> {
             override fun onResponse(call: retrofit2.Call<AuthResponse>, response: Response<AuthResponse>) {
@@ -53,13 +54,13 @@ class AuthViewModel @Inject constructor(
                     _loginStatus.value = true
                 } else {
                     _loginStatus.value = false
-                    _message.value = response.message() ?: "Ошибка авторизации"
+                    _message.value = response.message() ?: context.getString(R.string.error_auth)
                 }
             }
 
             override fun onFailure(call: retrofit2.Call<AuthResponse>, t: Throwable) {
                 _loginStatus.value = false
-                _message.value = t.localizedMessage ?: "Ошибка сети"
+                _message.value = t.localizedMessage ?: context.getString(R.string.error_net)
             }
         })
     }

@@ -16,13 +16,15 @@ import com.example.projectexcursions.models.Excursion
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
 
     private lateinit var binding: FragmentExcursionsListBinding
 
-    private lateinit var adapter: ExcursionAdapter
+    @Inject
+    lateinit var adapter: ExcursionAdapter
 
     private val viewModel: ExListViewModel by viewModels()
 
@@ -39,7 +41,6 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
     }
 
     private fun initCallback() {
-        adapter = ExcursionAdapter()
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
             override fun onExcursionClick(excursion: Excursion) {
                 Toast.makeText(requireContext(),
@@ -53,7 +54,7 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
 
     private fun subscribe() {
         lifecycleScope.launch {
-            viewModel.excursionsFromApi.collectLatest { pagingData ->
+            viewModel.excursions.collectLatest { pagingData ->
                 adapter.submitData(pagingData)
             }
         }

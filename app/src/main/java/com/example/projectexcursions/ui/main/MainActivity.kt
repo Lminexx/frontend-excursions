@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun subscribe() {
-
         viewModel.menuItem.observe(this) {menuItem ->
             when(menuItem) {
                 "" -> supportFragmentManager.beginTransaction().apply {

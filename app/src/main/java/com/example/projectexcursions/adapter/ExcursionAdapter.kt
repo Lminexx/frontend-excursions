@@ -1,41 +1,29 @@
 package com.example.projectexcursions.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.projectexcursions.R
+import com.example.projectexcursions.databinding.ItemExcursionBinding
 import com.example.projectexcursions.models.Excursion
+import javax.inject.Inject
 
-class ExcursionAdapter : PagingDataAdapter<Excursion, ExcursionAdapter.ExcursionViewHolder>(ExcursionDiffCallback) {
+class ExcursionAdapter @Inject constructor(
+    diffCallback: DiffUtil.ItemCallback<Excursion>
+) : PagingDataAdapter<Excursion, ExcursionAdapter.ExcursionViewHolder>(diffCallback) {
 
     var onExcursionClickListener: OnExcursionClickListener? = null
     interface OnExcursionClickListener {
         fun onExcursionClick(excursion: Excursion)
     }
-    object ExcursionDiffCallback : DiffUtil.ItemCallback<Excursion>() {
-        override fun areItemsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: Excursion, newItem: Excursion): Boolean {
-            return oldItem == newItem
-        }
-    }
-
-    inner class ExcursionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val titleTextView: TextView = itemView.findViewById(R.id.tv_excursion_title)
-        private val descriptionTextView: TextView = itemView.findViewById(R.id.tv_excursion_description)
-
+    inner class ExcursionViewHolder(private val binding: ItemExcursionBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(excursion: Excursion?) {
             if (excursion != null) {
-                titleTextView.text = excursion.title
-                descriptionTextView.text = excursion.description
+                binding.tvExcursionTitle.text = excursion.title
+                binding.tvExcursionDescription.text = excursion.description
 
-                itemView.setOnClickListener {
+                binding.root.setOnClickListener {
                     onExcursionClickListener?.onExcursionClick(excursion)
                 }
             }
@@ -43,8 +31,10 @@ class ExcursionAdapter : PagingDataAdapter<Excursion, ExcursionAdapter.Excursion
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExcursionViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_excursion, parent, false)
-        return ExcursionViewHolder(view)
+        val binding = ItemExcursionBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return ExcursionViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ExcursionViewHolder, position: Int) {

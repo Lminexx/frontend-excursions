@@ -4,7 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegistrationResponse(
-    val success: Boolean,
-    val message: String,
-    val userId: Int? = null
+    val code: Int
 )

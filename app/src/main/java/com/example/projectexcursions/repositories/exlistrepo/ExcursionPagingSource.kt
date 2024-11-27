@@ -6,6 +6,7 @@ import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiService
 import retrofit2.HttpException
 import java.io.IOException
+
 class ExcursionPagingSource(
     private val apiService: ApiService
 ) : PagingSource<Int, Excursion>() {
