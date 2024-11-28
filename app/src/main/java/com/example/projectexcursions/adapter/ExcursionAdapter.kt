@@ -9,7 +9,7 @@ import com.example.projectexcursions.databinding.ItemExcursionBinding
 import com.example.projectexcursions.models.Excursion
 import javax.inject.Inject
 
-class ExcursionAdapter @Inject constructor(
+class ExcursionAdapter(
     diffCallback: DiffUtil.ItemCallback<Excursion>
 ) : PagingDataAdapter<Excursion, ExcursionAdapter.ExcursionViewHolder>(diffCallback) {
 
