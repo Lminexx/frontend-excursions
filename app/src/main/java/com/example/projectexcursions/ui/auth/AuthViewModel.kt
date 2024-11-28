@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.auth
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -59,7 +60,7 @@ class AuthViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _loginStatus.value = false
-                _message.value = e.localizedMessage ?: context.getString(R.string.error_net)
+                _message.value = e.localizedMessage
             }
         }
     }
