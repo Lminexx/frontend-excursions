@@ -4,13 +4,12 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
-import com.example.projectexcursions.net.AuthResponse
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,24 +44,24 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun login(context: Context, login: String, password: String) {
-        val user = User(login, password)
-        apiService.authUser(user).enqueue(object : Callback<AuthResponse> {
-            override fun onResponse(call: retrofit2.Call<AuthResponse>, response: Response<AuthResponse>) {
-                if (response.isSuccessful && response.body() != null) {
-                    val token = response.body()!!.token
-                    _token.value = token
-                    _loginStatus.value = true
-                } else {
-                    _loginStatus.value = false
-                    _message.value = response.message() ?: context.getString(R.string.error_auth)
-                }
-            }
-
-            override fun onFailure(call: retrofit2.Call<AuthResponse>, t: Throwable) {
+        viewModelScope.launch {
+            try {
+                val user = User(login, password)
+                val response = apiService.authUser(user)
+                _token.value = response.token
+                _loginStatus.value = true
+            } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false
-                _message.value = t.localizedMessage ?: context.getString(R.string.error_net)
+                _message.value = when (e.code()) {
+                    401 -> context.getString(R.string.error_auth)
+                    403 -> context.getString(R.string.error_auth)
+                    else -> context.getString(R.string.error_auth)
+                }
+            } catch (e: Exception) {
+                _loginStatus.value = false
+                _message.value = e.localizedMessage ?: context.getString(R.string.error_net)
             }
-        })
+        }
     }
 
     fun clickAuth() {

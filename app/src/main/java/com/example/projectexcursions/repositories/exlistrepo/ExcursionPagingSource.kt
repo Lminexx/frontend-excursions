@@ -15,22 +15,20 @@ class ExcursionPagingSource(
         val position = params.key ?: 0
         return try {
             val response = apiService.getExcursions(page = position, limit = params.loadSize)
-            if (response.isSuccessful) {
-                val excursions = response.body()?.content ?: emptyList()
-                val pageInfo = response.body()?.page
+                val excursions = response.content
+                val pageInfo = response.page
 
                 LoadResult.Page(
                     data = excursions,
                     prevKey = if (position == 0) null else position - 1,
-                    nextKey = if ((pageInfo?.number ?: 0) < (pageInfo?.totalPages ?: 0)) position + 1 else null
+                    nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
                 )
-            } else {
-                LoadResult.Error(Exception("Ошибка при получении данных"))
-            }
         } catch (exception: IOException) {
-            LoadResult.Error(exception)
+            LoadResult.Error(Exception("Ошибка сети: ${exception.message}", exception))
         } catch (exception: HttpException) {
-            LoadResult.Error(exception)
+            LoadResult.Error(Exception("HTTP ошибка: ${exception.message()}", exception))
+        } catch (exception: Exception) {
+            LoadResult.Error(Exception("Неизвестная ошибка: ${exception.message}", exception))
         }
     }
 

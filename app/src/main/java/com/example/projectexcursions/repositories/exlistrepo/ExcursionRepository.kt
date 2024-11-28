@@ -2,7 +2,6 @@ package com.example.projectexcursions.repositories.exlistrepo
 
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ExcursionResponse
-import retrofit2.Response
 
 interface ExcursionRepository {
     fun getExcursionsPaging(): ExcursionPagingSource
@@ -11,5 +10,5 @@ interface ExcursionRepository {
 
     suspend fun saveExcursionsToDB(excursions: List<Excursion>)
 
-    suspend fun fetchExcursions(offset: Int, limit: Int): Response<ExcursionResponse>
+    suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionResponse
 }

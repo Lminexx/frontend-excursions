@@ -10,15 +10,15 @@ import retrofit2.http.Query
 
 interface ApiService {
     @POST("user")
-    suspend fun registerUser(@Body user: User): Response<RegistrationResponse>
+    suspend fun registerUser(@Body user: User): RegistrationResponse
     //todo отображение ошибок, которые отправляют нам бекенд
     @GET("excursion")
     suspend fun getExcursions(
         @Query("offset") page: Int,
         @Query("limit") limit: Int
-    ): Response<ExcursionResponse>
+    ): ExcursionResponse
     @POST("user/login")
-    fun authUser(@Body user: User): Call<AuthResponse>
+    suspend fun authUser(@Body user: User): AuthResponse
     //todo отображение ошибок, которые отправляют нам бекенд
 
 

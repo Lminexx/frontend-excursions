@@ -19,7 +19,7 @@ class ExcursionRepositoryImpl @Inject constructor(
         excursionDao.insertAll(excursions)
     }
 
-    override suspend fun fetchExcursions(offset: Int, limit: Int): Response<ExcursionResponse> {
+    override suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionResponse {
         return apiService.getExcursions(offset, limit)
     }
 }

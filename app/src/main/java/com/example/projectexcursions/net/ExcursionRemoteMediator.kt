@@ -27,14 +27,9 @@ class ExcursionRemoteMediator @Inject constructor(
         }
         return try {
             val response = repository.fetchExcursions(page, state.config.pageSize)
-            when (response.isSuccessful) {
-                true -> {
-                    val excursions = response.body()?.content ?: emptyList()
-                    repository.saveExcursionsToDB(excursions)
-                    MediatorResult.Success(endOfPaginationReached = excursions.isEmpty())
-                }
-                false -> MediatorResult.Error(Exception(response.message()))
-            }
+            val excursions = response.content
+            repository.saveExcursionsToDB(excursions)
+            MediatorResult.Success(endOfPaginationReached = excursions.isEmpty())
         } catch (e: Exception) {
             MediatorResult.Error(e)
         }
