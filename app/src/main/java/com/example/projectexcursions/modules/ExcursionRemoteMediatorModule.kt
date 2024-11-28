@@ -1,7 +1,7 @@
 package com.example.projectexcursions.modules
 
 import com.example.projectexcursions.net.ExcursionRemoteMediator
-import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
+import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +13,7 @@ object ExcursionRemoteMediatorModule {
 
     @Provides
     fun provideExRemoteMediator(
-        repo: ExcursionRepositoryImpl
+        repo: ExcursionRepository
     ): ExcursionRemoteMediator {
         return ExcursionRemoteMediator(repo)
     }
