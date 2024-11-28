@@ -46,7 +46,7 @@ class RegViewModel @Inject constructor(
             try {
                 val user = User(login, password)
                 val response = apiService.registerUser(user)
-                Log.d("RegistrationResponse", "Response: ${response}")
+                Log.d("RegistrationResponse", "Response: $response")
                 _regRespMes.value = "Пользователь зарегестрирован"
             } catch (e: Exception) {
                 Log.e("RegistrationError", "Ошибка при регистрации: ${e.message}")
