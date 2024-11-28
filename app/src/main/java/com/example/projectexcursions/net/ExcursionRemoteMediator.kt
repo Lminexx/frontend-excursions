@@ -5,12 +5,12 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.example.projectexcursions.models.Excursion
-import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
+import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class ExcursionRemoteMediator @Inject constructor(
-    private val repository: ExcursionRepositoryImpl
+    private val repository: ExcursionRepository
 ) : RemoteMediator<Int, Excursion>() {
     override suspend fun load(
         loadType: LoadType,
