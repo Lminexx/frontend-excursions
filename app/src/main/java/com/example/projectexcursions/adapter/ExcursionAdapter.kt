@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.databinding.ItemExcursionBinding
 import com.example.projectexcursions.models.Excursion
-import javax.inject.Inject
 
 class ExcursionAdapter(
     diffCallback: DiffUtil.ItemCallback<Excursion>
