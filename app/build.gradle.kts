@@ -86,7 +86,6 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
-<<<<<<< HEAD
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -98,12 +97,4 @@ dependencies {
     implementation(libs.androidx.room.paging)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
-=======
-    implementation(libs.retrofit)
-    implementation(libs.room.runtime)
-    implementation(libs.shimmer)
-    implementation(libs.glide)
-
-    kapt(libs.room.compiler)
->>>>>>> 41e3c83636f5296110d47b555effcfe828257636
 }
