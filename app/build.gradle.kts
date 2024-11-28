@@ -92,9 +92,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.hilt.android)
     implementation(libs.retrofit)
-    implementation(libs.room.runtime)
+    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.paging)
-    kapt(libs.room.compiler)
+    kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
 }

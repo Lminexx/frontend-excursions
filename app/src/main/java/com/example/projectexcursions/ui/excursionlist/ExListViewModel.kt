@@ -10,14 +10,14 @@ import androidx.paging.cachedIn
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ExcursionRemoteMediator
-import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
+import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
 class ExListViewModel @Inject constructor(
-    repository: ExcursionRepository,
+    repository: ExcursionRepositoryImpl,
     excursionDao: ExcursionDao
     ) : ViewModel() {
 
