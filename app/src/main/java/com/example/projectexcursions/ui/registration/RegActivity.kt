@@ -49,11 +49,16 @@ class RegActivity: AppCompatActivity() {
         }
 
         viewModel.regRespMes.observe(this) { response ->
-            Toast.makeText(this, response, Toast.LENGTH_SHORT).show()
+            response?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            } ?: run {
+                Toast.makeText(this, "Произошла ошибка", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        viewModel.validationMessage.observe(this) {message ->
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        viewModel.validationMessage.observe(this) { message ->
+            val finalMessage = message.takeIf { !it.isNullOrEmpty() } ?: "Неизвестная ошибка"
+            Toast.makeText(this, finalMessage, Toast.LENGTH_SHORT).show()
         }
     }
 }

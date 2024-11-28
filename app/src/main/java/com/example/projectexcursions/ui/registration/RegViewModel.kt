@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.registration
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,7 +36,6 @@ class RegViewModel @Inject constructor(
             repeatPassword.isBlank() -> _validationMessage.value = "Повторите пароль"
             password != repeatPassword -> _validationMessage.value = "Пароли не совпадают"
             else -> {
-                _validationMessage.value = null
                 reg(login, password)
             }
         }
@@ -46,23 +46,15 @@ class RegViewModel @Inject constructor(
             try {
                 val user = User(login, password)
                 val response = apiService.registerUser(user)
-
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    when (body?.code) {
-                        200 -> _regRespMes.value = "Пользователь зарегестрирован"
-                        400 -> _regRespMes.value = "Неверный запрос"
-                        429 -> _regRespMes.value = "Слишком много запросов за определённый промежуток времени"
-                        500 -> _regRespMes.value = "Проблема на стороне сервера"
-                    }
-                } else {
-                    _regRespMes.value = "нет подключения"
-                }
+                Log.d("RegistrationResponse", "Response: ${response}")
+                _regRespMes.value = "Пользователь зарегестрирован"
             } catch (e: Exception) {
-                _regRespMes.value = "Ошибка: \n$e"
+                Log.e("RegistrationError", "Ошибка при регистрации: ${e.message}")
+                _regRespMes.value = "Ошибка: \n${e.message}"
             }
         }
     }
+
 
     fun clickRegButton() {
         _regStatus.value = true
