@@ -7,7 +7,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.databinding.ActivityRegBinding
 import com.example.projectexcursions.ui.auth.AuthActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RegActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityRegBinding
@@ -42,19 +44,21 @@ class RegActivity: AppCompatActivity() {
 
         viewModel.regStatus.observe(this) { isSuccessful ->
             if (isSuccessful) {
-                Toast.makeText(this, "Регистрация успешна", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this, AuthActivity::class.java))
-            } else {
-                Toast.makeText(this, "Ошибка регистрации", Toast.LENGTH_SHORT).show()
             }
         }
 
-        viewModel.validationMessage.observe(this) {message ->
-            message?.let { Toast.makeText(this, it, Toast.LENGTH_SHORT).show() }
-                ?: run {
-                    startActivity(Intent(this@RegActivity, AuthActivity::class.java))
-                    viewModel.cameBack()
-                }
+        viewModel.regRespMes.observe(this) { response ->
+            response?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            } ?: run {
+                Toast.makeText(this, "Произошла ошибка", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.validationMessage.observe(this) { message ->
+            val finalMessage = message.takeIf { !it.isNullOrEmpty() } ?: "Неизвестная ошибка"
+            Toast.makeText(this, finalMessage, Toast.LENGTH_SHORT).show()
         }
     }
 }

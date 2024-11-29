@@ -3,7 +3,9 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
     kotlin("plugin.serialization")
+    id("com.google.dagger.hilt.android")
 }
+
 
 android {
     namespace = "com.example.projectexcursions"
@@ -21,8 +23,14 @@ android {
             useSupportLibrary = true
         }
     }
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+        correctErrorTypes = true
+    }
 
-    buildTypes {
+buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -58,6 +66,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     buildToolsVersion = "34.0.0"
 }
 
@@ -77,10 +86,15 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.hilt.android)
     implementation(libs.retrofit)
-    implementation(libs.room.runtime)
-    implementation(libs.shimmer)
-    implementation(libs.glide)
-
-    kapt(libs.room.compiler)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
+    kapt(libs.androidx.room.compiler)
+    kapt(libs.hilt.android.compiler)
 }
