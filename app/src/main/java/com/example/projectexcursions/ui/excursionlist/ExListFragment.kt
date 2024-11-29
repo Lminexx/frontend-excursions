@@ -1,10 +1,10 @@
 package com.example.projectexcursions.ui.excursionlist
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +13,7 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapters.ExcursionAdapter
 import com.example.projectexcursions.databinding.FragmentExcursionsListBinding
 import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.ui.excursion.ExcursionActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -41,11 +42,9 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
     }
 
     private fun initCallback() {
-        adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
+        adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener {
             override fun onExcursionClick(excursion: Excursion) {
-                Toast.makeText(requireContext(),
-                    "Мы работаем над открытием ${excursion.title}: \n${excursion.description}",
-                    Toast.LENGTH_SHORT).show()
+                viewModel.clickExcursion(excursion)
             }
         }
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
@@ -57,6 +56,18 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
             viewModel.excursions.collectLatest { pagingData ->
                 adapter.submitData(pagingData)
             }
+        }
+
+        viewModel.goToExcursion.observe(viewLifecycleOwner) { wantGoToEx ->
+            if (wantGoToEx) {
+                val excursion = viewModel.selectedExcursion
+                if (excursion != null) {
+                    startActivity(
+                        Intent(requireContext(), ExcursionActivity::class.java).putExtra("EXTRA_EXCURSION", excursion)
+                    )
+                }
+            }
+            viewModel.goneToExcursion()
         }
     }
 }
