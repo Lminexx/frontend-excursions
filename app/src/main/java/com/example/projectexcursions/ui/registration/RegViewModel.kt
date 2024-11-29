@@ -1,21 +1,29 @@
 package com.example.projectexcursions.ui.registration
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.projectexcursions.net.ApiClient
-import com.example.projectexcursions.net.RegistrationResponse
-import retrofit2.Callback
+import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.models.User
-import retrofit2.Response
+import com.example.projectexcursions.net.ApiService
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RegViewModel: ViewModel() {
-    //TODO обзяательная проверка логина и пароля, если такие существуют - выдать исключение с сообщшением или просто сообщение с ошибкой
+@HiltViewModel
+class RegViewModel @Inject constructor(
+    private val apiService: ApiService
+): ViewModel() {
 
     private val _validationMessage = MutableLiveData<String?>()
     val validationMessage: LiveData<String?> get() = _validationMessage
 
+    private val _regRespMes = MutableLiveData<String?>()
+    val regRespMes: LiveData<String?> get() = _regRespMes
+
     private val _regStatus = MutableLiveData<Boolean>()
+
     val regStatus: LiveData<Boolean> get() = _regStatus
 
     private val _wantComeBack = MutableLiveData<Boolean>()
@@ -28,25 +36,25 @@ class RegViewModel: ViewModel() {
             repeatPassword.isBlank() -> _validationMessage.value = "Повторите пароль"
             password != repeatPassword -> _validationMessage.value = "Пароли не совпадают"
             else -> {
-                _validationMessage.value = null
                 reg(login, password)
             }
         }
     }
 
-    fun reg(login: String, password: String) {
-        val user = User(login, password)
-        ApiClient.instance.registerUser(user).enqueue(object : Callback<RegistrationResponse> {
-            override fun onResponse(call: retrofit2.Call<RegistrationResponse>, response: Response<RegistrationResponse>) {
-                if (response.isSuccessful)
-                    _regStatus.value = true
+    private fun reg(login: String, password: String) {
+        viewModelScope.launch {
+            try {
+                val user = User(login, password)
+                val response = apiService.registerUser(user)
+                Log.d("RegistrationResponse", "Response: $response")
+                _regRespMes.value = "Пользователь зарегестрирован"
+            } catch (e: Exception) {
+                Log.e("RegistrationError", "Ошибка при регистрации: ${e.message}")
+                _regRespMes.value = "Ошибка: \n${e.message}"
             }
-
-            override fun onFailure(call: retrofit2.Call<RegistrationResponse>, t: Throwable) {
-                _regStatus.value = false
-            }
-        })
+        }
     }
+
 
     fun clickRegButton() {
         _regStatus.value = true

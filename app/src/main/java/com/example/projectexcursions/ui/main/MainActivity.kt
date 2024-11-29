@@ -1,19 +1,17 @@
 package com.example.projectexcursions.ui.main
 
-import ExListFragment
+import com.example.projectexcursions.ui.excursionlist.ExListFragment
 import FavFragment
 import MapFragment
 import ProfileFragment
-import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -28,30 +26,46 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setCurrentFragment(exListFragment)
-
         initCallBack()
         subscribe()
     }
 
-    private fun subscribe() {}
+    private fun subscribe() {
+        viewModel.menuItem.observe(this) {menuItem ->
+            when(menuItem) {
+                "" -> supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.fragment_container, exListFragment)
+                    commit()
+                }
+                "list" -> supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.fragment_container, exListFragment)
+                    commit()
+                }
+                "fav" -> supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.fragment_container, favFragment)
+                    commit()
+                }
+                "map" -> supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.fragment_container, mapFragment)
+                    commit()
+                }
+                "profile" -> supportFragmentManager.beginTransaction().apply {
+                    replace(R.id.fragment_container, profileFragment)
+                    commit()
+                }
+            }
+        }
+    }
 
     private fun initCallBack() {
-        binding.botNavView.setOnNavigationItemSelectedListener { item ->
+        binding.botNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.list -> setCurrentFragment(exListFragment)
-                R.id.fav -> setCurrentFragment(favFragment)
-                R.id.map -> setCurrentFragment(mapFragment)
-                R.id.profile -> setCurrentFragment(profileFragment)
-
+                R.id.list -> viewModel.clickExList()
+                R.id.fav -> viewModel.clickFav()
+                R.id.map -> viewModel.clickMap()
+                R.id.profile -> viewModel.clickProfile()
             }
             true
         }
     }
-
-    private fun setCurrentFragment(fragment: Fragment) =
-        supportFragmentManager.beginTransaction().apply {
-            replace(R.id.fragment_container, fragment)
-            commit()
-        }
 }
