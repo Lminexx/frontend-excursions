@@ -1,5 +1,7 @@
 package com.example.projectexcursions.ui.excursionlist
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.ExperimentalPagingApi
@@ -23,6 +25,11 @@ class ExListViewModel @Inject constructor(
 
     private val remoteMediator = ExcursionRemoteMediator(repository)
 
+    private val _goToExcursion = MutableLiveData(false)
+    val goToExcursion: LiveData<Boolean> get() = _goToExcursion
+
+    var selectedExcursion: Excursion? = null
+
     @OptIn(ExperimentalPagingApi::class)
     val excursions: Flow<PagingData<Excursion>> = Pager(
         config = PagingConfig(
@@ -32,4 +39,13 @@ class ExListViewModel @Inject constructor(
         remoteMediator = remoteMediator,
         pagingSourceFactory = { excursionDao.getPagingSource() }
     ).flow.cachedIn(viewModelScope)
+
+    fun clickExcursion(excursion: Excursion) {
+        selectedExcursion = excursion
+        _goToExcursion.value = true
+    }
+
+    fun goneToExcursion() {
+        _goToExcursion.value = false
+    }
 }
