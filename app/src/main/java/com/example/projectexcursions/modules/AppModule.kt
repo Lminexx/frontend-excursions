@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.projectexcursions.databases.OpenWorldDB
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.net.ApiService
+import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
 import dagger.Module
 import dagger.Provides
@@ -32,7 +33,7 @@ object AppModule {
     fun provideExcursionRepository(
         apiService: ApiService,
         excursionDao: ExcursionDao
-    ): ExcursionRepositoryImpl {
+    ): ExcursionRepository {
         return ExcursionRepositoryImpl(apiService, excursionDao)
     }
 }

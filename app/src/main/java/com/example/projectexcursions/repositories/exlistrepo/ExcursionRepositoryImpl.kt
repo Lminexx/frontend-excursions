@@ -4,10 +4,8 @@ import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
-import retrofit2.Response
-import javax.inject.Inject
 
-class ExcursionRepositoryImpl @Inject constructor(
+class ExcursionRepositoryImpl(
     private val apiService: ApiService,
     private val excursionDao: ExcursionDao
 ) : ExcursionRepository {
