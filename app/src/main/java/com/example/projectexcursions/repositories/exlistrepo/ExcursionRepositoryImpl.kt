@@ -4,6 +4,8 @@ import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class ExcursionRepositoryImpl(
     private val apiService: ApiService,
@@ -18,6 +20,8 @@ class ExcursionRepositoryImpl(
     }
 
     override suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionResponse {
-        return apiService.getExcursions(offset, limit)
+        return withContext(Dispatchers.IO) {
+            apiService.getExcursions(offset, limit)
+        }
     }
 }

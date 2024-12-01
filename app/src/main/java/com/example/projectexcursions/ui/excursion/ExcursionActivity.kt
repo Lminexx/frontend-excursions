@@ -33,7 +33,7 @@ class ExcursionActivity : AppCompatActivity() {
         if (::excursion.isInitialized) {
             binding.excursionTitle.text = excursion.title
             binding.excursionDescription.text = excursion.description
-            binding.excursionAuthor.text = excursion.authorId.toString()
+            binding.excursionAuthor.text = excursion.userId.toString()
         } else {
             Toast.makeText(this, "Экскурсия съедена", Toast.LENGTH_SHORT).show()
         }

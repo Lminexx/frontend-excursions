@@ -13,5 +13,5 @@ data class Excursion(
     @PrimaryKey val id: Int,
     val title: String,
     val description: String,
-    val authorId: Int
+    val userId: Long
 ): Parcelable
