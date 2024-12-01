@@ -1,5 +1,6 @@
 package com.example.projectexcursions.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -37,6 +38,8 @@ class ExcursionAdapter(
     }
 
     override fun onBindViewHolder(holder: ExcursionViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val excursion = getItem(position)
+        Log.d("ExcursionAdapter", "Binding excursion: $excursion")
+        holder.bind(excursion)
     }
 }

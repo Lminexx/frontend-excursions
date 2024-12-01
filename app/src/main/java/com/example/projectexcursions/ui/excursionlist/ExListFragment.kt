@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapters.ExcursionAdapter
@@ -54,6 +55,7 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
     private fun subscribe() {
         lifecycleScope.launch {
             viewModel.excursions.collectLatest { pagingData ->
+                adapter.submitData(PagingData.empty())
                 adapter.submitData(pagingData)
             }
         }
@@ -65,9 +67,9 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
                     startActivity(
                         Intent(requireContext(), ExcursionActivity::class.java).putExtra("EXTRA_EXCURSION", excursion)
                     )
+                    viewModel.goneToExcursion()
                 }
             }
-            viewModel.goneToExcursion()
         }
     }
 }
