@@ -1,6 +1,5 @@
 package com.example.projectexcursions.ui.main
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,11 +9,11 @@ import javax.inject.Inject
 @HiltViewModel
 open class MainViewModel @Inject constructor() : ViewModel() {
 
-    private val _menuItem = MutableLiveData<String>()
-    val menuItem: LiveData<String> get() = _menuItem
+    private val _menuItem = MutableLiveData<String?>()
+    val menuItem: LiveData<String?> get() = _menuItem
 
     fun startMainActivity() {
-        _menuItem.value = ""
+        _menuItem.value = null
     }
 
     fun clickExList() {

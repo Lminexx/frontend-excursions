@@ -1,22 +1,18 @@
 package com.example.projectexcursions.ui.excursionlist
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapters.ExcursionAdapter
-import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databinding.FragmentExcursionsListBinding
 import com.example.projectexcursions.models.Excursion
-import com.example.projectexcursions.ui.excursion.ExcursionActivity
+import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -65,10 +61,8 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
             if (wantGoToEx) {
                 val excursion = viewModel.selectedExcursion
                 if (excursion != null) {
-                    val intent = Intent(context, ExcursionActivity::class.java).apply {
-                        putExtra("EXTRA_EXCURSION", excursion)
-                    }
-                    context?.startActivity(intent) ?: Toast.makeText(context, "Context is null", Toast.LENGTH_SHORT).show()
+                    val intent = requireContext().createExcursionActivityIntent(excursion)
+                    startActivity(intent)
                     viewModel.goneToExcursion()
                 }
             }

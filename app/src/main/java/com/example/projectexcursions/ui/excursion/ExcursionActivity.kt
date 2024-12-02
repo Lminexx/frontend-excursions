@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.excursion
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -30,7 +31,7 @@ class ExcursionActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        excursion = intent.getParcelableExtra<Excursion>("EXTRA_EXCURSION")
+        excursion = intent.getParcelableExtra("EXTRA_EXCURSION")
             ?: run {
                 Toast.makeText(this, "Эксукрсию съели", Toast.LENGTH_SHORT).show()
                 finish()
@@ -53,5 +54,13 @@ class ExcursionActivity : AppCompatActivity() {
             startActivity(Intent(this@ExcursionActivity, MainActivity::class.java))
             viewModel.clickComeback()
         }
+    }
+
+    companion object {
+        private const val EXTRA_EXCURSION = "EXTRA_EXCURSION"
+
+        internal fun Context.createExcursionActivityIntent(excursion: Excursion): Intent =
+            Intent(this, ExcursionActivity::class.java)
+                .putExtra(EXTRA_EXCURSION, excursion)
     }
 }
