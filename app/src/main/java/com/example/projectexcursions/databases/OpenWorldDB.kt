@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.models.Excursion
 
-@Database(entities = [Excursion::class], version = 3)
+@Database(entities = [Excursion::class], version = 1)
 abstract class OpenWorldDB: RoomDatabase() {
     abstract fun excursionDao(): ExcursionDao
 
@@ -21,7 +21,8 @@ abstract class OpenWorldDB: RoomDatabase() {
                     context.applicationContext,
                     OpenWorldDB::class.java,
                     "OpenWorldDB"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
