@@ -15,4 +15,8 @@
     <string name="error_enter_password">Введите пароль</string>
     <string name="error_auth">Ошибка авторизации</string>
     <string name="error_net">Ошибка сети</string>
+    <string name="excursion_title">Заголовок экскурсии</string>
+    <string name="excursion_author">Автор экскурсии</string>
+    <string name="excursion_description">Описание экскурсии</string>
+    <string name="come_back">Вернуться</string>
 </resources>

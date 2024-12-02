@@ -28,5 +28,9 @@
             android:name="com.example.projectexcursions.ui.auth.AuthActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name="com.example.projectexcursions.ui.excursion.ExcursionActivity"
+            android:exported="true">
+        </activity>
     </application>
 </manifest>

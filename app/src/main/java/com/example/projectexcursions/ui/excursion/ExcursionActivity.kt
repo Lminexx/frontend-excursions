@@ -30,13 +30,16 @@ class ExcursionActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        if (::excursion.isInitialized) {
-            binding.excursionTitle.text = excursion.title
-            binding.excursionDescription.text = excursion.description
-            binding.excursionAuthor.text = excursion.userId.toString()
-        } else {
-            Toast.makeText(this, "Экскурсия съедена", Toast.LENGTH_SHORT).show()
-        }
+        excursion = intent.getParcelableExtra<Excursion>("EXTRA_EXCURSION")
+            ?: run {
+                Toast.makeText(this, "Эксукрсию съели", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
+
+        binding.excursionTitle.text = excursion.title
+        binding.excursionDescription.text = excursion.description
+        binding.excursionAuthor.text = excursion.userId?.toString() ?: "Автора съели"
     }
 
     private fun subscribe() {
