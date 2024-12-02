@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private fun subscribe() {
         viewModel.menuItem.observe(this) {menuItem ->
             when(menuItem) {
-                "" -> supportFragmentManager.beginTransaction().apply {
+                null -> supportFragmentManager.beginTransaction().apply {
                     replace(R.id.fragment_container, exListFragment)
                     commit()
                 }
