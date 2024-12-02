@@ -8,4 +8,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+ExcursionCardActivity.kt
+ExcursionCardViewModel.kt
 

@@ -11,4 +11,6 @@ interface ExcursionRepository {
     suspend fun saveExcursionsToDB(excursions: List<Excursion>)
 
     suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionResponse
+
+    suspend fun deleteAllExcursions()
 }

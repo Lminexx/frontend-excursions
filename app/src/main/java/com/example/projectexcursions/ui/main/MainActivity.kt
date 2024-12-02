@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel.startMainActivity()
         initCallBack()
         subscribe()
     }
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private fun subscribe() {
         viewModel.menuItem.observe(this) {menuItem ->
             when(menuItem) {
-                "" -> supportFragmentManager.beginTransaction().apply {
+                null -> supportFragmentManager.beginTransaction().apply {
                     replace(R.id.fragment_container, exListFragment)
                     commit()
                 }
