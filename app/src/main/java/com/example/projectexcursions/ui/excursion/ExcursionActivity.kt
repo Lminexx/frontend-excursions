@@ -32,7 +32,7 @@ class ExcursionActivity : AppCompatActivity() {
 
     private fun initData() {
         val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
-        if (excursionId == (-1).toLong()) {
+        if (excursionId == -1L) {
             Toast.makeText(this, "Invalidnaya exursia", Toast.LENGTH_SHORT).show()
             finish()
             return

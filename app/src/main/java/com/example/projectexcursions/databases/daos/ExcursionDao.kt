@@ -12,7 +12,7 @@ interface ExcursionDao {
     suspend fun insert(excursion: Excursion)
 
     @Query("SELECT * FROM excursion WHERE id = :id")
-    suspend fun getExcursionById(id: Long): Excursion
+    suspend fun getExcursionById(id: Long): Excursion?
 
     @Query("delete from excursion")
     suspend fun clearAll()

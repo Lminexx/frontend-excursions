@@ -1,6 +1,6 @@
 package com.example.projectexcursions.net
 
-import com.example.projectexcursions.models.ExcursionsList
+import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.User
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -12,7 +12,7 @@ interface ApiService {
     @POST("user")
     suspend fun registerUser(@Body user: User): RegistrationResponse
     //todo отображение ошибок, которые отправляют нам бекенд
-    @GET("excursionsList")
+    @GET("excursion")
     suspend fun getExcursions(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
@@ -20,10 +20,10 @@ interface ApiService {
     @POST("user/login")
     suspend fun authUser(@Body user: User): AuthResponse
     //todo отображение ошибок, которые отправляют нам бекенд
-    @GET("excursionsList/{id}")
+    @GET("excursion/{id}")
     suspend fun getExcursion(@Path("id") id: Long): ExcursionResponse
-    @POST("excursionsList/create")
-    suspend fun createExcursion(@Body excursionsList: ExcursionsList): ExcursionResponse
+    @POST("excursion/create")
+    suspend fun createExcursion(@Body excursion: Excursion): ExcursionResponse
 
     //todo миграция с http на https и
 }
