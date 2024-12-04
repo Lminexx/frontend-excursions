@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapters.ExcursionAdapter
 import com.example.projectexcursions.databinding.FragmentExcursionsListBinding
-import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -42,8 +42,8 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
 
     private fun initCallback() {
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener {
-            override fun onExcursionClick(excursion: Excursion) {
-                viewModel.clickExcursion(excursion)
+            override fun onExcursionClick(excursionsList: ExcursionsList) {
+                viewModel.clickExcursion(excursionsList)
             }
         }
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
@@ -59,9 +59,9 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
 
         viewModel.goToExcursion.observe(viewLifecycleOwner) { wantGoToEx ->
             if (wantGoToEx) {
-                val excursion = viewModel.selectedExcursion
+                val excursion = viewModel.selectedExcursionsList
                 if (excursion != null) {
-                    val intent = requireContext().createExcursionActivityIntent(excursion)
+                    val intent = requireContext().createExcursionActivityIntent(excursionId = excursion.id)
                     startActivity(intent)
                     viewModel.goneToExcursion()
                 }
