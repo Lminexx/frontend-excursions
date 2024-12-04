@@ -33,7 +33,7 @@ class ExcursionRepositoryImpl(
         return apiService.getExcursion(id)
     }
 
-    override suspend fun getExcursionFromDB(id: Long): Excursion {
+    override suspend fun getExcursionFromDB(id: Long): Excursion? {
         return excursionDao.getExcursionById(id)
     }
 

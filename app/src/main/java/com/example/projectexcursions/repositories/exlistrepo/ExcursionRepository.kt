@@ -18,7 +18,7 @@ interface ExcursionRepository {
 
     suspend fun fetchExcursion(id: Long): ExcursionResponse
 
-    suspend fun getExcursionFromDB(id: Long): Excursion
+    suspend fun getExcursionFromDB(id: Long): Excursion?
 
     suspend fun deleteAllExcursionsFromExcursions()
 

@@ -25,12 +25,15 @@ class ExcursionViewModel @Inject constructor(
     fun loadExcursion(excursionId: Long) {
         viewModelScope.launch {
             try {
-                val response = apiService.getExcursion(excursionId)
+                if (repository.getExcursionFromDB(excursionId) != null) {
+                    val excursionFromDB = repository.getExcursionFromDB(excursionId)
+                    _excursion.postValue(excursionFromDB)
+                } else {
+                    val response = apiService.getExcursion(excursionId)
+                    repository.saveExcursionToDB(response.excursion)
+                    _excursion.postValue(response.excursion)
+                }
 
-                repository.saveExcursionToDB(response.excursion)
-
-                val excursionFromDB = repository.getExcursionFromDB(excursionId)
-                _excursion.postValue(excursionFromDB)
             } catch (e: Exception) {
                 _excursion.postValue(null)
             }
