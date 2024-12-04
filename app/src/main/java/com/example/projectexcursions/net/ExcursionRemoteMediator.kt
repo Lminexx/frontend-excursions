@@ -4,17 +4,17 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
-import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class ExcursionRemoteMediator @Inject constructor(
     private val repository: ExcursionRepository
-) : RemoteMediator<Int, Excursion>() {
+) : RemoteMediator<Int, ExcursionsList>() {
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, Excursion>
+        state: PagingState<Int, ExcursionsList>
     ): MediatorResult {
         val page = when (loadType) {
             LoadType.REFRESH -> 0
@@ -24,7 +24,7 @@ class ExcursionRemoteMediator @Inject constructor(
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
                 lastItem.id
             }
-        }
+        }.toInt()
         return try {
             val response = repository.fetchExcursions(page, state.config.pageSize)
             val excursions = response.content

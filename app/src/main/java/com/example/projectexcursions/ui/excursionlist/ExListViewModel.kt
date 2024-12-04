@@ -9,11 +9,10 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.projectexcursions.databases.daos.ExcursionDao
-import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.databases.daos.ExcursionsDao
+import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ExcursionRemoteMediator
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
-import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -21,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExListViewModel @Inject constructor(
     repository: ExcursionRepository,
-    excursionDao: ExcursionDao
+    excursionsDao: ExcursionsDao
     ) : ViewModel() {
 
     private val remoteMediator = ExcursionRemoteMediator(repository)
@@ -29,20 +28,20 @@ class ExListViewModel @Inject constructor(
     private val _goToExcursion = MutableLiveData(false)
     val goToExcursion: LiveData<Boolean> get() = _goToExcursion
 
-    var selectedExcursion: Excursion? = null
+    var selectedExcursionsList: ExcursionsList? = null
 
     @OptIn(ExperimentalPagingApi::class)
-    val excursions: Flow<PagingData<Excursion>> = Pager(
+    val excursions: Flow<PagingData<ExcursionsList>> = Pager(
         config = PagingConfig(
             pageSize = 10,
             enablePlaceholders = false
         ),
         remoteMediator = remoteMediator,
-        pagingSourceFactory = { excursionDao.getPagingSource() }
+        pagingSourceFactory = { excursionsDao.getPagingSource() }
     ).flow.cachedIn(viewModelScope)
 
-    fun clickExcursion(excursion: Excursion) {
-        selectedExcursion = excursion
+    fun clickExcursion(excursionsList: ExcursionsList) {
+        selectedExcursionsList = excursionsList
         _goToExcursion.value = true
     }
 
