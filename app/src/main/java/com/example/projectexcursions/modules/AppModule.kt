@@ -3,6 +3,7 @@ package com.example.projectexcursions.modules
 import android.content.Context
 import com.example.projectexcursions.databases.OpenWorldDB
 import com.example.projectexcursions.databases.daos.ExcursionDao
+import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
@@ -23,8 +24,14 @@ object AppModule {
         return OpenWorldDB.getDatabase(context)
     }
 
+
     @Provides
-    fun provideExcursions(db: OpenWorldDB): ExcursionDao {
+    fun provideExcursions(db: OpenWorldDB): ExcursionsDao {
+        return db.excursionsDao()
+    }
+
+    @Provides
+    fun provideExcursion(db: OpenWorldDB): ExcursionDao {
         return db.excursionDao()
     }
 
@@ -32,8 +39,9 @@ object AppModule {
     @Singleton
     fun provideExcursionRepository(
         apiService: ApiService,
+        excursionsDao: ExcursionsDao,
         excursionDao: ExcursionDao
     ): ExcursionRepository {
-        return ExcursionRepositoryImpl(apiService, excursionDao)
+        return ExcursionRepositoryImpl(apiService, excursionsDao, excursionDao)
     }
 }

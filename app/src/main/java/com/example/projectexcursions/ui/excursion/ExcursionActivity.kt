@@ -31,21 +31,28 @@ class ExcursionActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        excursion = intent.getParcelableExtra("EXTRA_EXCURSION")
-            ?: run {
-                Toast.makeText(this, "Эксукрсию съели", Toast.LENGTH_SHORT).show()
-                finish()
-                return
-            }
-
-        binding.excursionTitle.text = excursion.title
-        binding.excursionDescription.text = excursion.description
-        binding.excursionAuthor.text = excursion.userId?.toString() ?: "Автора съели"
+        val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
+        if (excursionId == -1L) {
+            Toast.makeText(this, "Invalidnaya exursia", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+        viewModel.loadExcursion(excursionId)
     }
 
     private fun subscribe() {
         viewModel.comeBackToMainActivity.observe(this) { wannaComeback ->
             if (wannaComeback) viewModel.cameBack()
+        }
+
+        viewModel.excursion.observe(this) { excursion ->
+            if (excursion != null) {
+                binding.excursionTitle.text = excursion.title
+                binding.excursionAuthor.text = excursion.userId?.toString() ?: "Автора съели"
+                binding.excursionDescription.text = excursion.description
+            } else {
+                Toast.makeText(this, "Экскурсию съели", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -57,10 +64,10 @@ class ExcursionActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val EXTRA_EXCURSION = "EXTRA_EXCURSION"
+        private const val EXTRA_EXCURSION_ID = "EXTRA_EXCURSION_ID"
 
-        internal fun Context.createExcursionActivityIntent(excursion: Excursion): Intent =
+        internal fun Context.createExcursionActivityIntent(excursionId: Long): Intent =
             Intent(this, ExcursionActivity::class.java)
-                .putExtra(EXTRA_EXCURSION, excursion)
+                .putExtra(EXTRA_EXCURSION_ID, excursionId)
     }
 }
