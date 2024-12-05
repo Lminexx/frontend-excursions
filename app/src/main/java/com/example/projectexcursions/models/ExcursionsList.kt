@@ -8,8 +8,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @Serializable
-@Entity(tableName = "excursion")
-data class Excursion(
+@Entity(tableName = "excursions")
+data class ExcursionsList(
     @PrimaryKey val id: Long,
     val title: String,
     val description: String,

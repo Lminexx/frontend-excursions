@@ -2,19 +2,19 @@ package com.example.projectexcursions.repositories.exlistrepo
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ApiService
 import retrofit2.HttpException
 import java.io.IOException
 
 class ExcursionPagingSource(
     private val apiService: ApiService
-) : PagingSource<Int, Excursion>() {
+) : PagingSource<Int, ExcursionsList>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Excursion> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
         val position = params.key ?: 0
         return try {
-            val response = apiService.getExcursions(page = position, limit = params.loadSize)
+            val response = apiService.getExcursions(offset = position, limit = params.loadSize)
                 val excursions = response.content
                 val pageInfo = response.page
 
@@ -32,7 +32,7 @@ class ExcursionPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, Excursion>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
         return state.anchorPosition
     }
 }
