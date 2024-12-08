@@ -1,73 +1,68 @@
 package com.example.projectexcursions.ui.create_excursion
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.projectexcursions.models.Excursion
-import com.example.projectexcursions.net.ApiService
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
+import com.example.projectexcursions.ui.main.MainActivity
 
+class CreateExcursionActivity : AppCompatActivity() {
 
-@HiltViewModel
-class CreateExcursionViewModel @Inject constructor(
-    private val apiService: ApiService // Внедрение API сервиса.
-) : ViewModel() {
+    private lateinit var binding: ActivityExcursionCreateBinding
+    private val viewModel: CreateExcursionViewModel by viewModels()
 
-    private val _wantComeBack = MutableLiveData<Boolean>()
-    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityExcursionCreateBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-    private val _createExcursion = MutableLiveData<Boolean>()
-    val createExcursion: LiveData<Boolean> get() = _createExcursion
+        initCallback()
+        subscribe()
+    }
 
-    private val _wantCreateExc = MutableLiveData<Boolean>()
-    val wantCreateExc: LiveData<Boolean> get() = _wantCreateExc
-
-    private val _creationMessage = MutableLiveData<String?>()
-    val creationMessage: LiveData<String?> get() = _creationMessage
-
-    // Метод для создания экскурсии, аналогичный методу регистрации
-    fun createExcursion(title: String, description: String) {
-        if (excursionTitle.isBlank()) {
-            _creationMessage.value = "Введите название"
-            return
+    private fun initCallback() {
+        binding.buttonComeback.setOnClickListener { viewModel.clickComeBack() }
+        binding.buttonCreateExcursion.setOnClickListener {
+            // Получаем текст из полей ввода и передаем их в метод clickCreateButton.
+            val title = binding.excursionTitle.text.toString()
+            val description = binding.excursionDescription.text.toString()
+            viewModel.clickCreateButton(title, description)
         }
-        if (excursionDescription.isBlank()) {
-            _creationMessage.value = "Введите описание"
-            return
-        }
+    }
 
-        viewModelScope.launch {
-            try {
-                val excursion = Excursion(title, description)
-                val response = apiService.createExcursion(excursion)
-                Log.d("CreateExcursion", "Response: $response")
-                _creationMessage.value = "Экскурсия успешно создана"
-                _createExcursion.value = true
-            } catch (e: Exception) {
-                Log.e("CreateError", "Ошибка при создании экскурсии: ${e.message}")
-                _creationMessage.value = "Ошибка при создании: \n${e.message}"
-                _createExcursion.value = false
+    private fun subscribe() {
+        viewModel.wantComeBack.observe(this) { wannaComeBack ->
+            if (wannaComeBack) {
+                startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
+                viewModel.cameBack()
             }
         }
-    }
 
-    fun clickComeBack() {
-        _wantComeBack.value = true
-    }
+        viewModel.createExcursionStatus.observe(this) { isSuccessful ->
+            if (isSuccessful) {
+                Toast.makeText(this, "Экскурсия успешно создана", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
+                viewModel.excursionCreated()
+            } else {
+                // Показываем сообщение об ошибке создания экскурсии.
+                Toast.makeText(this, "Ошибка при создании экскурсии", Toast.LENGTH_SHORT).show()
+            }
+        }
 
-    fun cameBack() {
-        _wantComeBack.value = false
-    }
+        viewModel.validationMessage.observe(this) { message ->
+            message?.let {
+                // Показ сообщения о валидации пользователю.
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        }
 
-    fun clickCreateExcursion() {
-        createExcursion("", "") // Заменить на фактические данные или вызвать с параметрами извне.
-    }
-
-    fun excursionCreated() {
-        _createExcursion.value = false
+        viewModel.creationMessage.observe(this) { message ->
+            message?.let {
+                // Показать успешное или неудачное сообщение о создании.
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e00a8c04cdadaa414b8cd94dfd4d38dc",
+    "identityHash": "84354a91f1c90a61637478bcd56c0ed0",
     "entities": [
       {
         "tableName": "excursions",
@@ -44,12 +44,12 @@
       },
       {
         "tableName": "excursion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `userId` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `userId` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -84,7 +84,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e00a8c04cdadaa414b8cd94dfd4d38dc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '84354a91f1c90a61637478bcd56c0ed0')"
     ]
   }
 }

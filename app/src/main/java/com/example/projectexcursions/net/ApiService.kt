@@ -1,6 +1,5 @@
 package com.example.projectexcursions.net
 
-import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.User
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -23,7 +22,7 @@ interface ApiService {
     @GET("excursion/{id}")
     suspend fun getExcursion(@Path("id") id: Long): ExcursionResponse
     @POST("excursion/create")
-    suspend fun createExcursion(@Body excursion: Excursion): ExcursionResponse
+    suspend fun createExcursion(excursion1: String, @Body excursion: String): ExcursionResponse
 
     //todo миграция с http на https и
 }

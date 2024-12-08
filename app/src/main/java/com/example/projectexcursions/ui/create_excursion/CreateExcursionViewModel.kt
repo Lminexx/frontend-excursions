@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectexcursions.models.Excursion // Предполагаем, что у вас есть такой класс.
+import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -13,45 +13,49 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateExcursionViewModel @Inject constructor(
-    private val apiService: ApiService // Внедрение API сервиса.
+    private val apiService: ApiService
 ) : ViewModel() {
 
-    private val _wantComeBack = MutableLiveData<Boolean>()
-    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
-
-    private val _createExcursion = MutableLiveData<Boolean>()
-    val createExcursion: LiveData<Boolean> get() = _createExcursion
-
-    private val _wantCreateExc = MutableLiveData<Boolean>()
-    val wantCreateExc: LiveData<Boolean> get() = _wantCreateExc
+    private val _validationMessage = MutableLiveData<String?>()
+    val validationMessage: LiveData<String?> get() = _validationMessage
 
     private val _creationMessage = MutableLiveData<String?>()
     val creationMessage: LiveData<String?> get() = _creationMessage
 
-    // Метод для создания экскурсии, аналогичный методу регистрации
-    fun createExcursion(title: String, description: String) {
-        if (title.isBlank()) {
-            _creationMessage.value = "Введите название"
-            return
-        }
-        if (description.isBlank()) {
-            _creationMessage.value = "Введите описание"
-            return
-        }
+    private val _createExcursionStatus = MutableLiveData<Boolean>()
+    val createExcursionStatus: LiveData<Boolean> get() = _createExcursionStatus
 
+    private val _wantComeBack = MutableLiveData<Boolean>()
+    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
+
+    fun validateAndCreateExcursion(title: String, description: String, userId: String) {
+        when {
+            title.isBlank() -> _validationMessage.value = "Введите название"
+            description.isBlank() -> _validationMessage.value = "Введите описание"
+            else -> {
+                createExcursion(title, description, userId)
+            }
+        }
+    }
+
+    private fun createExcursion(title: String, description: String, userId: String) {
         viewModelScope.launch {
             try {
                 val excursion = Excursion(title, description)
-                val response = apiService.createExcursion(excursion)
+                val response = apiService.createExcursion(excursion, userId)
                 Log.d("CreateExcursion", "Response: $response")
                 _creationMessage.value = "Экскурсия успешно создана"
-                _createExcursion.value = true
+                _createExcursionStatus.value = true
             } catch (e: Exception) {
                 Log.e("CreateError", "Ошибка при создании экскурсии: ${e.message}")
                 _creationMessage.value = "Ошибка при создании: \n${e.message}"
-                _createExcursion.value = false
+                _createExcursionStatus.value = false
             }
         }
+    }
+
+    fun clickCreateButton(title: String, description: String, userId: String) {
+        validateAndCreateExcursion(title, description)
     }
 
     fun clickComeBack() {
@@ -62,11 +66,7 @@ class CreateExcursionViewModel @Inject constructor(
         _wantComeBack.value = false
     }
 
-    fun clickCreateExcursion() {
-        createExcursion("", "") // Замените на фактические данные или вызовите с параметрами извне.
-    }
-
     fun excursionCreated() {
-        _createExcursion.value = false
+        _createExcursionStatus.value = false
     }
 }
