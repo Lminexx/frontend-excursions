@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
+    id("dagger.hilt.android.plugin")
 }
 
 
@@ -98,4 +99,5 @@ dependencies {
     implementation(libs.androidx.room.paging)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
+    implementation("com.auth0.android:jwtdecode:2.0.1")
 }
