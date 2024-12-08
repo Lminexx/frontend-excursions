@@ -8,6 +8,7 @@ import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
+import com.example.projectexcursions.token_bd.DatabaseModule.MIGRATION_1_2
 
 @Database(entities = [ExcursionsList::class, Excursion::class], version = 1)
 abstract class OpenWorldDB: RoomDatabase() {
@@ -25,7 +26,7 @@ abstract class OpenWorldDB: RoomDatabase() {
                     context.applicationContext,
                     OpenWorldDB::class.java,
                     "OpenWorldDB"
-                ).fallbackToDestructiveMigration()
+                ).addMigrations(INITIAL_MIGRATION, MIGRATION_1_2) // Заменил fallbackToDestructiveMigration на addMigrations
                     .build()
                 INSTANCE = instance
                 instance

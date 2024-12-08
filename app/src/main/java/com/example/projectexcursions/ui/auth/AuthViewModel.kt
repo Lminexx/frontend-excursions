@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.auth
 
+
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.LiveData
@@ -9,14 +10,19 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
+import com.example.projectexcursions.token_bd.TokenEntity
+import com.example.projectexcursions.token_bd.TokenDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val apiService: ApiService
-): ViewModel() {
+    private val apiService: ApiService,
+    private val tokenDao: TokenDao // Инъекция зависимости DAO.
+) : ViewModel() {
 
     private val _loginStatus = MutableLiveData<Boolean>()
     val loginStatus: LiveData<Boolean> get() = _loginStatus
@@ -50,14 +56,19 @@ class AuthViewModel @Inject constructor(
                 val user = User(login, password)
                 val response = apiService.authUser(user)
                 _token.value = response.token
+
+                // Сохранение токена в базе данных.
+                tokenDao.insertToken(TokenEntity(token = response.token))
+
                 _loginStatus.value = true
             } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false
-                _message.value = when (e.code()) {
-                    401 -> context.getString(R.string.error_auth)
-                    403 -> context.getString(R.string.error_auth)
-                    else -> context.getString(R.string.error_auth)
-                }
+                _message.value =
+                    when (e.code()) {
+                        401 -> context.getString(R.string.error_auth)
+                        403 -> context.getString(R.string.error_auth)
+                        else -> context.getString(R.string.error_auth)
+                    }
             } catch (e: Exception) {
                 _loginStatus.value = false
                 _message.value = e.localizedMessage
@@ -66,18 +77,19 @@ class AuthViewModel @Inject constructor(
     }
 
     fun clickAuth() {
-        _loginStatus.value = true
+        _loginStatus.value= true
     }
 
     fun sucAuth() {
-        _loginStatus.value = false
+        _loginStatus.value= false
     }
 
     fun clickRegister() {
-        _wantReg.value = true
+        _wantReg.value= true
     }
 
     fun goneToReg() {
-        _wantReg.value = false
+        _wantReg.value= false
     }
 }
+

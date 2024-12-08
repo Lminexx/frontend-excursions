@@ -1,48 +1,73 @@
 package com.example.projectexcursions.ui.create_excursion
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
-import com.example.projectexcursions.ui.main.MainActivity
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.net.ApiService
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CreateExcursionActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityExcursionCreateBinding
-    private val viewModel: CreateExcursionViewModel by viewModels()
+@HiltViewModel
+class CreateExcursionViewModel @Inject constructor(
+    private val apiService: ApiService // Внедрение API сервиса.
+) : ViewModel() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityExcursionCreateBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    private val _wantComeBack = MutableLiveData<Boolean>()
+    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
-        initCallback()
-        subscribe()
-    }
+    private val _createExcursion = MutableLiveData<Boolean>()
+    val createExcursion: LiveData<Boolean> get() = _createExcursion
 
-    private fun initCallback() {
-        binding.buttonComeback.setOnClickListener { viewModel.clickComeBack() }
-        binding.buttonCreateExcursion.setOnClickListener { viewModel.clickCreateExcursion() }
-    }
+    private val _wantCreateExc = MutableLiveData<Boolean>()
+    val wantCreateExc: LiveData<Boolean> get() = _wantCreateExc
 
-    private fun subscribe() {
-        viewModel.wantComeBack.observe(this) {wannaComeBack ->
-            if (wannaComeBack) {
-                startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
-                viewModel.cameBack()
+    private val _creationMessage = MutableLiveData<String?>()
+    val creationMessage: LiveData<String?> get() = _creationMessage
+
+    // Метод для создания экскурсии, аналогичный методу регистрации
+    fun createExcursion(title: String, description: String) {
+        if (excursionTitle.isBlank()) {
+            _creationMessage.value = "Введите название"
+            return
+        }
+        if (excursionDescription.isBlank()) {
+            _creationMessage.value = "Введите описание"
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val excursion = Excursion(title, description)
+                val response = apiService.createExcursion(excursion)
+                Log.d("CreateExcursion", "Response: $response")
+                _creationMessage.value = "Экскурсия успешно создана"
+                _createExcursion.value = true
+            } catch (e: Exception) {
+                Log.e("CreateError", "Ошибка при создании экскурсии: ${e.message}")
+                _creationMessage.value = "Ошибка при создании: \n${e.message}"
+                _createExcursion.value = false
             }
         }
+    }
 
-        viewModel.wantCreateExc.observe(this) {wannaCreate ->
-            if (wannaCreate) {}
-        }
+    fun clickComeBack() {
+        _wantComeBack.value = true
+    }
 
-        viewModel.createExcursion.observe(this) {isSuccessful ->
-            if (isSuccessful) {
-                startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
-                viewModel.excursionCreated()
-            }
-        }
+    fun cameBack() {
+        _wantComeBack.value = false
+    }
+
+    fun clickCreateExcursion() {
+        createExcursion("", "") // Заменить на фактические данные или вызвать с параметрами извне.
+    }
+
+    fun excursionCreated() {
+        _createExcursion.value = false
     }
 }

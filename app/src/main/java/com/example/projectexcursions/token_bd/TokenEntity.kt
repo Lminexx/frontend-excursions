@@ -3,8 +3,10 @@ package com.example.projectexcursions.token_bd
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "tokens")
+
+
+@Entity(tableName = "token_table")
 data class TokenEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val id: Int = 0,
     val token: String
 )

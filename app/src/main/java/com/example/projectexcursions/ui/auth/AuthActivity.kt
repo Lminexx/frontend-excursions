@@ -1,6 +1,5 @@
 package com.example.projectexcursions.ui.auth
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -13,7 +12,7 @@ import com.example.projectexcursions.ui.registration.RegActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class AuthActivity: AppCompatActivity() {
+class AuthActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthBinding
     private val viewModel: AuthViewModel by viewModels()
@@ -30,7 +29,6 @@ class AuthActivity: AppCompatActivity() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
                 viewModel.token.observe(this) { token ->
-                    saveToken(token)
                     startActivity(Intent(this@AuthActivity, MainActivity::class.java))
                 }
             } else {
@@ -46,18 +44,21 @@ class AuthActivity: AppCompatActivity() {
         }
     }
 
-    private fun saveToken(token: String) {
-        val sharedPreferences = getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("auth_token", token).apply()
-    }
-
     private fun initCallback() {
         binding.buttAuth.setOnClickListener {
             val login = binding.inputLogin.text.toString().trim()
             val password = binding.inputPass.text.toString().trim()
-
-            viewModel.validateAndLogin(this ,login, password)
+            viewModel.validateAndLogin(this, login, password)
         }
-        binding.goToRegButt.setOnClickListener { viewModel.clickRegister() }
+
+        binding.goToRegButt.setOnClickListener {
+            viewModel.clickRegister()
+        }
+
+        binding.buttonBack.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }

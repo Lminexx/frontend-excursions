@@ -1,57 +1,114 @@
 package com.example.projectexcursions.ui.fragments
 
-import androidx.fragment.app.Fragment
-import com.example.projectexcursions.R
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import com.example.projectexcursions.token_bd.TokenRepository
+import android.widget.Button
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.auth0.android.jwt.JWT
+import com.example.projectexcursions.R
+import com.example.projectexcursions.token_bd.TokenDao
 import com.example.projectexcursions.ui.auth.AuthActivity
-import com.example.projectexcursions.ui.auth.AuthViewModel
-import com.example.projectexcursions.ui.auth.AuthViewModelFactory
+import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class ProfileFragment : Fragment(R.layout.fragment_profile) {
+@AndroidEntryPoint
+class ProfileFragment : Fragment() {
 
-    private lateinit var authViewModel: AuthViewModel
-    private lateinit var profileInfoTextView: TextView
+    @Inject lateinit var tokenDao: TokenDao
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val tokenRepository = TokenRepository(requireContext())
-        val factory = AuthViewModelFactory(tokenRepository)
-        authViewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
+        return inflater.inflate(R.layout.fragment_profile, container, false)
+    }
 
-        val view = inflater.inflate(R.layout.fragment_profile, container, false)
-        profileInfoTextView = view.findViewById(R.id.profile_info)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        // Проверка аутентификации
-        authViewModel.checkAndDecodeToken().observe(viewLifecycleOwner, Observer { claims ->
-            if (claims != null) {
-                // Пользователь аутентифицирован
-                displayUserInfo(claims)
-            } else {
-                // Пользователь не аутентифицирован, переходим на экран аутентификации
-                startAuthActivity()
+        checkToken()
+
+
+        view.findViewById<Button>(R.id.button_create_excursion).setOnClickListener {
+            navigateToCreateExcursionActivity()
+        }
+    }
+
+    private fun checkToken() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val tokenEntity = tokenDao.getToken() // Получение токена из БД.
+
+                if (tokenEntity == null) {
+                    // Если токен отсутствует в базе данных, переходим к авторизации.
+                    withContext(Dispatchers.Main) {
+                        navigateToAuthActivity()
+                    }
+                } else if (isValidToken(tokenEntity.token)) {
+                    // Если токен валиден, извлекаем имя пользователя.
+                    val userName = extractUserNameFromToken(tokenEntity.token)
+                    withContext(Dispatchers.Main) {
+                        showUserName(userName)
+                    }
+                } else {
+                    // Если токен невалиден, запускаем AuthActivity для авторизации.
+                    withContext(Dispatchers.Main) {
+                        navigateToAuthActivity()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Ошибка при проверке токена", Toast.LENGTH_SHORT).show()
+                    navigateToAuthActivity()
+                }
             }
-        })
-
-        return view
+        }
     }
-    private fun displayUserInfo(claims: Map<String, Any>) {
-        // Извлеките необходимые данные из claims и отобразите их
-        val userName = claims["name"] as? String ?: "Неизвестный пользователь"
 
-        profileInfoTextView.text = "Имя пользователя: $userName"
-    }
-    private fun startAuthActivity() {
-        val intent = Intent(requireActivity(), AuthActivity::class.java)
+    private fun navigateToAuthActivity() {
+        val intent = Intent(requireContext(), AuthActivity::class.java)
         startActivity(intent)
+        requireActivity().finish()
+    }
+
+    // Новая функция для перехода в CreateExcursionActivity.
+    private fun navigateToCreateExcursionActivity() {
+        val intent = Intent(requireContext(), CreateExcursionActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun isValidToken(token: String): Boolean {
+        return try {
+            val jwt = JWT(token)
+            !jwt.isExpired(10) // Проверка на истечение срока действия за 10 секунд от текущего времени.
+        } catch (e: Exception) {
+            false // Если возникло исключение при декодировании, считаем токен невалидным.
+        }
+    }
+
+    private fun extractUserNameFromToken(token: String): String? {
+        return try {
+            val jwt = JWT(token)
+            jwt.getClaim("user_name").asString() // Извлечение имени пользователя из claim "user_name".
+        } catch (e: Exception) {
+            null // В случае ошибки возвращаем null.
+        }
+    }
+
+    private fun showUserName(userName: String?) {
+        userName?.let {
+            Toast.makeText(requireContext(), "Привет, $it", Toast.LENGTH_SHORT).show()
+        } ?: run {
+            Toast.makeText(requireContext(), "Имя пользователя не найдено", Toast.LENGTH_SHORT).show()
+        }
     }
 }

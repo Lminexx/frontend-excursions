@@ -3,7 +3,7 @@ package com.example.projectexcursions.ui.main
 import com.example.projectexcursions.ui.excursionlist.ExListFragment
 import FavFragment
 import MapFragment
-import ProfileFragment
+import com.example.projectexcursions.ui.fragments.ProfileFragment
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
