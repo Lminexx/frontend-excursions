@@ -22,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/white"
+        app:itemIconTint="@color/dark_grey"
         app:itemTextColor="@color/dark_grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
