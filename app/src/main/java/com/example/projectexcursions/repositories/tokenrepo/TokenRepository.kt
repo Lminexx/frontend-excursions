@@ -5,7 +5,7 @@ import com.example.projectexcursions.models.Token
 interface TokenRepository {
     suspend fun saveToken(token: String)
 
-    suspend fun getToken(): String?
+    suspend fun getToken(): Token?
 
     fun isTokenValid(token: String): Boolean
 

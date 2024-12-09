@@ -9,19 +9,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 open class MainViewModel @Inject constructor(
-    private val tokenRepository: TokenRepository
+    private val repository: TokenRepository
 ) : ViewModel() {
 
     private val _menuItem = MutableLiveData<String?>()
     val menuItem: LiveData<String?> get() = _menuItem
 
+
     private val _isAuth = MutableLiveData<Boolean>()
-
     val isAuth: LiveData<Boolean> get() = _isAuth
-
-    fun startMainActivity() {
-        _menuItem.value = null
-    }
 
     fun clickExList() {
         _menuItem.value = "list"
@@ -40,7 +36,7 @@ open class MainViewModel @Inject constructor(
     }
 
     suspend fun checkAuthStatus() {
-        val token = tokenRepository.getToken()
+        val token = repository.getToken()
         _isAuth.value = token != null
     }
 }

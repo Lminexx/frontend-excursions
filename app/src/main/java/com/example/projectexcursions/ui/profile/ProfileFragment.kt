@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.FragmentProfileBinding
+import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.excursion.ExcursionActivity
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,20 +34,24 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        initCallback()
+        subscribe()
     }
 
     private fun initCallback() {
+        binding.buttCreateExcursion.setOnClickListener { viewModel.clickCreateExcursion() }
     }
 
     private fun subscribe() {
-        TODO("Not yet implemented")
-    }
-    companion object {
-        private const val TOKEN = "TOKEN"
+        viewModel.wantCreate.observe(viewLifecycleOwner) {wannaCreate ->
+            if (wannaCreate) {
+                startActivity(Intent(requireContext(), CreateExcursionActivity::class.java))
+                viewModel.isCreating()
+            }
+        }
 
-        internal fun Context.createProfileIntent(token: String): Intent =
-            Intent(this, MainActivity::class.java)
-                .putExtra(TOKEN, token)
+        viewModel.username.observe(viewLifecycleOwner) {
+            username -> binding.userNicknameTextView.text = username
+        }
     }
 }
