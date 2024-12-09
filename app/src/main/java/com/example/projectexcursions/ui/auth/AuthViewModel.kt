@@ -9,13 +9,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val tokenRepository: TokenRepository
 ): ViewModel() {
 
     private val _loginStatus = MutableLiveData<Boolean>()
@@ -51,6 +53,7 @@ class AuthViewModel @Inject constructor(
                 val response = apiService.authUser(user)
                 _token.value = response.token
                 _loginStatus.value = true
+                tokenRepository.saveToken(_token.value.toString())
             } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false
                 _message.value = when (e.code()) {
@@ -69,7 +72,7 @@ class AuthViewModel @Inject constructor(
         _loginStatus.value = true
     }
 
-    fun sucAuth() {
+    fun clickedAuth() {
         _loginStatus.value = false
     }
 
