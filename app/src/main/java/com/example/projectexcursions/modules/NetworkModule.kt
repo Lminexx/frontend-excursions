@@ -1,6 +1,6 @@
 package com.example.projectexcursions.modules
 
-import com.example.projectexcursions.MyApplication
+import com.example.projectexcursions.OpenWorldApp
 import com.example.projectexcursions.net.ApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -13,7 +13,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.create
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -33,7 +32,7 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor {chain ->
-                val token = MyApplication.getAuthToken()
+                val token = OpenWorldApp.getAuthToken()
                 val request = chain.request()
                 val requestBuilder = request.newBuilder()
                 if (token != null) {

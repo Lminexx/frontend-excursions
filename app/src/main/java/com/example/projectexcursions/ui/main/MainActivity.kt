@@ -3,13 +3,17 @@ package com.example.projectexcursions.ui.main
 import com.example.projectexcursions.ui.excursionlist.ExListFragment
 import FavFragment
 import MapFragment
-import ProfileFragment
+import android.content.Intent
+import com.example.projectexcursions.ui.profile.ProfileFragment
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityMainBinding
+import com.example.projectexcursions.ui.auth.AuthActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -50,9 +54,20 @@ class MainActivity : AppCompatActivity() {
                     replace(R.id.fragment_container, mapFragment)
                     commit()
                 }
-                "profile" -> supportFragmentManager.beginTransaction().apply {
-                    replace(R.id.fragment_container, profileFragment)
-                    commit()
+                "profile" -> {
+                    lifecycleScope.launch {
+                        viewModel.checkAuthStatus()
+                    }
+                    viewModel.isAuth.observe(this) {isAuth ->
+                        if (isAuth) {
+                            supportFragmentManager.beginTransaction().apply {
+                                replace(R.id.fragment_container, profileFragment)
+                                commit()
+                            }
+                        } else {
+                            startActivity(Intent(this@MainActivity, AuthActivity::class.java))
+                        }
+                    }
                 }
             }
         }

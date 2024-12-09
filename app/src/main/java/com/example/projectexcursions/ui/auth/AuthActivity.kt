@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.main.MainActivity
+import com.example.projectexcursions.ui.profile.ProfileFragment.Companion.createProfileIntent
 import com.example.projectexcursions.ui.registration.RegActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,7 +31,8 @@ class AuthActivity: AppCompatActivity() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
                 viewModel.token.observe(this) { token ->
-                    saveToken(token)
+                    auth(token)
+                    val intent = this.createProfileIntent(token = token)
                     startActivity(Intent(this@AuthActivity, MainActivity::class.java))
                 }
             } else {
@@ -46,7 +48,7 @@ class AuthActivity: AppCompatActivity() {
         }
     }
 
-    private fun saveToken(token: String) {
+    private fun auth(token: String) {
         val sharedPreferences = getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
         sharedPreferences.edit().putString("auth_token", token).apply()
     }

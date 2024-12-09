@@ -25,5 +25,5 @@ interface ApiService {
     @POST("excursion/create")
     suspend fun createExcursion(@Body excursion: Excursion): ExcursionResponse
 
-    //todo миграция с http на https и
+    //todo миграция с http на https
 }

@@ -4,13 +4,13 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class MyApplication : Application() {
+class OpenWorldApp : Application() {
 
     companion object {
-        private var instance: MyApplication? = null
+        private var instance: OpenWorldApp? = null
 
-        fun getInstance(): MyApplication {
-            return instance ?: throw IllegalStateException("MyApplication is not initialized")
+        fun getInstance(): OpenWorldApp {
+            return instance ?: throw IllegalStateException("OpenWorldApp is not initialized")
         }
 
         fun getAuthToken(): String? {
