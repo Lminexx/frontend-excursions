@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.auth
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.main.MainActivity
-import com.example.projectexcursions.ui.profile.ProfileFragment.Companion.createProfileIntent
 import com.example.projectexcursions.ui.registration.RegActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,9 +31,12 @@ class AuthActivity: AppCompatActivity() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
                 viewModel.token.observe(this) { token ->
-                    auth(token)
-                    val intent = this.createProfileIntent(token = token)
-                    startActivity(Intent(this@AuthActivity, MainActivity::class.java))
+                if (token != null) {
+                    viewModel.saveToken(token)
+                    val intent = createAuthResultIntent(true)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
+                    }
                 }
             } else {
                 Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()
@@ -48,18 +51,20 @@ class AuthActivity: AppCompatActivity() {
         }
     }
 
-    private fun auth(token: String) {
-        val sharedPreferences = getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("auth_token", token).apply()
-    }
-
     private fun initCallback() {
         binding.buttAuth.setOnClickListener {
             val login = binding.inputLogin.text.toString().trim()
             val password = binding.inputPass.text.toString().trim()
-
             viewModel.validateAndLogin(this ,login, password)
         }
-        binding.goToRegButt.setOnClickListener { viewModel.clickRegister() }
+        binding.buttReg.setOnClickListener { viewModel.clickRegister() }
+    }
+
+    companion object {
+        private const val EXTRA_AUTH_STATUS = "EXTRA_AUTH_STATUS"
+
+        internal fun Context.createAuthResultIntent(isAuthSuccess: Boolean): Intent =
+            Intent(this, MainActivity::class.java)
+                .putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
     }
 }

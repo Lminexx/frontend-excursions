@@ -1,7 +1,7 @@
 package com.example.projectexcursions.ui.auth
 
 import android.content.Context
-import android.widget.Toast
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,9 +26,6 @@ class AuthViewModel @Inject constructor(
     private val _wantReg = MutableLiveData<Boolean>()
     val wantReg: LiveData<Boolean> get() = _wantReg
 
-    private val _message = MutableLiveData<String>()
-    val message: LiveData<String> get() = _message
-
     private val _token = MutableLiveData<String>()
     val token: LiveData<String> get() = _token
 
@@ -41,39 +38,31 @@ class AuthViewModel @Inject constructor(
             password.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_password)
             else -> {
                 _validationMessage.value = null
-                login(context, login, password)
+                checkLogin(context, login, password)
             }
         }
     }
 
-    private fun login(context: Context, login: String, password: String) {
+    private fun checkLogin(context: Context, login: String, password: String) {
         viewModelScope.launch {
             try {
                 val user = User(login, password)
                 val response = apiService.authUser(user)
                 _token.value = response.token
                 _loginStatus.value = true
-                tokenRepository.saveToken(_token.value.toString())
             } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false
-                _message.value = when (e.code()) {
-                    401 -> context.getString(R.string.error_auth)
-                    403 -> context.getString(R.string.error_auth)
+                val errorMessage = when (e.code()) {
+                    401, 403 -> context.getString(R.string.error_auth)
                     else -> context.getString(R.string.error_auth)
                 }
+                _validationMessage.value = errorMessage
             } catch (e: Exception) {
                 _loginStatus.value = false
-                _message.value = e.localizedMessage
+                _validationMessage.value = e.localizedMessage
+                Log.e("LoginError", "Login error: ", e)
             }
         }
-    }
-
-    fun clickAuth() {
-        _loginStatus.value = true
-    }
-
-    fun clickedAuth() {
-        _loginStatus.value = false
     }
 
     fun clickRegister() {
@@ -82,5 +71,11 @@ class AuthViewModel @Inject constructor(
 
     fun goneToReg() {
         _wantReg.value = false
+    }
+
+    fun saveToken(token: String) {
+        viewModelScope.launch {
+            tokenRepository.saveToken(token)
+        }
     }
 }

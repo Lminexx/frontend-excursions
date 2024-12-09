@@ -31,35 +31,45 @@
         android:id="@+id/logo"
         android:layout_width="140dp"
         android:layout_height="140dp"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_launcher_foreground" />
 
     <Button
-        android:id="@+id/go_to_reg_butt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="4dp"
-        android:text="@string/reg_string"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/butt_auth" />
-
-    <Button
-        android:id="@+id/butt_auth"
+        android:id="@+id/buttAuth"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginHorizontal="4dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/login_string"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/input_pass"
-        app:layout_constraintVertical_bias="0.189" />
+        app:layout_constraintBottom_toTopOf="@id/buttReg" />
+
+    <Button
+        android:id="@+id/buttReg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="4dp"
+        android:text="@string/reg_string"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/butt_came_back" />
+
+    <Button
+        android:id="@+id/butt_came_back"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="4dp"
+        android:layout_marginBottom="72dp"
+        android:text="@string/come_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
