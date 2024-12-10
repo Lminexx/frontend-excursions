@@ -79,7 +79,10 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            switchFragment(ProfileFragment())
+            val isAuth = data?.getBooleanExtra(AuthActivity.EXTRA_AUTH_STATUS, false) ?: false
+            if (isAuth) {
+                switchFragment(ProfileFragment())
+            }
         }
     }
 }

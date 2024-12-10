@@ -30,7 +30,8 @@ class AuthActivity: AppCompatActivity() {
     private fun subscribe() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
-                    setResult(Activity.RESULT_OK)
+                    val intent = createAuthResultIntent(true)
+                    setResult(Activity.RESULT_OK, intent)
                     finish()
             } else {
                 Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()

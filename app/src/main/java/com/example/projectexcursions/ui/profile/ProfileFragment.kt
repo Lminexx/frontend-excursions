@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.projectexcursions.R
+import com.example.projectexcursions.UsernameNotFoundException
 import com.example.projectexcursions.databinding.FragmentProfileBinding
 import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.excursion.ExcursionActivity
@@ -51,7 +52,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
         }
 
         viewModel.username.observe(viewLifecycleOwner) {
-            username -> binding.userNicknameTextView.text = username
+            username -> binding.userNicknameTextView.text = username ?: throw UsernameNotFoundException("Usera net v tokene")
         }
     }
 }

@@ -7,11 +7,13 @@ interface TokenRepository {
 
     suspend fun getToken(): Token?
 
+    suspend fun getTokens(): List<Token?>
+
+    suspend fun clearToken()
+
     fun isTokenValid(token: String): Boolean
 
     fun decodeToken(token: String): Map<String, Any>?
 
-    suspend fun getTokens(): List<Token?>
-
-    suspend fun clearToken()
+    fun getCachedToken(): Token?
 }
