@@ -1,12 +1,13 @@
 package com.example.projectexcursions.modules
 
-import com.example.projectexcursions.OpenWorldApp
 import com.example.projectexcursions.net.ApiService
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -20,11 +21,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "http://openworldt.domain.com/api/v1/"
+    private const val BASE_URL = "http://217.71.129.134/api/v1/"
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(tokenRepo: TokenRepository): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -32,7 +33,7 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor {chain ->
-                val token = OpenWorldApp.getAuthToken()
+                val token = runBlocking { tokenRepo.getToken() }
                 val request = chain.request()
                 val requestBuilder = request.newBuilder()
                 if (token != null) {

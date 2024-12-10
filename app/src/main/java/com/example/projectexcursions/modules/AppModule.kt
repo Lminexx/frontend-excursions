@@ -45,7 +45,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideExcursionRepository(
+    fun provideExcursionsRepository(
         apiService: ApiService,
         excursionsDao: ExcursionsDao,
         excursionDao: ExcursionDao
@@ -56,9 +56,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideTokenRepository(
-        apiService: ApiService,
         tokenDao: TokenDao
     ): TokenRepository {
-        return TokenRepositoryImpl(apiService, tokenDao)
+        return TokenRepositoryImpl(tokenDao)
     }
 }

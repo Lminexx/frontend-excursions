@@ -12,11 +12,6 @@ class OpenWorldApp : Application() {
         fun getInstance(): OpenWorldApp {
             return instance ?: throw IllegalStateException("OpenWorldApp is not initialized")
         }
-
-        fun getAuthToken(): String? {
-        return getInstance().getSharedPreferences("auth_prefs", MODE_PRIVATE)
-                .getString("auth_token", null)
-        }
     }
 
     override fun onCreate() {

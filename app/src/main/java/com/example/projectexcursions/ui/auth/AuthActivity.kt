@@ -30,14 +30,8 @@ class AuthActivity: AppCompatActivity() {
     private fun subscribe() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
-                viewModel.token.observe(this) { token ->
-                if (token != null) {
-                    viewModel.saveToken(token)
-                    val intent = createAuthResultIntent(true)
-                    setResult(Activity.RESULT_OK, intent)
+                    setResult(Activity.RESULT_OK)
                     finish()
-                    }
-                }
             } else {
                 Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()
             }
@@ -49,6 +43,13 @@ class AuthActivity: AppCompatActivity() {
                 viewModel.goneToReg()
             }
         }
+
+        viewModel.wantComeBack.observe(this) { wannaComeBack ->
+            if (wannaComeBack) {
+                startActivity(Intent(this@AuthActivity, MainActivity::class.java))
+                viewModel.cameBack()
+            }
+        }
     }
 
     private fun initCallback() {
@@ -58,13 +59,13 @@ class AuthActivity: AppCompatActivity() {
             viewModel.validateAndLogin(this ,login, password)
         }
         binding.buttReg.setOnClickListener { viewModel.clickRegister() }
+        binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
     }
 
     companion object {
-        private const val EXTRA_AUTH_STATUS = "EXTRA_AUTH_STATUS"
+        const val EXTRA_AUTH_STATUS = "EXTRA_AUTH_STATUS"
 
-        internal fun Context.createAuthResultIntent(isAuthSuccess: Boolean): Intent =
-            Intent(this, MainActivity::class.java)
-                .putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
+         private fun Context.createAuthResultIntent(isAuthSuccess: Boolean): Intent =
+            Intent().putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
     }
 }

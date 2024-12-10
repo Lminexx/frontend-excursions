@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
+import com.example.projectexcursions.models.Token
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
@@ -30,7 +31,10 @@ class AuthViewModel @Inject constructor(
     val token: LiveData<String> get() = _token
 
     private val _validationMessage = MutableLiveData<String?>()
-    val value : LiveData<String?> get() = _validationMessage
+    val value: LiveData<String?> get() = _validationMessage
+
+    private val _wantComeBack = MutableLiveData<Boolean>()
+    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
     fun validateAndLogin(context: Context, login: String, password: String) {
         when {
@@ -49,6 +53,7 @@ class AuthViewModel @Inject constructor(
                 val user = User(login, password)
                 val response = apiService.authUser(user)
                 _token.value = response.token
+                tokenRepository.saveToken(Token(token = token.value!!))
                 _loginStatus.value = true
             } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false
@@ -73,9 +78,11 @@ class AuthViewModel @Inject constructor(
         _wantReg.value = false
     }
 
-    fun saveToken(token: String) {
-        viewModelScope.launch {
-            tokenRepository.saveToken(token)
-        }
+    fun clickComeBack() {
+        _wantComeBack.value = true
+    }
+
+    fun cameBack() {
+        _wantComeBack.value = false
     }
 }
