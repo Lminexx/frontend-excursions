@@ -9,20 +9,27 @@ import javax.inject.Inject
 
 
 class TokenRepositoryImpl @Inject constructor(
-    private val apiService: ApiService,
     private val tokenDao: TokenDao
 ): TokenRepository {
 
-    override suspend fun saveToken(token: String) {
-        val tokenEntity = Token(token = token)
-        tokenDao.insertToken(tokenEntity)
+    private var cachedToken: Token? = null
+
+    override suspend fun saveToken(token: Token) {
+        tokenDao.insertToken(token)
+        cachedToken = token
     }
 
     override suspend fun getToken(): Token? {
-        val token = tokenDao.getLatestToken()
-        return if (isTokenValid(token.toString()))
-            token
-        else null
+        if (cachedToken == null) {
+            val token = tokenDao.getLatestToken()
+            cachedToken = token
+        }
+        return cachedToken
+    }
+
+    override suspend fun clearToken() {
+        tokenDao.clearAll()
+        cachedToken = null
     }
 
     override fun isTokenValid(token: String): Boolean {
@@ -45,7 +52,7 @@ class TokenRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTokens(): List<Token> {
+    override suspend fun getTokens(): List<Token?> {
         return tokenDao.getAllTokens()
     }
 }

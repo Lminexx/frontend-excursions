@@ -3,7 +3,7 @@ package com.example.projectexcursions.repositories.tokenrepo
 import com.example.projectexcursions.models.Token
 
 interface TokenRepository {
-    suspend fun saveToken(token: String)
+    suspend fun saveToken(token: Token)
 
     suspend fun getToken(): Token?
 
@@ -11,5 +11,7 @@ interface TokenRepository {
 
     fun decodeToken(token: String): Map<String, Any>?
 
-    suspend fun getTokens(): List<Token>
+    suspend fun getTokens(): List<Token?>
+
+    suspend fun clearToken()
 }

@@ -28,16 +28,12 @@ class ProfileViewModel @Inject constructor(
     private fun loadUser() {
         viewModelScope.launch {
             val token = repository.getToken().toString()
-            if (repository.isTokenValid(token)) {
                 val decodedToken = repository.decodeToken(token)
                 val username = decodedToken?.get("username") as? String
                 if (username != null)
                     _username.value = username
                 else
                     throw UsernameNotFoundException("Username not found in token")
-            }
-            else
-                throw InvalidTokenException("Token is invalid")
         }
     }
 
