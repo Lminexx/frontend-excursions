@@ -32,6 +32,10 @@ class TokenRepositoryImpl @Inject constructor(
         cachedToken = null
     }
 
+    override suspend fun getTokens(): List<Token?> {
+        return tokenDao.getAllTokens()
+    }
+
     override fun isTokenValid(token: String): Boolean {
         return try {
             val jwt = JWT(token)
@@ -52,7 +56,10 @@ class TokenRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTokens(): List<Token?> {
-        return tokenDao.getAllTokens()
+    override fun getCachedToken(): Token? {
+        return if (cachedToken != null)
+            cachedToken
+        else
+            null
     }
 }

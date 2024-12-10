@@ -10,7 +10,7 @@ import kotlinx.parcelize.Parcelize
 @Serializable
 @Entity(tableName = "excursion")
 data class Excursion(
-    @PrimaryKey val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val title: String,
     val description: String,
     val userId: Long?

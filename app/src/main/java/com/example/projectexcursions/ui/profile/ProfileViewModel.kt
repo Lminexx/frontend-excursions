@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectexcursions.InvalidTokenException
 import com.example.projectexcursions.UsernameNotFoundException
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,8 +26,8 @@ class ProfileViewModel @Inject constructor(
     }
     private fun loadUser() {
         viewModelScope.launch {
-            val token = repository.getToken().toString()
-                val decodedToken = repository.decodeToken(token)
+            val token = repository.getCachedToken()
+                val decodedToken = token?.let { repository.decodeToken(it.token) }
                 val username = decodedToken?.get("username") as? String
                 if (username != null)
                     _username.value = username
