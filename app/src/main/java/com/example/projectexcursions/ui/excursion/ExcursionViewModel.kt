@@ -17,8 +17,8 @@ class ExcursionViewModel @Inject constructor(
     private val repository: ExcursionRepository
 ) : ViewModel() {
 
-    private val _comeBackToMainActivity = MutableLiveData(false)
-    val comeBackToMainActivity: LiveData<Boolean> get() = _comeBackToMainActivity
+    private val _wantComeBack = MutableLiveData<Boolean>()
+    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
     private val _excursion = MutableLiveData<Excursion?>()
     val excursion: LiveData<Excursion?> = _excursion
@@ -39,10 +39,10 @@ class ExcursionViewModel @Inject constructor(
         }
     }
     fun clickComeback() {
-        _comeBackToMainActivity.value = true
+        _wantComeBack.value = true
     }
 
     fun cameBack() {
-        _comeBackToMainActivity.value = false
+        _wantComeBack.value = false
     }
 }

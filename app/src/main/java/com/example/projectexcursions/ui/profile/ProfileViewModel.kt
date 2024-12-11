@@ -22,6 +22,9 @@ class ProfileViewModel @Inject constructor(
     private val _wantCreate = MutableLiveData<Boolean>()
     val wantCreate: LiveData<Boolean> get() = _wantCreate
 
+    private val _wantComeBack = MutableLiveData<Boolean>()
+    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
+
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
 
@@ -33,7 +36,7 @@ class ProfileViewModel @Inject constructor(
             val token = repository.getCachedToken()
             val decodedToken = token?.let { repository.decodeToken(it.token) }
             val username = decodedToken?.get("username") as? String
-            if (username != null) {
+            if (!username.isNullOrEmpty()) {
                 _username.value = username
             } else {
                 _message.value = "Username not found in token"
@@ -48,5 +51,13 @@ class ProfileViewModel @Inject constructor(
 
     fun isCreating() {
         _wantCreate.value = false
+    }
+
+    fun clickComeBack() {
+        _wantComeBack.value = true
+    }
+
+    fun cameBack() {
+        _wantComeBack.value = false
     }
 }

@@ -23,4 +23,5 @@
     <string name="load">Загрузка</string>
     <string name="create_excursion">Создать экскурсию</string>
     <string name="user">Юзер</string>
+    <string name="log_out">Выйти</string>
 </resources>
