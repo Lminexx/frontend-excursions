@@ -34,7 +34,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val token = repository.getCachedToken()
             val decodedToken = token?.let { repository.decodeToken(it.token) }
-            val username = decodedToken?.get("username") as? String
+            val username = decodedToken?.get("username")?.asString()
             if (!username.isNullOrEmpty()) {
                 _username.value = username
                 Log.d("UsernameCheck1", username)

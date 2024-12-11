@@ -65,8 +65,8 @@ class CreateExcursionViewModel @Inject constructor(
         try {
             val token = tokenRepository.getCachedToken()
             val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
-            val username = decodedToken!!["username"] as String
-            _username.value = username
+            val username = decodedToken?.get("username")!!.asString()
+            _username.value = username!!
         } catch (e: Exception) {
             _message.value = "Username error:\n${e.message}"
             Log.e("GettingUsernameInCreatingExcursion", e.message!!)

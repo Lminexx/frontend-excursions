@@ -1,5 +1,6 @@
 package com.example.projectexcursions.repositories.tokenrepo
 
+import com.auth0.android.jwt.Claim
 import com.example.projectexcursions.models.Token
 
 interface TokenRepository {
@@ -13,7 +14,7 @@ interface TokenRepository {
 
     fun isTokenValid(token: String): Boolean
 
-    fun decodeToken(token: String): Map<String, Any>?
+    fun decodeToken(token: String): Map<String, Claim>?
 
     fun getCachedToken(): Token?
 
