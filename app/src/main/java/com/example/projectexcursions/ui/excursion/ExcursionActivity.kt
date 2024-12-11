@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
-import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,7 +38,7 @@ class ExcursionActivity : AppCompatActivity() {
     }
 
     private fun subscribe() {
-        viewModel.comeBackToMainActivity.observe(this) { wannaComeback ->
+        viewModel.wantComeBack.observe(this) { wannaComeback ->
             if (wannaComeback) viewModel.cameBack()
         }
 
