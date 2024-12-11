@@ -1,5 +1,6 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
+import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ExcursionResponse
@@ -23,4 +24,6 @@ interface ExcursionRepository {
     suspend fun deleteAllExcursionsFromExcursions()
 
     suspend fun deleteAllExcursionsFromExcursion()
+
+    suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse
 }

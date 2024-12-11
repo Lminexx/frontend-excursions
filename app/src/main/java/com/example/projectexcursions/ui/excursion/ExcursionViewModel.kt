@@ -33,7 +33,6 @@ class ExcursionViewModel @Inject constructor(
                     repository.saveExcursionToDB(response.excursion)
                     _excursion.postValue(response.excursion)
                 }
-
             } catch (e: Exception) {
                 _excursion.postValue(null)
             }

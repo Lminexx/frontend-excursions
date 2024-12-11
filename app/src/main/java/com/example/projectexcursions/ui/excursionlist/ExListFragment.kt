@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
+class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
 
     private lateinit var binding: FragmentExcursionsListBinding
 
@@ -29,15 +29,18 @@ class ExListFragment : Fragment(R.layout.fragment_excursions_list) {
     private val viewModel: ExListViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentExcursionsListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initCallback()
         subscribe()
-
-        return binding.root
     }
 
     private fun initCallback() {

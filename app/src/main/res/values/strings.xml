@@ -20,4 +20,7 @@
     <string name="excursion_description">Описание экскурсии</string>
     <string name="come_back">Вернуться</string>
     <string name="create">Создать</string>
+    <string name="load">Загрузка</string>
+    <string name="create_excursion">Создать экскурсию</string>
+    <string name="user">Юзер</string>
 </resources>

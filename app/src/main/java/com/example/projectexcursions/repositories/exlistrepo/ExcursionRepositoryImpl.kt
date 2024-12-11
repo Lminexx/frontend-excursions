@@ -2,6 +2,7 @@ package com.example.projectexcursions.repositories.exlistrepo
 
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databases.daos.ExcursionsDao
+import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ApiService
@@ -40,4 +41,8 @@ class ExcursionRepositoryImpl(
     override suspend fun deleteAllExcursionsFromExcursions() = excursionsDao.clearAll()
 
     override suspend fun deleteAllExcursionsFromExcursion() = excursionDao.clearAll()
+
+    override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
+        return apiService.createExcursion(creatingExcursion)
+    }
 }

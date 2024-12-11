@@ -1,21 +1,24 @@
 package com.example.projectexcursions.ui.auth
 
 import android.content.Context
-import android.widget.Toast
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
+import com.example.projectexcursions.models.Token
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val tokenRepository: TokenRepository
 ): ViewModel() {
 
     private val _loginStatus = MutableLiveData<Boolean>()
@@ -24,14 +27,14 @@ class AuthViewModel @Inject constructor(
     private val _wantReg = MutableLiveData<Boolean>()
     val wantReg: LiveData<Boolean> get() = _wantReg
 
-    private val _message = MutableLiveData<String>()
-    val message: LiveData<String> get() = _message
-
     private val _token = MutableLiveData<String>()
     val token: LiveData<String> get() = _token
 
     private val _validationMessage = MutableLiveData<String?>()
-    val value : LiveData<String?> get() = _validationMessage
+    val value: LiveData<String?> get() = _validationMessage
+
+    private val _wantComeBack = MutableLiveData<Boolean>()
+    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
     fun validateAndLogin(context: Context, login: String, password: String) {
         when {
@@ -39,38 +42,32 @@ class AuthViewModel @Inject constructor(
             password.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_password)
             else -> {
                 _validationMessage.value = null
-                login(context, login, password)
+                checkLogin(context, login, password)
             }
         }
     }
 
-    private fun login(context: Context, login: String, password: String) {
+    private fun checkLogin(context: Context, login: String, password: String) {
         viewModelScope.launch {
             try {
                 val user = User(login, password)
                 val response = apiService.authUser(user)
                 _token.value = response.token
+                tokenRepository.saveToken(Token(token = token.value!!))
                 _loginStatus.value = true
             } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false
-                _message.value = when (e.code()) {
-                    401 -> context.getString(R.string.error_auth)
-                    403 -> context.getString(R.string.error_auth)
+                val errorMessage = when (e.code()) {
+                    401, 403 -> context.getString(R.string.error_auth)
                     else -> context.getString(R.string.error_auth)
                 }
+                _validationMessage.value = errorMessage
             } catch (e: Exception) {
                 _loginStatus.value = false
-                _message.value = e.localizedMessage
+                _validationMessage.value = e.localizedMessage
+                Log.e("LoginError", "Login error: ", e)
             }
         }
-    }
-
-    fun clickAuth() {
-        _loginStatus.value = true
-    }
-
-    fun sucAuth() {
-        _loginStatus.value = false
     }
 
     fun clickRegister() {
@@ -79,5 +76,13 @@ class AuthViewModel @Inject constructor(
 
     fun goneToReg() {
         _wantReg.value = false
+    }
+
+    fun clickComeBack() {
+        _wantComeBack.value = true
+    }
+
+    fun cameBack() {
+        _wantComeBack.value = false
     }
 }
