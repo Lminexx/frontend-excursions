@@ -11,6 +11,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityMainBinding
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     private fun switchFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
+            .setReorderingAllowed(true)
             .commit()
     }
 
