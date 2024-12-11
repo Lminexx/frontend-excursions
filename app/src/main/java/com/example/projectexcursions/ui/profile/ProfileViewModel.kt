@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.profile
 
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,18 +22,23 @@ class ProfileViewModel @Inject constructor(
     private val _wantCreate = MutableLiveData<Boolean>()
     val wantCreate: LiveData<Boolean> get() = _wantCreate
 
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> get() = _message
+
     init {
         loadUser()
     }
     private fun loadUser() {
         viewModelScope.launch {
             val token = repository.getCachedToken()
-                val decodedToken = token?.let { repository.decodeToken(it.token) }
-                val username = decodedToken?.get("username") as? String
-                if (username != null)
-                    _username.value = username
-                else
-                    throw UsernameNotFoundException("Username not found in token")
+            val decodedToken = token?.let { repository.decodeToken(it.token) }
+            val username = decodedToken?.get("username") as? String
+            if (username != null) {
+                _username.value = username
+            } else {
+                _message.value = "Username not found in token"
+                //throw UsernameNotFoundException("Username not found in token")
+            }
         }
     }
 

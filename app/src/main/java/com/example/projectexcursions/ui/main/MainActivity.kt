@@ -4,14 +4,12 @@ import com.example.projectexcursions.ui.excursionlist.ExListFragment
 import FavFragment
 import MapFragment
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import com.example.projectexcursions.ui.profile.ProfileFragment
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityMainBinding
@@ -32,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel.setStartFragment()
         initCallBack()
         subscribe()
     }
@@ -39,20 +38,18 @@ class MainActivity : AppCompatActivity() {
     private fun subscribe() {
         viewModel.menuItem.observe(this) { menuItem ->
             when (menuItem) {
-                "list" -> switchFragment(ExListFragment())
-                "fav" -> switchFragment(FavFragment())
-                "map" -> switchFragment(MapFragment())
+                null -> replaceFragment(ExListFragment())
+                "list" -> replaceFragment(ExListFragment())
+                "fav" -> replaceFragment(FavFragment())
+                "map" -> replaceFragment(MapFragment())
                 "profile" -> {
                     lifecycleScope.launch {
-                        viewModel.checkAuthStatus()
-
-                        viewModel.isAuth.observe(this@MainActivity) { isAuth ->
-                            if (isAuth)
-                                switchFragment(ProfileFragment())
-                            else {
-                                val intent = Intent(this@MainActivity, AuthActivity::class.java)
-                                startActivityForResult(intent, AUTH_REQUEST_CODE)
-                            }
+                        val isAuth = viewModel.checkAuthStatus()
+                        if (isAuth)
+                            replaceFragment(ProfileFragment())
+                        else {
+                            val intent = Intent(this@MainActivity, AuthActivity::class.java)
+                            startActivityForResult(intent, AUTH_REQUEST_CODE)
                         }
                     }
                 }
@@ -71,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun switchFragment(fragment: Fragment) {
+    private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .setReorderingAllowed(true)
@@ -83,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val isAuth = data?.getBooleanExtra(AuthActivity.EXTRA_AUTH_STATUS, false) ?: false
             if (isAuth) {
-                switchFragment(ProfileFragment())
+                replaceFragment(ProfileFragment())
             }
         }
     }

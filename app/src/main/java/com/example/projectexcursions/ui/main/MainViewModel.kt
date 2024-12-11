@@ -15,9 +15,9 @@ open class MainViewModel @Inject constructor(
     private val _menuItem = MutableLiveData<String?>()
     val menuItem: LiveData<String?> get() = _menuItem
 
-
-    private val _isAuth = MutableLiveData<Boolean>()
-    val isAuth: LiveData<Boolean> get() = _isAuth
+    fun setStartFragment() {
+        _menuItem.value = null
+    }
 
     fun clickExList() {
         _menuItem.value = "list"
@@ -35,8 +35,8 @@ open class MainViewModel @Inject constructor(
         _menuItem.value = "profile"
     }
 
-    suspend fun checkAuthStatus() {
+    suspend fun checkAuthStatus(): Boolean {
         val token = repository.getToken()
-        _isAuth.value = token != null
+        return token != null
     }
 }

@@ -7,7 +7,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.ui.main.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CreateExcursionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityExcursionCreateBinding
