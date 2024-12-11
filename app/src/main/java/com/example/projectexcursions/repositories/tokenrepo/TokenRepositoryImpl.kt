@@ -4,7 +4,6 @@ import android.util.Log
 import com.example.projectexcursions.models.Token
 import com.auth0.android.jwt.JWT
 import com.example.projectexcursions.databases.daos.TokenDao
-import com.example.projectexcursions.net.ApiService
 import javax.inject.Inject
 
 

@@ -66,7 +66,8 @@ class AuthActivity: AppCompatActivity() {
     companion object {
         const val EXTRA_AUTH_STATUS = "EXTRA_AUTH_STATUS"
 
-         private fun Context.createAuthResultIntent(isAuthSuccess: Boolean): Intent =
+         private fun createAuthResultIntent(isAuthSuccess: Boolean): Intent =
             Intent().putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
     }
+    //todo автоматическая авторизация при успешной регистрации
 }
