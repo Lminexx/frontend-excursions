@@ -4,9 +4,12 @@ import android.content.Context
 import com.example.projectexcursions.databases.OpenWorldDB
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databases.daos.ExcursionsDao
+import com.example.projectexcursions.databases.daos.TokenDao
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,12 +39,25 @@ object AppModule {
     }
 
     @Provides
+    fun provideToken(db: OpenWorldDB): TokenDao {
+        return db.tokenDao()
+    }
+
+    @Provides
     @Singleton
-    fun provideExcursionRepository(
+    fun provideExcursionsRepository(
         apiService: ApiService,
         excursionsDao: ExcursionsDao,
         excursionDao: ExcursionDao
     ): ExcursionRepository {
         return ExcursionRepositoryImpl(apiService, excursionsDao, excursionDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTokenRepository(
+        tokenDao: TokenDao
+    ): TokenRepository {
+        return TokenRepositoryImpl(tokenDao)
     }
 }

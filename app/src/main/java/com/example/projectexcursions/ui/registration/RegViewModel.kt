@@ -48,9 +48,11 @@ class RegViewModel @Inject constructor(
                 val response = apiService.registerUser(user)
                 Log.d("RegistrationResponse", "Response: $response")
                 _regRespMes.value = "Пользователь зарегестрирован"
+                _wantComeBack.value = true
             } catch (e: Exception) {
                 Log.e("RegistrationError", "Ошибка при регистрации: ${e.message}")
-                _regRespMes.value = "Ошибка: \n${e.message}"
+                if (e.message!!.contains("409"))
+                    _regRespMes.value = "Пользователь уже существует"
             }
         }
     }

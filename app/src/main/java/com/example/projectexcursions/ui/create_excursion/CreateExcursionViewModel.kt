@@ -1,29 +1,73 @@
 package com.example.projectexcursions.ui.create_excursion
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.projectexcursions.models.CreatingExcursion
+import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateExcursionViewModel @Inject constructor(): ViewModel() {
+class CreateExcursionViewModel @Inject constructor(
+    private val tokenRepository: TokenRepository,
+    private val excursionRepository: ExcursionRepository
+): ViewModel() {
 
-    //для отслеживания перемещения юзера
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
-    //для отслеживания состояния создания экскурсии
     private val _createExcursion = MutableLiveData<Boolean>()
     val createExcursion: LiveData<Boolean> get() = _createExcursion
 
-    //для отслеживания клика на кнопку
     private val _wantCreateExc = MutableLiveData<Boolean>()
     val wantCreateExc: LiveData<Boolean> get() = _wantCreateExc
 
-    fun createExcursion(title: String, description: String) {
-        //todo здесь реализуй, собсна, логику воровки и отправки экскурсий, в качестве примера можешь использовать регистрацию
-        //_createExcursion написал для того, чтобы можно было отслеживать состояние создания экскурсии, но можешь это убрать, если не надо
+    private val _username = MutableLiveData<String>()
+    val username: LiveData<String> get() = _username
+
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> get() = _message
+    init {
+        getUsername()
+    }
+
+    //todo добавить текст из message в resources/string (context как раз для этого)
+    fun createExcursion(context: Context, title: String, description: String) {
+        when {
+            username.value.isNullOrEmpty() -> _message.value = "Username is null or empty"
+            description.isEmpty() -> _message.value = "Description is empty"
+            title.isEmpty() -> _message.value = "Title is empty"
+            else -> {
+                val excursion = CreatingExcursion(title, description, username.value!!)
+                viewModelScope.launch {
+                    try {
+                        val response = excursionRepository.createExcursion(excursion)
+                        excursionRepository.saveExcursionToDB(response.excursion)
+                        _message.value = "Excursion created successfully"
+                        _createExcursion.value = true
+                    } catch (e: Exception) {
+                        _message.value = "Error: ${e.message}"
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getUsername() {
+        try {
+            val token = tokenRepository.getCachedToken()
+            val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
+            val username = decodedToken?.get("username") as String
+            _username.value = username
+        } catch (e: Exception) {
+            _message.value = "Username error:\n${e.message}"
+        }
     }
 
     fun clickComeBack() {

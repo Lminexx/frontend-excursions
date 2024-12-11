@@ -1,17 +1,12 @@
 package com.example.projectexcursions.models
 
-import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
 @Serializable
-@Entity(tableName = "excursion")
-data class Excursion(
+@Entity(tableName = "tokens")
+data class Token (
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-    val title: String,
-    val description: String,
-    val userId: Long?
-): Parcelable
+    val token: String
+)

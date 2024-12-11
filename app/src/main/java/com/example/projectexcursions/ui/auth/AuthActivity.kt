@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.auth
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -29,10 +30,9 @@ class AuthActivity: AppCompatActivity() {
     private fun subscribe() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
-                viewModel.token.observe(this) { token ->
-                    saveToken(token)
-                    startActivity(Intent(this@AuthActivity, MainActivity::class.java))
-                }
+                    val intent = createAuthResultIntent(true)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
             } else {
                 Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()
             }
@@ -44,20 +44,30 @@ class AuthActivity: AppCompatActivity() {
                 viewModel.goneToReg()
             }
         }
-    }
 
-    private fun saveToken(token: String) {
-        val sharedPreferences = getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("auth_token", token).apply()
+        viewModel.wantComeBack.observe(this) { wannaComeBack ->
+            if (wannaComeBack) {
+                startActivity(Intent(this@AuthActivity, MainActivity::class.java))
+                viewModel.cameBack()
+            }
+        }
     }
 
     private fun initCallback() {
         binding.buttAuth.setOnClickListener {
             val login = binding.inputLogin.text.toString().trim()
             val password = binding.inputPass.text.toString().trim()
-
             viewModel.validateAndLogin(this ,login, password)
         }
-        binding.goToRegButt.setOnClickListener { viewModel.clickRegister() }
+        binding.buttReg.setOnClickListener { viewModel.clickRegister() }
+        binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
     }
+
+    companion object {
+        const val EXTRA_AUTH_STATUS = "EXTRA_AUTH_STATUS"
+
+         private fun createAuthResultIntent(isAuthSuccess: Boolean): Intent =
+            Intent().putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
+    }
+    //todo автоматическая авторизация при успешной регистрации
 }

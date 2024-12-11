@@ -21,7 +21,7 @@ import javax.inject.Inject
 class ExListViewModel @Inject constructor(
     repository: ExcursionRepository,
     excursionsDao: ExcursionsDao
-    ) : ViewModel() {
+    ): ViewModel() {
 
     private val remoteMediator = ExcursionRemoteMediator(repository)
 

@@ -18,8 +18,6 @@ class ExcursionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityExcursionBinding
 
-    private lateinit var excursion: Excursion
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExcursionBinding.inflate(layoutInflater)
