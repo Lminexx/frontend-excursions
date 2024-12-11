@@ -1,6 +1,7 @@
 package com.example.projectexcursions.repositories.tokenrepo
 
 import android.util.Log
+import com.auth0.android.jwt.Claim
 import com.example.projectexcursions.models.Token
 import com.auth0.android.jwt.JWT
 import com.example.projectexcursions.databases.daos.TokenDao
@@ -50,7 +51,7 @@ class TokenRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun decodeToken(token: String): Map<String, Any>? {
+    override fun decodeToken(token: String): Map<String, Claim>? {
         return try {
             val jwt = JWT(token)
             jwt.claims
