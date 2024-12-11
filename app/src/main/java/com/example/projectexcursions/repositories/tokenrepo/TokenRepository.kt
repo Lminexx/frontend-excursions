@@ -16,4 +16,6 @@ interface TokenRepository {
     fun decodeToken(token: String): Map<String, Any>?
 
     fun getCachedToken(): Token?
+
+    suspend fun deleteToken(token: String)
 }

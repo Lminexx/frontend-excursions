@@ -31,6 +31,11 @@ class TokenRepositoryImpl @Inject constructor(
         cachedToken = null
     }
 
+    override suspend fun deleteToken(token: String) {
+        tokenDao.deleteToken(token)
+        cachedToken = null
+    }
+
     override suspend fun getTokens(): List<Token?> {
         return tokenDao.getAllTokens()
     }

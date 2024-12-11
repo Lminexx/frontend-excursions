@@ -1,11 +1,10 @@
 package com.example.projectexcursions.ui.profile
 
-import android.widget.Toast
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectexcursions.UsernameNotFoundException
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -38,10 +37,19 @@ class ProfileViewModel @Inject constructor(
             val username = decodedToken?.get("username") as? String
             if (!username.isNullOrEmpty()) {
                 _username.value = username
+                Log.d("UsernameCheck1", username)
+                Log.d("UsernameCheck2", _username.value!!)
             } else {
                 _message.value = "Username not found in token"
                 //throw UsernameNotFoundException("Username not found in token")
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            val token = repository.getCachedToken()
+            repository.deleteToken(token!!.token)
         }
     }
 
