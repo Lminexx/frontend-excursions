@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.create_excursion
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,6 +54,7 @@ class CreateExcursionViewModel @Inject constructor(
                         _createExcursion.value = true
                     } catch (e: Exception) {
                         _message.value = "Error: ${e.message}"
+                        Log.e("CreatingExcursionError: ", e.message!!)
                     }
                 }
             }
@@ -63,10 +65,11 @@ class CreateExcursionViewModel @Inject constructor(
         try {
             val token = tokenRepository.getCachedToken()
             val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
-            val username = decodedToken?.get("username") as String
+            val username = decodedToken!!["username"] as String
             _username.value = username
         } catch (e: Exception) {
             _message.value = "Username error:\n${e.message}"
+            Log.e("GettingUsernameInCreatingExcursion", e.message!!)
         }
     }
 

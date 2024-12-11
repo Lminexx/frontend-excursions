@@ -22,4 +22,7 @@ interface TokenDao {
 
     @Query("delete from tokens")
     suspend fun clearAll()
+
+    @Query("delete from tokens where token = :token")
+    suspend fun deleteToken(token: String)
 }
