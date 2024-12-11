@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,7 +31,7 @@ class ExcursionActivity : AppCompatActivity() {
     private fun initData() {
         val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
         if (excursionId == -1L) {
-            Toast.makeText(this, "Invalidnaya exursia", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, this.getString(R.string.invalid_excursion), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -45,10 +46,10 @@ class ExcursionActivity : AppCompatActivity() {
         viewModel.excursion.observe(this) { excursion ->
             if (excursion != null) {
                 binding.excursionTitle.text = excursion.title
-                binding.excursionAuthor.text = excursion.userId?.toString() ?: "Автора съели"
+                binding.excursionAuthor.text = excursion.userId?.toString() ?: this.getString(R.string.author_eaten)
                 binding.excursionDescription.text = excursion.description
             } else {
-                Toast.makeText(this, "Экскурсию съели", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT).show()
             }
         }
     }

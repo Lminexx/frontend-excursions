@@ -30,8 +30,8 @@ class AuthViewModel @Inject constructor(
     private val _token = MutableLiveData<String>()
     val token: LiveData<String> get() = _token
 
-    private val _validationMessage = MutableLiveData<String?>()
-    val value: LiveData<String?> get() = _validationMessage
+    private val _validationMessage = MutableLiveData<String>()
+    val validationMessage: LiveData<String> get() = _validationMessage
 
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
@@ -40,8 +40,9 @@ class AuthViewModel @Inject constructor(
         when {
             login.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_login)
             password.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_password)
+            !isInputLangValid(login) -> _validationMessage.value = context.getString(R.string.lang_error)
+            !isInputLangValid(password) -> _validationMessage.value = context.getString(R.string.lang_error)
             else -> {
-                _validationMessage.value = null
                 checkLogin(context, login, password)
             }
         }
@@ -68,6 +69,11 @@ class AuthViewModel @Inject constructor(
                 Log.e("LoginError", "Login error: ", e)
             }
         }
+    }
+
+    private fun isInputLangValid(input: String): Boolean {
+        val regex = "^[a-zA-Z0-9]+$".toRegex()
+        return regex.matches(input)
     }
 
     fun clickRegister() {

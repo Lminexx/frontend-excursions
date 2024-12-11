@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.projectexcursions.R
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
@@ -38,19 +39,17 @@ class CreateExcursionViewModel @Inject constructor(
         getUsername()
     }
 
-    //todo добавить текст из message в resources/string (context как раз для этого)
     fun createExcursion(context: Context, title: String, description: String) {
         when {
-            username.value.isNullOrEmpty() -> _message.value = "Username is null or empty"
-            description.isEmpty() -> _message.value = "Description is empty"
-            title.isEmpty() -> _message.value = "Title is empty"
+            description.isBlank() -> _message.value = context.getString(R.string.empty_desc)
+            title.isBlank() -> _message.value = context.getString(R.string.empty_title)
             else -> {
                 val excursion = CreatingExcursion(title, description, username.value!!)
                 viewModelScope.launch {
                     try {
                         val response = excursionRepository.createExcursion(excursion)
                         excursionRepository.saveExcursionToDB(response.excursion)
-                        _message.value = "Excursion created successfully"
+                        _message.value = context.getString(R.string.create_success)
                         _createExcursion.value = true
                     } catch (e: Exception) {
                         _message.value = "Error: ${e.message}"

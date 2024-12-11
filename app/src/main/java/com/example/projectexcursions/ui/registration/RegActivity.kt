@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityRegBinding
 import com.example.projectexcursions.ui.auth.AuthActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +30,7 @@ class RegActivity: AppCompatActivity() {
             val password = binding.inputPass.text.toString().trim()
             val repPass = binding.repeatPass.text.toString().trim()
 
-            viewModel.validateAndRegister(login, password, repPass)
+            viewModel.validateAndRegister(this, login, password, repPass)
         }
         binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
     }
@@ -52,12 +53,12 @@ class RegActivity: AppCompatActivity() {
             response?.let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             } ?: run {
-                Toast.makeText(this, "Произошла ошибка", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, this.getString(R.string.shit_happens), Toast.LENGTH_SHORT).show()
             }
         }
 
         viewModel.validationMessage.observe(this) { message ->
-            val finalMessage = message.takeIf { !it.isNullOrEmpty() } ?: "Неизвестная ошибка"
+            val finalMessage = message.takeIf { !it.isNullOrEmpty() } ?: this.getString(R.string.unknown_error)
             Toast.makeText(this, finalMessage, Toast.LENGTH_SHORT).show()
         }
     }
