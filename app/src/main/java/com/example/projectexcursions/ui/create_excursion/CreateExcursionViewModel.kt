@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.CreatingExcursion
-import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,10 +43,12 @@ class CreateExcursionViewModel @Inject constructor(
             description.isBlank() -> _message.value = context.getString(R.string.empty_desc)
             title.isBlank() -> _message.value = context.getString(R.string.empty_title)
             else -> {
+                Log.d("CreatingExcursion", "CreatingExcursion")
+                val token = tokenRepository.getCachedToken()!!.token
                 val excursion = CreatingExcursion(title, description, username.value!!)
                 viewModelScope.launch {
                     try {
-                        val response = excursionRepository.createExcursion(excursion)
+                        val response = excursionRepository.createExcursion(token, excursion)
                         excursionRepository.saveExcursionToDB(response.excursion)
                         _message.value = context.getString(R.string.create_success)
                         _createExcursion.value = true
@@ -64,8 +65,9 @@ class CreateExcursionViewModel @Inject constructor(
         try {
             val token = tokenRepository.getCachedToken()
             val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
-            val username = decodedToken?.get("username")!!.asString()
-            _username.value = username!!
+            val name = decodedToken?.get("username")!!.asString()
+            _username.value = name!!
+            Log.d("Username", "${_username.value}")
         } catch (e: Exception) {
             _message.value = "Username error:\n${e.message}"
             Log.e("GettingUsernameInCreatingExcursion", e.message!!)

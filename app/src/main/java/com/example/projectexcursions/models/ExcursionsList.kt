@@ -13,5 +13,5 @@ data class ExcursionsList(
     @PrimaryKey val id: Long,
     val title: String,
     val description: String,
-    val userId: Long?
+    val username: String
 ): Parcelable

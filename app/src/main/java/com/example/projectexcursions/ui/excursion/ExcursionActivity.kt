@@ -46,7 +46,7 @@ class ExcursionActivity : AppCompatActivity() {
         viewModel.excursion.observe(this) { excursion ->
             if (excursion != null) {
                 binding.excursionTitle.text = excursion.title
-                binding.excursionAuthor.text = excursion.userId?.toString() ?: this.getString(R.string.author_eaten)
+                binding.excursionAuthor.text = excursion.username
                 binding.excursionDescription.text = excursion.description
             } else {
                 Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT).show()

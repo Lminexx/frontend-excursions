@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.excursionlist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,6 +58,7 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
         lifecycleScope.launch {
             viewModel.excursions.collectLatest { pagingData ->
                 adapter.submitData(pagingData)
+                Log.d("GetAllExcursions", "All excursions was get")
             }
         }
 
