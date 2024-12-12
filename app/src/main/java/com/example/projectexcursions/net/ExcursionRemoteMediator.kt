@@ -1,5 +1,6 @@
 package com.example.projectexcursions.net
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -27,8 +28,10 @@ class ExcursionRemoteMediator @Inject constructor(
         }.toInt()
         return try {
             val response = repository.fetchExcursions(page, state.config.pageSize)
+            Log.d("ExcursionsGetter", "Get excursions")
             val excursions = response.content
             repository.saveExcursionsToDB(excursions)
+            Log.d("SaveExc",  "SaveExc")
             MediatorResult.Success(endOfPaginationReached = excursions.isEmpty())
         } catch (e: Exception) {
             MediatorResult.Error(e)
