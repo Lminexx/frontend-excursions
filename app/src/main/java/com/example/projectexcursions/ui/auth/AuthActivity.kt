@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,8 @@ class AuthActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthBinding
     private val viewModel: AuthViewModel by viewModels()
+
+    private val REG_REQUEST_CODE = 1002
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +43,8 @@ class AuthActivity: AppCompatActivity() {
 
         viewModel.wantReg.observe(this) { wannaReg ->
             if (wannaReg) {
-                startActivity(Intent(this@AuthActivity, RegActivity::class.java))
+                val intent = Intent(this@AuthActivity, RegActivity::class.java)
+                startActivityForResult(intent, REG_REQUEST_CODE)
                 viewModel.goneToReg()
             }
         }
@@ -67,11 +71,26 @@ class AuthActivity: AppCompatActivity() {
         binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REG_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val isReg = data?.getBooleanExtra(RegActivity.EXTRA_REG_STATUS, false) ?: false
+            Log.d("DataNaN?", "$data")
+            if (isReg) {
+                Log.d("RegIntent", "GetRegIntent")
+                val username = data?.getStringExtra(RegActivity.EXTRA_REG_USERNAME)
+                val password = data?.getStringExtra(RegActivity.EXTRA_REG_PASSWORD)
+                Log.d("Data", "$username")
+                Log.d("Data", "$password")
+                viewModel.validateAndLogin(this, username!!, password!!)
+            }
+        }
+    }
+
     companion object {
         const val EXTRA_AUTH_STATUS = "EXTRA_AUTH_STATUS"
 
          private fun createAuthResultIntent(isAuthSuccess: Boolean): Intent =
             Intent().putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
     }
-    //todo автоматическая авторизация при успешной регистрации
 }
