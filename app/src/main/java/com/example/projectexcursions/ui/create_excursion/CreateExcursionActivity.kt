@@ -2,6 +2,7 @@ package com.example.projectexcursions.ui.create_excursion
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -37,19 +38,13 @@ class CreateExcursionActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.wantCreateExc.observe(this) { wannaCreate ->
+        viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
+                Log.d("WantCreate", "WantCreate")
                 val title = binding.excursionTitle.text.toString()
                 val description = binding.excursionDescription.text.toString()
-                viewModel.createExcursion(this, title, description)
-                viewModel.excursionCreated()
-            }
-        }
-
-        viewModel.createExcursion.observe(this) { isSuccessful ->
-            if (isSuccessful) {
+                viewModel.createExcursion(this@CreateExcursionActivity, title, description)
                 startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
-                viewModel.excursionCreated()
             }
         }
 

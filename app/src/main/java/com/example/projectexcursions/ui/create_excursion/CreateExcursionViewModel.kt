@@ -44,16 +44,19 @@ class CreateExcursionViewModel @Inject constructor(
             description.isBlank() -> _message.value = context.getString(R.string.empty_desc)
             title.isBlank() -> _message.value = context.getString(R.string.empty_title)
             else -> {
+                Log.d("CreatingExcursion", "CreatingExcursion")
+                val token = tokenRepository.getCachedToken()!!.token
                 val excursion = CreatingExcursion(title, description, username.value!!)
                 viewModelScope.launch {
                     try {
-                        val response = excursionRepository.createExcursion(excursion)
-                        excursionRepository.saveExcursionToDB(response.excursion)
+                        val response = excursionRepository.createExcursion(token, excursion)
+                        val respondedExcursion = Excursion(response.id, response.title, response.description, response.username)
+                        excursionRepository.saveExcursionToDB(respondedExcursion)
                         _message.value = context.getString(R.string.create_success)
-                        _createExcursion.value = true
                     } catch (e: Exception) {
                         _message.value = "Error: ${e.message}"
                         Log.e("CreatingExcursionError: ", e.message!!)
+                        _createExcursion.value = false
                     }
                 }
             }
@@ -64,8 +67,9 @@ class CreateExcursionViewModel @Inject constructor(
         try {
             val token = tokenRepository.getCachedToken()
             val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
-            val username = decodedToken?.get("username")!!.asString()
-            _username.value = username!!
+            val name = decodedToken?.get("username")!!.asString()
+            _username.value = name!!
+            Log.d("Username", "${_username.value}")
         } catch (e: Exception) {
             _message.value = "Username error:\n${e.message}"
             Log.e("GettingUsernameInCreatingExcursion", e.message!!)
@@ -82,9 +86,5 @@ class CreateExcursionViewModel @Inject constructor(
 
     fun clickCreateExcursion() {
         _createExcursion.value = true
-    }
-
-    fun excursionCreated() {
-        _createExcursion.value = false
     }
 }
