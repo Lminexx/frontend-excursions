@@ -43,6 +43,8 @@
         android:layout_marginHorizontal="4dp"
         android:layout_marginBottom="8dp"
         android:text="@string/login_string"
+        android:textColor="@color/white"
+        android:background="@drawable/button_pattern_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/buttReg" />
@@ -51,23 +53,23 @@
         android:id="@+id/buttReg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="4dp"
-        android:text="@string/reg_string"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/buttComeBack" />
-
-    <Button
-        android:id="@+id/buttComeBack"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
         android:layout_marginHorizontal="4dp"
-        android:layout_marginBottom="72dp"
-        android:text="@string/come_back"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/button_pattern_1"
+        android:text="@string/reg_string"
+        app:layout_constraintBottom_toTopOf="@id/buttComeBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/buttComeBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="100dp"
+        android:background="#00000"
+        android:contentDescription="@string/come_back"
+        android:src="@drawable/ic_come_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
