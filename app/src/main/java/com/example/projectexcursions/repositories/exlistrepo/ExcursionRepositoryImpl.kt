@@ -48,7 +48,7 @@ class ExcursionRepositoryImpl(
 
     override suspend fun deleteAllExcursionsFromExcursion() = excursionDao.clearAll()
 
-    override suspend fun createExcursion(token: String ,creatingExcursion: CreatingExcursion): ExcursionResponse {
+    override suspend fun createExcursion(token: String, creatingExcursion: CreatingExcursion): ExcursionResponse {
         return apiService.createExcursion(token, creatingExcursion)
     }
 }

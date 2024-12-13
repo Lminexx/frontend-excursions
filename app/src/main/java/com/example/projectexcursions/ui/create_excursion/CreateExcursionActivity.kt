@@ -45,7 +45,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val description = binding.excursionDescription.text.toString()
                 viewModel.createExcursion(this@CreateExcursionActivity, title, description)
                 startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
-                viewModel.excursionCreated()
             }
         }
 
