@@ -9,11 +9,14 @@ import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import javax.inject.Inject
 
-class ExcursionRepositoryImpl(
+class ExcursionRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val excursionsDao: ExcursionsDao,
-    private val excursionDao: ExcursionDao
+    private val excursionDao: ExcursionDao,
+    private val tokenRepository: TokenRepository
 ) : ExcursionRepository {
     override fun getExcursionsPaging() = ExcursionPagingSource(apiService)
 
@@ -48,7 +51,8 @@ class ExcursionRepositoryImpl(
 
     override suspend fun deleteAllExcursionsFromExcursion() = excursionDao.clearAll()
 
-    override suspend fun createExcursion(token: String, creatingExcursion: CreatingExcursion): ExcursionResponse {
+    override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
+        val token = tokenRepository.getCachedToken()!!.token
         return apiService.createExcursion(token, creatingExcursion)
     }
 }

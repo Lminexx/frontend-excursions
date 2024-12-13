@@ -11,8 +11,8 @@ import com.example.projectexcursions.models.ExcursionsList
 interface ExcursionsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(excursionsLists: List<ExcursionsList>)
-
-    @Query("select * from excursions order by id desc")
+    //todo убрать эти временные костыли
+    @Query("select * from excursions")
     suspend fun getAllExcursions(): List<ExcursionsList>
 
     @Query("select * from excursions")

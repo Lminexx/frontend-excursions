@@ -48,9 +48,10 @@ object AppModule {
     fun provideExcursionsRepository(
         apiService: ApiService,
         excursionsDao: ExcursionsDao,
-        excursionDao: ExcursionDao
+        excursionDao: ExcursionDao,
+        tokenRepo: TokenRepository
     ): ExcursionRepository {
-        return ExcursionRepositoryImpl(apiService, excursionsDao, excursionDao)
+        return ExcursionRepositoryImpl(apiService, excursionsDao, excursionDao, tokenRepo)
     }
 
     @Provides

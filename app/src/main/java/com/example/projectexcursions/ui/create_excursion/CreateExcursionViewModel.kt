@@ -40,16 +40,11 @@ class CreateExcursionViewModel @Inject constructor(
     }
 
     fun createExcursion(context: Context, title: String, description: String) {
-        when {
-            description.isBlank() -> _message.value = context.getString(R.string.empty_desc)
-            title.isBlank() -> _message.value = context.getString(R.string.empty_title)
-            else -> {
                 Log.d("CreatingExcursion", "CreatingExcursion")
-                val token = tokenRepository.getCachedToken()!!.token
                 val excursion = CreatingExcursion(title, description, username.value!!)
                 viewModelScope.launch {
                     try {
-                        val response = excursionRepository.createExcursion(token, excursion)
+                        val response = excursionRepository.createExcursion(excursion)
                         val respondedExcursion = Excursion(response.id, response.title, response.description, response.username)
                         excursionRepository.saveExcursionToDB(respondedExcursion)
                         _message.value = context.getString(R.string.create_success)
@@ -59,8 +54,6 @@ class CreateExcursionViewModel @Inject constructor(
                         _createExcursion.value = false
                     }
                 }
-            }
-        }
     }
 
     private fun getUsername() {
@@ -73,6 +66,20 @@ class CreateExcursionViewModel @Inject constructor(
         } catch (e: Exception) {
             _message.value = "Username error:\n${e.message}"
             Log.e("GettingUsernameInCreatingExcursion", e.message!!)
+        }
+    }
+
+    fun isExcursionCorrect(context: Context, title: String, description: String): Boolean {
+        when {
+            title.isBlank() -> {
+                _message.value = context.getString(R.string.empty_title)
+                return false
+            }
+            description.isBlank() -> {
+                _message.value = context.getString(R.string.empty_desc)
+                return false
+            }
+            else -> return true
         }
     }
 

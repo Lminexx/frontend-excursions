@@ -7,6 +7,7 @@ import android.app.Activity
 import android.content.Intent
 import com.example.projectexcursions.ui.profile.ProfileFragment
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -14,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityMainBinding
 import com.example.projectexcursions.ui.auth.AuthActivity
+import com.example.projectexcursions.ui.registration.RegActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -29,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        Log.d("StartMainActivity", "MainActivityStarted")
 
         viewModel.setStartFragment()
         initCallBack()
@@ -79,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val isAuth = data?.getBooleanExtra(AuthActivity.EXTRA_AUTH_STATUS, false) ?: false
+            Log.d("AuthDataNaN?","$data")
             if (isAuth) {
                 replaceFragment(ProfileFragment())
             }

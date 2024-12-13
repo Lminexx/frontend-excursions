@@ -31,6 +31,13 @@ class RegViewModel @Inject constructor(
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
+    private val _username = MutableLiveData<String>()
+    val username: LiveData<String> get() = _username
+
+    private val _password = MutableLiveData<String>()
+    val password: LiveData<String> get() = _password
+
+
     fun validateAndRegister(context: Context, login: String, password: String, repeatPassword: String) {
         when {
             login.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_login)
@@ -38,20 +45,24 @@ class RegViewModel @Inject constructor(
             repeatPassword.isBlank() -> _validationMessage.value = context.getString(R.string.repeat_password)
             password != repeatPassword -> _validationMessage.value = context.getString(R.string.pass_not_same)
             else -> {
-                reg(context, login, password)
+                _username.value = login
+                _password.value = password
+                reg(context)
             }
         }
     }
 
-    private fun reg(context: Context, login: String, password: String) {
+    private fun reg(context: Context) {
         viewModelScope.launch {
             try {
-                if (isInputLangValid(login) && isInputLangValid(password)) {
-                    val user = User(login, password)
+                val username = _username.value!!
+                val password = _password.value!!
+                if (isInputLangValid(username) && isInputLangValid(password)) {
+                    val user = User(username, password)
                     val response = apiService.registerUser(user)
                     Log.d("RegistrationResponse", "Response: $response")
                     _regRespMes.value = context.getString(R.string.user_registered)
-                    _wantComeBack.value = true
+                    _regStatus.value = true
                 } else {
                     _regRespMes.value = context.getString(R.string.lang_error)
                 }
@@ -66,10 +77,6 @@ class RegViewModel @Inject constructor(
     private fun isInputLangValid(input: String): Boolean {
         val regex = "^[a-zA-Z0-9]+$".toRegex()
         return regex.matches(input)
-    }
-
-    fun clickRegButton() {
-        _regStatus.value = true
     }
 
     fun clickComeBack() {
