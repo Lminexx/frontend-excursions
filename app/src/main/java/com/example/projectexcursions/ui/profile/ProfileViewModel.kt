@@ -1,11 +1,11 @@
 package com.example.projectexcursions.ui.profile
 
-import android.widget.Toast
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectexcursions.UsernameNotFoundException
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -22,6 +22,9 @@ class ProfileViewModel @Inject constructor(
     private val _wantCreate = MutableLiveData<Boolean>()
     val wantCreate: LiveData<Boolean> get() = _wantCreate
 
+    private val _wantComeBack = MutableLiveData<Boolean>()
+    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
+
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
 
@@ -32,13 +35,22 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val token = repository.getCachedToken()
             val decodedToken = token?.let { repository.decodeToken(it.token) }
-            val username = decodedToken?.get("username") as? String
-            if (username != null) {
+            val username = decodedToken?.get("username")?.asString()
+            if (!username.isNullOrEmpty()) {
                 _username.value = username
+                Log.d("UsernameCheck1", username)
+                Log.d("UsernameCheck2", _username.value!!)
             } else {
                 _message.value = "Username not found in token"
                 //throw UsernameNotFoundException("Username not found in token")
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            val token = repository.getCachedToken()
+            repository.deleteToken(token!!.token)
         }
     }
 
@@ -48,5 +60,13 @@ class ProfileViewModel @Inject constructor(
 
     fun isCreating() {
         _wantCreate.value = false
+    }
+
+    fun clickComeBack() {
+        _wantComeBack.value = true
+    }
+
+    fun cameBack() {
+        _wantComeBack.value = false
     }
 }

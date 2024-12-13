@@ -4,7 +4,7 @@
     <string name="password_hint">Пароль</string>
     <string name="login_string">Войти</string>
     <string name="reg_string">Зарегистрироваться</string>
-    <string name="repeat_password_hint">Повторите пароль</string>
+    <string name="repeat_password">Повторите пароль</string>
     <string name="comeback_text">Вернуться назад</string>
     <string name="list">Список</string>
     <string name="map">Карта</string>
@@ -23,4 +23,18 @@
     <string name="load">Загрузка</string>
     <string name="create_excursion">Создать экскурсию</string>
     <string name="user">Юзер</string>
+    <string name="log_out">Выйти</string>
+    <string name="lang_error">Используйте латинский алфавит!</string>
+    <string name="repeat_login">Повторите логин</string>
+    <string name="pass_not_same">Пароли не совпадают</string>
+    <string name="user_registered">Пользователь зарегестрирован</string>
+    <string name="user_exists">Пользователь существует</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="shit_happens">Произошла ошибка</string>
+    <string name="empty_desc">Заполните описание</string>
+    <string name="empty_title">Введите название</string>
+    <string name="create_success">Экскурсия создана успешно</string>
+    <string name="author_eaten">Автор съеден</string>
+    <string name="excursion_eaten">Экскурсия съедена</string>
+    <string name="invalid_excursion">Экскурсия-бедолага</string>
 </resources>

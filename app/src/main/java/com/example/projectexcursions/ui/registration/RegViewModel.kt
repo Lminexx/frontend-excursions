@@ -1,10 +1,12 @@
 package com.example.projectexcursions.ui.registration
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.projectexcursions.R
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,34 +31,42 @@ class RegViewModel @Inject constructor(
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
-    fun validateAndRegister(login: String, password: String, repeatPassword: String) {
+    fun validateAndRegister(context: Context, login: String, password: String, repeatPassword: String) {
         when {
-            login.isBlank() -> _validationMessage.value = "Введите логин"
-            password.isBlank() -> _validationMessage.value = "Введите пароль"
-            repeatPassword.isBlank() -> _validationMessage.value = "Повторите пароль"
-            password != repeatPassword -> _validationMessage.value = "Пароли не совпадают"
+            login.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_login)
+            password.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_password)
+            repeatPassword.isBlank() -> _validationMessage.value = context.getString(R.string.repeat_password)
+            password != repeatPassword -> _validationMessage.value = context.getString(R.string.pass_not_same)
             else -> {
-                reg(login, password)
+                reg(context, login, password)
             }
         }
     }
 
-    private fun reg(login: String, password: String) {
+    private fun reg(context: Context, login: String, password: String) {
         viewModelScope.launch {
             try {
-                val user = User(login, password)
-                val response = apiService.registerUser(user)
-                Log.d("RegistrationResponse", "Response: $response")
-                _regRespMes.value = "Пользователь зарегестрирован"
-                _wantComeBack.value = true
+                if (isInputLangValid(login) && isInputLangValid(password)) {
+                    val user = User(login, password)
+                    val response = apiService.registerUser(user)
+                    Log.d("RegistrationResponse", "Response: $response")
+                    _regRespMes.value = context.getString(R.string.user_registered)
+                    _wantComeBack.value = true
+                } else {
+                    _regRespMes.value = context.getString(R.string.lang_error)
+                }
             } catch (e: Exception) {
                 Log.e("RegistrationError", "Ошибка при регистрации: ${e.message}")
                 if (e.message!!.contains("409"))
-                    _regRespMes.value = "Пользователь уже существует"
+                    _regRespMes.value = context.getString(R.string.user_exists)
             }
         }
     }
 
+    private fun isInputLangValid(input: String): Boolean {
+        val regex = "^[a-zA-Z0-9]+$".toRegex()
+        return regex.matches(input)
+    }
 
     fun clickRegButton() {
         _regStatus.value = true
