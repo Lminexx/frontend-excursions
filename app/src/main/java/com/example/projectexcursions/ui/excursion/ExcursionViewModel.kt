@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.excursion
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,19 +23,24 @@ class ExcursionViewModel @Inject constructor(
 
     private val _excursion = MutableLiveData<Excursion?>()
     val excursion: LiveData<Excursion?> = _excursion
+
     fun loadExcursion(excursionId: Long) {
         viewModelScope.launch {
             try {
                 if (repository.getExcursionFromDB(excursionId) != null) {
                     val excursionFromDB = repository.getExcursionFromDB(excursionId)
-                    _excursion.postValue(excursionFromDB)
+                    _excursion.value = excursionFromDB
+                    Log.d("ExcursionInDB", "ExcExists")
                 } else {
-                    val response = apiService.getExcursion(excursionId)
-                    repository.saveExcursionToDB(response.excursion)
-                    _excursion.postValue(response.excursion)
+                    val response = repository.fetchExcursion(id = excursionId)
+                    val excursion = Excursion(response.id, response.title, response.description, response.username)
+                    repository.saveExcursionToDB(excursion)
+                    _excursion.value = excursion
+                    Log.d("ExcursionIsnInDB", "FetchExcursion")
                 }
             } catch (e: Exception) {
-                _excursion.postValue(null)
+                Log.e("LoadExcursion", e.message!!)
+                _excursion.value = null
             }
         }
     }

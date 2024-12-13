@@ -5,6 +5,8 @@ import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.User
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.HEAD
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -24,7 +26,10 @@ interface ApiService {
     @GET("excursion/{id}")
     suspend fun getExcursion(@Path("id") id: Long): ExcursionResponse
     @POST("excursion/create")
-    suspend fun createExcursion(@Body creatingExcursion: CreatingExcursion): ExcursionResponse
+    suspend fun createExcursion(
+        @Header("Authorization") token:String,
+        @Body creatingExcursion: CreatingExcursion
+    ): ExcursionResponse
 
     //todo миграция с http на https
 }

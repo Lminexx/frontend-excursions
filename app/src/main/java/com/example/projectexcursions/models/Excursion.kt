@@ -13,5 +13,5 @@ data class Excursion(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val title: String,
     val description: String,
-    val userId: Long?
+    val username: String
 ): Parcelable

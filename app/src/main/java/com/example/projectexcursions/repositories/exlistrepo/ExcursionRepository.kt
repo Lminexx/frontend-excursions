@@ -25,5 +25,5 @@ interface ExcursionRepository {
 
     suspend fun deleteAllExcursionsFromExcursion()
 
-    suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse
+    suspend fun createExcursion(token: String, creatingExcursion: CreatingExcursion): ExcursionResponse
 }

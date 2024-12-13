@@ -1,5 +1,6 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
+import android.util.Log
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.models.CreatingExcursion
@@ -19,22 +20,27 @@ class ExcursionRepositoryImpl(
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
     override suspend fun saveExcursionsToDB(excursionsLists: List<ExcursionsList>) {
+        Log.d("InsertExs", "InsertExcursions")
         excursionsDao.insertAll(excursionsLists)
     }
 
     override suspend fun saveExcursionToDB(excursion: Excursion) {
+        Log.d("InsertEx", "InsertExcursion")
         excursionDao.insert(excursion)
     }
 
     override suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionsResponse {
+        Log.d("FetchingExs", "FetchExcursions")
         return apiService.getExcursions(offset, limit)
     }
 
     override suspend fun fetchExcursion(id: Long): ExcursionResponse {
+        Log.d("FetchingEx", "FetchExcursion")
         return apiService.getExcursion(id)
     }
 
     override suspend fun getExcursionFromDB(id: Long): Excursion? {
+        Log.d("GettingEx", "GetExcursion")
         return excursionDao.getExcursionById(id)
     }
 
@@ -42,7 +48,7 @@ class ExcursionRepositoryImpl(
 
     override suspend fun deleteAllExcursionsFromExcursion() = excursionDao.clearAll()
 
-    override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
-        return apiService.createExcursion(creatingExcursion)
+    override suspend fun createExcursion(token: String, creatingExcursion: CreatingExcursion): ExcursionResponse {
+        return apiService.createExcursion(token, creatingExcursion)
     }
 }
