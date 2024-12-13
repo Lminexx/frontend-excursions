@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.CreatingExcursion
+import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,12 +50,13 @@ class CreateExcursionViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         val response = excursionRepository.createExcursion(token, excursion)
-                        excursionRepository.saveExcursionToDB(response.excursion)
+                        val respondedExcursion = Excursion(response.id, response.title, response.description, response.username)
+                        excursionRepository.saveExcursionToDB(respondedExcursion)
                         _message.value = context.getString(R.string.create_success)
-                        _createExcursion.value = true
                     } catch (e: Exception) {
                         _message.value = "Error: ${e.message}"
                         Log.e("CreatingExcursionError: ", e.message!!)
+                        _createExcursion.value = false
                     }
                 }
             }
@@ -84,9 +86,5 @@ class CreateExcursionViewModel @Inject constructor(
 
     fun clickCreateExcursion() {
         _createExcursion.value = true
-    }
-
-    fun excursionCreated() {
-        _createExcursion.value = false
     }
 }
