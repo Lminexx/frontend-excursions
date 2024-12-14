@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -98,6 +99,7 @@ dependencies {
     implementation(libs.androidx.room.paging)
     implementation(libs.java.jwt)
     implementation(libs.jwtdecode)
+    implementation(libs.maps.mobile)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
 }
