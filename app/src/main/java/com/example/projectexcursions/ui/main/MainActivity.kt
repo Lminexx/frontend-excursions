@@ -2,7 +2,7 @@ package com.example.projectexcursions.ui.main
 
 import com.example.projectexcursions.ui.excursionlist.ExListFragment
 import FavFragment
-import MapFragment
+import com.example.projectexcursions.ui.map.MapFragment
 import android.app.Activity
 import android.content.Intent
 import com.example.projectexcursions.ui.profile.ProfileFragment
@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityMainBinding
 import com.example.projectexcursions.ui.auth.AuthActivity
-import com.example.projectexcursions.ui.registration.RegActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
