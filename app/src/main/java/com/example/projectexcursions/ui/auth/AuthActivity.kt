@@ -35,7 +35,7 @@ class AuthActivity: AppCompatActivity() {
             if (successAuth) {
                 val intent = createAuthResultIntent(true)
                 setResult(Activity.RESULT_OK, intent)
-                finish()
+                startActivity(Intent(this@AuthActivity, MainActivity::class.java))
             } else {
                 Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()
             }
