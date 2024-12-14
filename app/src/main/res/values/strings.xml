@@ -37,4 +37,5 @@
     <string name="author_eaten">Автор съеден</string>
     <string name="excursion_eaten">Экскурсия съедена</string>
     <string name="invalid_excursion">Экскурсия-бедолага</string>
+    <string name="error_reg">Ошибка регистрации</string>
 </resources>

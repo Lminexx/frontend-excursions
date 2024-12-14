@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,8 +44,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                 Log.d("WantCreate", "WantCreate")
                 val title = binding.excursionTitle.text.toString()
                 val description = binding.excursionDescription.text.toString()
-                viewModel.createExcursion(this@CreateExcursionActivity, title, description)
-                startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
+                if (viewModel.isExcursionCorrect(this, title, description)) {
+                    viewModel.createExcursion(this@CreateExcursionActivity, title, description)
+                    startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
+                }
             }
         }
 
