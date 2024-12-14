@@ -2,11 +2,12 @@ package com.example.projectexcursions.ui.main
 
 import com.example.projectexcursions.ui.excursionlist.ExListFragment
 import FavFragment
-import MapFragment
+import com.example.projectexcursions.ui.map.MapFragment
 import android.app.Activity
 import android.content.Intent
 import com.example.projectexcursions.ui.profile.ProfileFragment
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        Log.d("StartMainActivity", "MainActivityStarted")
 
         viewModel.setStartFragment()
         initCallBack()
@@ -79,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val isAuth = data?.getBooleanExtra(AuthActivity.EXTRA_AUTH_STATUS, false) ?: false
+            Log.d("AuthDataNaN?","$data")
             if (isAuth) {
                 replaceFragment(ProfileFragment())
             }
