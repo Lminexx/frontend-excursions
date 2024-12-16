@@ -15,7 +15,7 @@ class ExcursionRepositoryImpl(
     private val excursionsDao: ExcursionsDao,
     private val excursionDao: ExcursionDao
 ) : ExcursionRepository {
-    override fun getExcursionsPaging() = ExcursionPagingSource(apiService)
+    override fun excursionPagingSource() = ExcursionPagingSource(apiService)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 

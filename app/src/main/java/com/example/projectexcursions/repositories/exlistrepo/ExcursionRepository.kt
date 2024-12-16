@@ -7,7 +7,7 @@ import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
 
 interface ExcursionRepository {
-    fun getExcursionsPaging(): ExcursionPagingSource
+    fun excursionPagingSource(): ExcursionPagingSource
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
