@@ -27,7 +27,7 @@
     <string name="lang_error">Используйте латинский алфавит!</string>
     <string name="repeat_login">Повторите логин</string>
     <string name="pass_not_same">Пароли не совпадают</string>
-    <string name="user_registered">Пользователь зарегестрирован</string>
+    <string name="user_registered">Пользователь зарегистрирован</string>
     <string name="user_exists">Пользователь существует</string>
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="shit_happens">Произошла ошибка</string>
