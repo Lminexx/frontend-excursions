@@ -17,7 +17,7 @@ abstract class OpenWorldDB: RoomDatabase() {
 
     abstract fun excursionDao(): ExcursionDao
 
-    abstract fun tokenDao(): TokenDao
+        abstract fun tokenDao(): TokenDao
 
     companion object {
         @Volatile

@@ -25,6 +25,7 @@ class ProfileViewModel @Inject constructor(
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
+    //временная заглушка
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
 

@@ -18,7 +18,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class ProfileFragment: Fragment(R.layout.fragment_profile) {
 
     private lateinit var binding: FragmentProfileBinding
-
     private val viewModel: ProfileViewModel by viewModels()
 
     override fun onCreateView(

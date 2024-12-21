@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class ExcursionResponse (
     val id: Long,
     val title: String,
+    val userId: Long,
     val description: String,
     val username: String
 )
