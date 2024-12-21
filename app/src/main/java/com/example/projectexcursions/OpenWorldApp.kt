@@ -1,11 +1,11 @@
-package com.example.projectexcursions;
+package com.example.projectexcursions
 
 import android.app.Application
 import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class OpenWorldApp : Application() {
+class OpenWorldApp: Application() {
 
     companion object {
         private var instance: OpenWorldApp? = null

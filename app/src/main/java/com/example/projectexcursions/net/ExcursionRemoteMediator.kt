@@ -18,12 +18,23 @@ class ExcursionRemoteMediator @Inject constructor(
         state: PagingState<Int, ExcursionsList>
     ): MediatorResult {
         val page = when (loadType) {
-            LoadType.REFRESH -> 0
-            LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
+            LoadType.REFRESH -> {
+                0
+            }
+            LoadType.PREPEND -> {
+                Log.d("LoadType", "LoadTypePrepended")
+                return MediatorResult.Success(endOfPaginationReached = true)
+            }
             LoadType.APPEND -> {
+                Log.d("LoadType", "LoadTypeAppended")
+                val pageCount: Int = if (state.firstItemOrNull() != null) {
+                    state.firstItemOrNull()!!.id.toInt().div(10)
+                } else {
+                    0
+                }
                 val lastItem = state.lastItemOrNull()
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
-                lastItem.id
+                pageCount.minus(lastItem.id.toInt().div(10))
             }
         }.toInt()
         return try {
