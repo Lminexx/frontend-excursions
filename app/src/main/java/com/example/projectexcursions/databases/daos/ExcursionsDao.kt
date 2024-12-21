@@ -15,7 +15,7 @@ interface ExcursionsDao {
     @Query("select * from excursions")
     suspend fun getAllExcursions(): List<ExcursionsList>
 
-    @Query("select * from excursions")
+    @Query("select * from excursions order by id desc")
     fun getPagingSource(): PagingSource<Int, ExcursionsList>
 
     @Query("delete from excursions")
