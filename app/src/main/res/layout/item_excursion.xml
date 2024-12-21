@@ -9,16 +9,16 @@
     <TextView
         android:id="@+id/tv_excursion_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:layout_height="20dp"
+        android:textSize="16sp"
         android:textColor="@android:color/black"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tv_excursion_description"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:layout_height="20dp"
+        android:textSize="16sp"
         android:textColor="@android:color/darker_gray"
         android:layout_marginTop="4dp" />
 </LinearLayout>
