@@ -3,6 +3,7 @@ package com.example.projectexcursions.net
 import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
+import androidx.paging.PagingData
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.example.projectexcursions.models.ExcursionsList
@@ -19,6 +20,7 @@ class ExcursionRemoteMediator @Inject constructor(
     ): MediatorResult {
         val page = when (loadType) {
             LoadType.REFRESH -> {
+                repository.deleteAllExcursionsFromExcursions()
                 0
             }
             LoadType.PREPEND -> {
@@ -26,23 +28,25 @@ class ExcursionRemoteMediator @Inject constructor(
                 return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
-                Log.d("LoadType", "LoadTypeAppended")
-                val pageCount: Int = if (state.firstItemOrNull() != null) {
-                    state.firstItemOrNull()!!.id.toInt().div(10)
-                } else {
-                    0
+                Log.d("RemoteMediator", "Pages size: ${state.pages.size}")
+                state.pages.forEachIndexed { index, page ->
+                    Log.d("RemoteMediator", "Page $index, NextKey: ${page.nextKey}, PrevKey: ${page.prevKey}")
                 }
-                val lastItem = state.lastItemOrNull()
+                Log.d("LoadType", "LoadTypeAppended")
+                val nextKey = state.pages.lastOrNull()?.nextKey
                     ?: return MediatorResult.Success(endOfPaginationReached = true)
-                pageCount.minus(lastItem.id.toInt().div(10))
+                Log.d("NextKey", "$nextKey")
+                nextKey
             }
-        }.toInt()
+        }
         return try {
+            Log.d("Page", "$page")
             val response = repository.fetchExcursions(page, state.config.pageSize)
-            Log.d("ExcursionsGetter", "Get excursions")
+            Log.d("ExcursionsGetter", "$response")
             val excursions = response.content
+            Log.d("ExcursionsToSave", "Page: $page, Excursions: ${excursions.size}")
             repository.saveExcursionsToDB(excursions)
-            Log.d("SaveExc",  "SaveExc")
+            Log.d("ExcursionRemoting", "SaveExcs")
             MediatorResult.Success(endOfPaginationReached = excursions.isEmpty())
         } catch (e: Exception) {
             MediatorResult.Error(e)
