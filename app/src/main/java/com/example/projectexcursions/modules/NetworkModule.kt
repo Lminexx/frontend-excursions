@@ -33,11 +33,11 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor {chain ->
-                val token = runBlocking { tokenRepo.getToken() }
+                val token = runBlocking { tokenRepo.getToken()?.token }
                 val request = chain.request()
                 val requestBuilder = request.newBuilder()
                 if (token != null) {
-                    requestBuilder.addHeader("Authorization", "Bearer $token")
+                    requestBuilder.addHeader("Authorization", token.toString())
                 }
                 chain.proceed(requestBuilder.build())
             }

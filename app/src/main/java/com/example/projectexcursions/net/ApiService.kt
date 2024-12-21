@@ -1,11 +1,9 @@
 package com.example.projectexcursions.net
 
 import com.example.projectexcursions.models.CreatingExcursion
-import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.User
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.HEAD
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -27,7 +25,6 @@ interface ApiService {
     suspend fun getExcursion(@Path("id") id: Long): ExcursionResponse
     @POST("excursion/create")
     suspend fun createExcursion(
-        @Header("Authorization") token:String,
         @Body creatingExcursion: CreatingExcursion
     ): ExcursionResponse
 

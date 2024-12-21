@@ -66,5 +66,6 @@ class TokenRepositoryImpl @Inject constructor(
             cachedToken
         else
             null
+        Log.d("GetCachedToken","$cachedToken")
     }
 }

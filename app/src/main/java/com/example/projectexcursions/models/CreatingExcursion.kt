@@ -5,6 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreatingExcursion(
     val title: String,
-    val description: String,
-    val username: String
+    val description: String
 )

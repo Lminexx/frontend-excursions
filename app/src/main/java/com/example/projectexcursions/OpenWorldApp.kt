@@ -9,10 +9,6 @@ class OpenWorldApp : Application() {
 
     companion object {
         private var instance: OpenWorldApp? = null
-
-        fun getInstance(): OpenWorldApp {
-            return instance ?: throw IllegalStateException("OpenWorldApp is not initialized")
-        }
     }
 
     override fun onCreate() {

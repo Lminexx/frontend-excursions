@@ -55,6 +55,7 @@ class AuthViewModel @Inject constructor(
                 val response = apiService.authUser(user)
                 _token.value = response.token
                 tokenRepository.saveToken(Token(token = token.value!!))
+                Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
                 _loginStatus.value = true
             } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false

@@ -7,7 +7,6 @@ plugins {
     id("kotlin-parcelize")
 }
 
-
 android {
     namespace = "com.example.projectexcursions"
     compileSdk = 34
@@ -100,7 +99,7 @@ dependencies {
     implementation(libs.java.jwt)
     implementation(libs.jwtdecode)
     implementation(libs.maps.mobile)
-    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation(libs.play.services.location)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
 }
