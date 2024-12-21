@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
-import com.example.projectexcursions.adapters.ExcursionAdapter
+import com.example.projectexcursions.adapter.ExcursionAdapter
 import com.example.projectexcursions.databinding.FragmentExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
@@ -23,10 +23,8 @@ import javax.inject.Inject
 class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
 
     private lateinit var binding: FragmentExcursionsListBinding
-
     @Inject
     lateinit var adapter: ExcursionAdapter
-
     private val viewModel: ExListViewModel by viewModels()
 
     override fun onCreateView(

@@ -25,7 +25,6 @@ class RegViewModel @Inject constructor(
     val regRespMes: LiveData<String?> get() = _regRespMes
 
     private val _regStatus = MutableLiveData<Boolean>()
-
     val regStatus: LiveData<Boolean> get() = _regStatus
 
     private val _wantComeBack = MutableLiveData<Boolean>()

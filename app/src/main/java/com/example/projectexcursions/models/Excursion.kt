@@ -12,6 +12,7 @@ import kotlinx.parcelize.Parcelize
 data class Excursion(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val title: String,
+    val userId: Long,
     val description: String,
     val username: String
 ): Parcelable
