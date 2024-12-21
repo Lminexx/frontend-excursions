@@ -18,7 +18,7 @@ class ExcursionRepositoryImpl @Inject constructor(
     private val excursionDao: ExcursionDao,
     private val tokenRepository: TokenRepository
 ) : ExcursionRepository {
-    override fun getExcursionsPaging() = ExcursionPagingSource(apiService)
+    override fun excursionPagingSource() = ExcursionPagingSource(apiService)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -52,7 +52,6 @@ class ExcursionRepositoryImpl @Inject constructor(
     override suspend fun deleteAllExcursionsFromExcursion() = excursionDao.clearAll()
 
     override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
-        val token = tokenRepository.getCachedToken()!!.token
-        return apiService.createExcursion(token, creatingExcursion)
+        return apiService.createExcursion(creatingExcursion)
     }
 }

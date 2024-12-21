@@ -1,4 +1,4 @@
-package com.example.projectexcursions.adapters
+package com.example.projectexcursions.adapter
 
 import android.util.Log
 import android.view.LayoutInflater

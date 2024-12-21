@@ -27,27 +27,26 @@ class CreateExcursionViewModel @Inject constructor(
     private val _createExcursion = MutableLiveData<Boolean>()
     val createExcursion: LiveData<Boolean> get() = _createExcursion
 
-    private val _wantCreateExc = MutableLiveData<Boolean>()
-    val wantCreateExc: LiveData<Boolean> get() = _wantCreateExc
-
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
 
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
+
     init {
         getUsername()
     }
 
     fun createExcursion(context: Context, title: String, description: String) {
                 Log.d("CreatingExcursion", "CreatingExcursion")
-                val excursion = CreatingExcursion(title, description, username.value!!)
+                val excursion = CreatingExcursion(title, description)
                 viewModelScope.launch {
                     try {
                         val response = excursionRepository.createExcursion(excursion)
-                        val respondedExcursion = Excursion(response.id, response.title, response.description, response.username)
+                        val respondedExcursion = Excursion(response.id, response.title, response.userId, response.description, response.username)
                         excursionRepository.saveExcursionToDB(respondedExcursion)
                         _message.value = context.getString(R.string.create_success)
+                        _wantComeBack.value = true
                     } catch (e: Exception) {
                         _message.value = "Error: ${e.message}"
                         Log.e("CreatingExcursionError: ", e.message!!)
