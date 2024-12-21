@@ -37,7 +37,7 @@ class ExListViewModel @Inject constructor(
             enablePlaceholders = false
         ),
         remoteMediator = remoteMediator,
-        pagingSourceFactory = { excursionsDao.getPagingSource() }
+        pagingSourceFactory = { repository.excursionPagingSource() }
     ).flow.cachedIn(viewModelScope)
 
     fun clickExcursion(excursionsList: ExcursionsList) {

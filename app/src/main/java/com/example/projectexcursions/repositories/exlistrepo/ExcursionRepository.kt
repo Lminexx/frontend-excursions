@@ -1,5 +1,6 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
+import androidx.paging.PagingSource
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
