@@ -19,6 +19,9 @@
             android:text="@string/user"
             android:textColor="#000000"
             android:textSize="24sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:scrollHorizontally="false"
             app:layout_constraintStart_toEndOf="@id/userPhoto"
             app:layout_constraintTop_toTopOf="parent" />
 
