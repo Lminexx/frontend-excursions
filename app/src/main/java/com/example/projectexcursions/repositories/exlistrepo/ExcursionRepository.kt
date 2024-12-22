@@ -1,5 +1,6 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
@@ -8,7 +9,7 @@ import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
 
 interface ExcursionRepository {
-    fun excursionPagingSource(): ExcursionPagingSource
+    fun excursionPagingSource(): PagingSource<Int, ExcursionsList>
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
