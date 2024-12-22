@@ -43,8 +43,8 @@ class CreateExcursionActivity : AppCompatActivity() {
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
                 Log.d("WantCreate", "WantCreate")
-                val title = binding.excursionTitle.text.toString().trim()
-                val description = binding.excursionDescription.text.toString().trim()
+                val title = binding.excursionTitle.text.toString()
+                val description = binding.excursionDescription.text.toString()
                 if (viewModel.isExcursionCorrect(this, title, description)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
                     startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))

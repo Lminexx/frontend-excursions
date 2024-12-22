@@ -12,7 +12,6 @@ import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 class ExcursionActivity : AppCompatActivity() {
 
