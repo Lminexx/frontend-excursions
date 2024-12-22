@@ -3,6 +3,7 @@ package com.example.projectexcursions.ui.excursion
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,7 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class ExcursionActivity : AppCompatActivity() {
@@ -36,6 +38,7 @@ class ExcursionActivity : AppCompatActivity() {
             return
         }
         viewModel.loadExcursion(excursionId)
+        binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 
     private fun subscribe() {

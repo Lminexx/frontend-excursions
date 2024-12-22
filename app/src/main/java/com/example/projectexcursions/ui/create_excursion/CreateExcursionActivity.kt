@@ -2,6 +2,7 @@ package com.example.projectexcursions.ui.create_excursion
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -28,6 +29,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     private fun initCallback() {
         binding.buttonComeback.setOnClickListener { viewModel.clickComeBack() }
         binding.buttonCreateExcursion.setOnClickListener { viewModel.clickCreateExcursion() }
+        binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 
     private fun subscribe() {
@@ -41,8 +43,8 @@ class CreateExcursionActivity : AppCompatActivity() {
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
                 Log.d("WantCreate", "WantCreate")
-                val title = binding.excursionTitle.text.toString()
-                val description = binding.excursionDescription.text.toString()
+                val title = binding.excursionTitle.text.toString().trim()
+                val description = binding.excursionDescription.text.toString().trim()
                 if (viewModel.isExcursionCorrect(this, title, description)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
                     startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))

@@ -12,7 +12,10 @@
         android:layout_height="20dp"
         android:textSize="16sp"
         android:textColor="@android:color/black"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:scrollHorizontally="false" />
 
     <TextView
         android:id="@+id/tv_excursion_description"
@@ -20,5 +23,8 @@
         android:layout_height="20dp"
         android:textSize="16sp"
         android:textColor="@android:color/darker_gray"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="4dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:scrollHorizontally="false" />
 </LinearLayout>

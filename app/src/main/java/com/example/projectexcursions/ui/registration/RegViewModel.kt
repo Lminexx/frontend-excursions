@@ -74,7 +74,7 @@ class RegViewModel @Inject constructor(
     }
 
     private fun isInputLangValid(input: String): Boolean {
-        val regex = "^[a-zA-Z0-9]+$".toRegex()
+        val regex = "^[a-zA-Z0-9!@#\$%^&*()_+{}\\[\\]:;<>,.?~\\-=\\s]*\$".toRegex()
         return regex.matches(input)
     }
 

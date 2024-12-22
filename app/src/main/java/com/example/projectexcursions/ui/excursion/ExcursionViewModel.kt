@@ -44,6 +44,7 @@ class ExcursionViewModel @Inject constructor(
             }
         }
     }
+
     fun clickComeback() {
         _wantComeBack.value = true
     }
