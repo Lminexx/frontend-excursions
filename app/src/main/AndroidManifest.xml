@@ -6,16 +6,18 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:name=".OpenWorldApp"
-        android:icon="@drawable/ic_app"
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_app_v3"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:roundIcon="@drawable/ic_app"
+        android:roundIcon="@drawable/ic_app_v3"
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjectExcursions"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:enableOnBackInvokedCallback="true">
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="tiramisu">
         <activity
             android:name="com.example.projectexcursions.ui.main.MainActivity"
             android:exported="true">

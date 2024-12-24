@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">ProjectExcursions</string>
     <string name="login_hint">Логин</string>
     <string name="password_hint">Пароль</string>
     <string name="login_string">Войти</string>
@@ -39,4 +38,6 @@
     <string name="invalid_excursion">Экскурсия-бедолага</string>
     <string name="error_reg">Ошибка регистрации</string>
     <string name="profilelogo">ProfileLogo</string>
+    <string name="logo">Лого</string>
+    <string name="app_name">OpenWorld</string>
 </resources>
