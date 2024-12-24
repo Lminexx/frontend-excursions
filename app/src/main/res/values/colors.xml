@@ -12,4 +12,7 @@
     <color name="light_yellow">#FFFFCC</color>
     <color name="yellow">#FFFF00</color>
     <color name="dark_yellow">#AAAA00</color>
+    <color name="lighter_blue">#FF01C5F6</color>
+    <color name="blue">#FF0176ED</color>
+    <color name="biryuzoviy">#FF01C5D0</color>
 </resources>
