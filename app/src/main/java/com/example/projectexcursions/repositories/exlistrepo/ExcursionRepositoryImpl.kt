@@ -1,6 +1,7 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
 import android.util.Log
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databases.daos.ExcursionsDao
@@ -20,7 +21,9 @@ class ExcursionRepositoryImpl @Inject constructor(
     private val tokenRepository: TokenRepository
 ) : ExcursionRepository {
 
-    override fun excursionPagingSource() = ExcursionPagingSource(apiService)
+    override fun excursionPagingSource(): PagingSource<Int, ExcursionsList> {
+        return excursionsDao.getPagingSource()
+    }
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
