@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.yandex.mapkit.MapKitFactory
@@ -28,6 +29,9 @@ class MapFragment:Fragment(R.layout.fragment_map) {
         binding = FragmentMapBinding.inflate(inflater, container, false)
         mapView = binding.mapview
 
+        initCallback()
+        subscribe()
+
         return binding.root
     }
 
@@ -44,4 +48,8 @@ class MapFragment:Fragment(R.layout.fragment_map) {
         MapKitFactory.getInstance().onStop()
         super.onStop()
     }
+
+    private fun initCallback() {}
+
+    private fun subscribe() {}
 }

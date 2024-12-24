@@ -100,6 +100,7 @@ dependencies {
     implementation(libs.jwtdecode)
     implementation(libs.maps.mobile)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.core.splashscreen)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
 }
