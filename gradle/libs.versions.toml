@@ -1,6 +1,7 @@
 [versions]
 activityKtx = "1.9.3"
 agp = "8.4.1"
+coreSplashscreen = "1.0.1"
 hiltAndroid = "2.51.1"
 javaJwt = "3.18.2"
 jwtdecode = "2.0.0"
@@ -28,6 +29,7 @@ playServicesMaps = "19.0.0"
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleLivedataKtx" }
