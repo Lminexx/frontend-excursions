@@ -10,14 +10,17 @@ plugins {
 android {
     namespace = "com.example.projectexcursions"
     compileSdk = 34
-
     defaultConfig {
         applicationId = "com.example.projectexcursions"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
+        buildConfigField(
+            type = "String",
+            name = "MAPKIT_API_KEY",
+            value = "\"${project.findProperty("yandexMapKitApiKey")}\"",
+        )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -60,6 +63,7 @@ buildTypes {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     packaging {
         resources {
