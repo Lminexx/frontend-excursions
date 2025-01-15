@@ -15,7 +15,6 @@ class OpenWorldApp: Application() {
         super.onCreate()
         instance = this
 
-        val MAPKIT_API_KEY = "05f28853-a7b8-468b-83b5-7f909106b088" //не воруйте пж
-        MapKitFactory.setApiKey(MAPKIT_API_KEY)
+        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
     }
 }

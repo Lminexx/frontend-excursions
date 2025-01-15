@@ -13,6 +13,7 @@ import com.yandex.mapkit.mapview.MapView
 
 class MapFragment:Fragment(R.layout.fragment_map) {
 
+    private val viewModel: MapViewModel by viewModels()
     private lateinit var mapView: MapView
     private lateinit var binding: FragmentMapBinding
 
