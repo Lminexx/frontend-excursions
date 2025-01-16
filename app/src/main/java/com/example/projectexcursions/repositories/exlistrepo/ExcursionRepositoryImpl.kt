@@ -21,6 +21,7 @@ class ExcursionRepositoryImpl @Inject constructor(
 ) : ExcursionRepository {
 
     override fun excursionPagingSource() = ExcursionPagingSource(apiService)
+    override fun searchExcursionPagingSource(excursionTitle: String) = SearchExcursionPagingSource(apiService, excursionTitle)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -55,5 +56,15 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
         return apiService.createExcursion(creatingExcursion)
+    }
+
+    //вроде как не нужен, но на всякий случай оставлю
+    override suspend fun searchExcursions(
+        query: String,
+        offset: Int,
+        limit: Int
+    ): ExcursionsResponse {
+        Log.d("FetchingExs", "FetchExcursions")
+        return apiService.searchExcursions(query, offset, limit)
     }
 }
