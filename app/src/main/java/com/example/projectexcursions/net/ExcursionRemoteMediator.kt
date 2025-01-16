@@ -25,7 +25,6 @@ class ExcursionRemoteMediator @Inject constructor(
             }
             LoadType.PREPEND -> {
                 Log.d("LoadType", "LoadTypePrepended")
-                return MediatorResult.Success(endOfPaginationReached = true)
             }
             LoadType.APPEND -> {
                 Log.d("RemoteMediator", "Pages size: ${state.pages.size}")
