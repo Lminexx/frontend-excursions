@@ -21,6 +21,7 @@ class ExcursionRepositoryImpl @Inject constructor(
 ) : ExcursionRepository {
 
     override fun excursionPagingSource() = ExcursionPagingSource(apiService)
+
     override fun searchExcursionPagingSource(excursionTitle: String) = SearchExcursionPagingSource(apiService, excursionTitle)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
