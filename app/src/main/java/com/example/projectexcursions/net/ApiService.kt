@@ -27,6 +27,11 @@ interface ApiService {
     suspend fun createExcursion(
         @Body creatingExcursion: CreatingExcursion
     ): ExcursionResponse
-
+    @POST("excursion/search")
+    suspend fun searchExcursions(
+        @Query("query") query: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): ExcursionsResponse
     //todo миграция с http на https
 }

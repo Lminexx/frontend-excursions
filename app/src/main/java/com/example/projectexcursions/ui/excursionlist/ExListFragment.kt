@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -48,13 +49,34 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
                 viewModel.clickExcursion(excursionsList)
             }
         }
+
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
+
         binding.recyclerView.adapter = adapter
+
+        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let { viewModel.searchExcursionsQuery(it)}
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let { viewModel.searchExcursionsQuery(it) }
+                return true
+            }
+        })
     }
 
     private fun subscribe() {
         lifecycleScope.launch {
             viewModel.excursions.collectLatest { pagingData ->
+                adapter.submitData(pagingData)
+                Log.d("GetAllExcursions", "All excursions was get")
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.searchedExcursions.collectLatest { pagingData ->
                 adapter.submitData(pagingData)
                 Log.d("GetAllExcursions", "All excursions was get")
             }

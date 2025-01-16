@@ -40,4 +40,5 @@
     <string name="profilelogo">ProfileLogo</string>
     <string name="logo">Лого</string>
     <string name="app_name">OpenWorld</string>
+    <string name="search_hint">Найти экскурсию</string>
 </resources>
