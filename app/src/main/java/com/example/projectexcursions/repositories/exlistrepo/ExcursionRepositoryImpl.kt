@@ -21,9 +21,9 @@ class ExcursionRepositoryImpl @Inject constructor(
     private val tokenRepository: TokenRepository
 ) : ExcursionRepository {
 
-    override fun excursionPagingSource(): PagingSource<Int, ExcursionsList> {
-        return excursionsDao.getPagingSource()
-    }
+    override fun excursionPagingSource() = ExcursionPagingSource(apiService)
+
+    override fun searchExcursionPagingSource(excursionTitle: String) = SearchExcursionPagingSource(apiService, excursionTitle)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
