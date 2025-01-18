@@ -20,6 +20,8 @@ class ExcursionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityExcursionBinding
 
+    private var isFavorite: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExcursionBinding.inflate(layoutInflater)
@@ -33,7 +35,8 @@ class ExcursionActivity : AppCompatActivity() {
     private fun initData() {
         val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
         if (excursionId == -1L) {
-            Toast.makeText(this, this.getString(R.string.invalid_excursion), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, this.getString(R.string.invalid_excursion), Toast.LENGTH_SHORT)
+                .show()
             finish()
             return
         }
@@ -52,7 +55,8 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionAuthor.text = excursion.username
                 binding.excursionDescription.text = excursion.description
             } else {
-                Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -61,6 +65,17 @@ class ExcursionActivity : AppCompatActivity() {
         binding.buttonComeback.setOnClickListener {
             startActivity(Intent(this@ExcursionActivity, MainActivity::class.java))
             viewModel.clickComeback()
+        }
+    }
+
+    private fun initFavorite() {
+
+        binding.favoriteButton.setOnClickListener {
+            if(isFavorite){
+
+            } else{
+
+            }
         }
     }
 
