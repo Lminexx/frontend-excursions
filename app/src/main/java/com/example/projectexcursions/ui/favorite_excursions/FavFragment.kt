@@ -1,3 +1,5 @@
+package com.example.projectexcursions.ui.favorite_excursions
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,20 +13,21 @@ import com.example.projectexcursions.ui.favorite_excursions.FavViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-//@AndroidEntryPoint
+@AndroidEntryPoint
 class FavFragment : Fragment(R.layout.fragment_fav) {
 
-//    private lateinit var binding: FragmentFavBinding
-//    @Inject
-//    lateinit var adapter: FavAdapter
-//    private val viewModel: FavViewModel by viewModels()
-//
-//    override fun onCreateView(
-//        inflater: LayoutInflater,
-//        container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View {
-//        binding = FragmentFavBinding.inflate(inflater, container, false)
-//        return binding.root
-//    }
+    private lateinit var binding: FragmentFavBinding
+    @Inject
+    lateinit var adapter: FavAdapter
+    private val viewModel: FavViewModel by viewModels()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentFavBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
 }

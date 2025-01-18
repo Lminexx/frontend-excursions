@@ -59,4 +59,12 @@ class ExcursionRepositoryImpl @Inject constructor(
     override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
         return apiService.createExcursion(creatingExcursion)
     }
+
+    override suspend fun addFavorite(token: String, id: Long) {
+        //apiService.addFavorite(token, id)
+    }
+
+    override suspend fun deleteFavorite(token: String, id: Long) {
+        //apiService.deleteFavorite(token, id)
+    }
 }
