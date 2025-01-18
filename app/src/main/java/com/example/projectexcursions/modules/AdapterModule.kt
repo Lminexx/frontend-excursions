@@ -4,7 +4,6 @@ import androidx.recyclerview.widget.DiffUtil
 import com.example.projectexcursions.adapter.ExcursionAdapter
 import com.example.projectexcursions.adapter.FavAdapter
 import com.example.projectexcursions.models.ExcursionsList
-import com.example.projectexcursions.models.FavExcursionsList
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +19,7 @@ object AdapterModule {
     }
 
     @Provides
-    fun provideFunAdapter(diffCallback: DiffUtil.ItemCallback<FavExcursionsList>): FavAdapter{
+    fun provideFuvAdapter(diffCallback: DiffUtil.ItemCallback<ExcursionsList>): FavAdapter{
         return FavAdapter(diffCallback)
     }
 

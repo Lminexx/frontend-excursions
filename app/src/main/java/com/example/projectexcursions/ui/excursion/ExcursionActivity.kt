@@ -7,10 +7,12 @@ import android.text.method.ScrollingMovementMethod
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -41,6 +43,9 @@ class ExcursionActivity : AppCompatActivity() {
             return
         }
         viewModel.loadExcursion(excursionId)
+//        if(viewModel.excursion.value!!.favorite){
+//            binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
+//        }
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 
@@ -59,6 +64,14 @@ class ExcursionActivity : AppCompatActivity() {
                     .show()
             }
         }
+
+        viewModel.favorite.observe(this){favorite->
+            if(favorite){
+                viewModel.addFavorite()
+            }else{
+                viewModel.deleteFavorite()
+            }
+        }
     }
 
     private fun initCallback() {
@@ -66,15 +79,26 @@ class ExcursionActivity : AppCompatActivity() {
             startActivity(Intent(this@ExcursionActivity, MainActivity::class.java))
             viewModel.clickComeback()
         }
-    }
-
-    private fun initFavorite() {
-
         binding.favoriteButton.setOnClickListener {
-            if(isFavorite){
-
-            } else{
-
+            lifecycleScope.launch {
+                if (viewModel.checkAuthStatus()) {
+                    if (isFavorite) {
+                        binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_hollow)
+                        isFavorite = false
+                        viewModel.clickNotFavorite()
+                    } else {
+                        binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
+                        isFavorite = true
+                        viewModel.clickFavorite()
+                    }
+                } else {
+                    Toast.makeText(
+                        this@ExcursionActivity,
+                        this@ExcursionActivity.getString(R.string.error_favorite),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
             }
         }
     }

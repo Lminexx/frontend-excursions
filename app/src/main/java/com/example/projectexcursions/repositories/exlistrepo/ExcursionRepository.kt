@@ -28,4 +28,8 @@ interface ExcursionRepository {
     suspend fun deleteAllExcursionsFromExcursion()
 
     suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse
+
+    suspend fun addFavorite(token:String, id:Long)
+
+    suspend fun deleteFavorite(token:String, id:Long)
 }
