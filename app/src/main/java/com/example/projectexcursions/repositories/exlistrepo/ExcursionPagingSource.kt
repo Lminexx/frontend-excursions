@@ -16,8 +16,10 @@ class ExcursionPagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
         val position = params.key ?: 0
         Log.d("PagingSource", "Loading page: $position")
+        Log.d("Paging", "Offset: $position")
+        Log.d("Paging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.getExcursions(offset = position, limit = params.loadSize)
+            val response = apiService.getExcursions(offset = position, limit = params.loadSize, favoriteFlag = false)
             val excursions = response.content
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1

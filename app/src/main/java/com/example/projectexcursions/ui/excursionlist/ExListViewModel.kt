@@ -64,7 +64,7 @@ class ExListViewModel @Inject constructor(
                         pageSize = 10,
                         enablePlaceholders = false
                     ),
-                    pagingSourceFactory = { repository.excursionPagingSource() }
+                    pagingSourceFactory = { repository.searchExcursionPagingSource(query) }
                 ).flow
             }
         }.cachedIn(viewModelScope)

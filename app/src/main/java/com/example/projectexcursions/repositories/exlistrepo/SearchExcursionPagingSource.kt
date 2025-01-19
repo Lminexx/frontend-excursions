@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class SearchExcursionPagingSource @Inject constructor(
     private val apiService: ApiService,
-    private val excursionTitle: String
+    private val query: String
 ): PagingSource<Int, ExcursionsList>() {
     override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
         return state.anchorPosition?.let {anchorPosition ->
@@ -22,14 +22,17 @@ class SearchExcursionPagingSource @Inject constructor(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
         val position = params.key ?: 0
-        Log.d("PagingSource", "Loading page: $position")
+        Log.d("SearchPagingSource", "Loading page: $position")
+        Log.d("SearchPaging", "Query: ${query.trim()}")
+        Log.d("SearchPaging", "Offset: $position")
+        Log.d("SearchPaging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.searchExcursions(query = excursionTitle, offset = position, limit = params.loadSize)
+            val response = apiService.searchExcursions(query = query.trim(), offset = position, limit = params.loadSize, favoriteFlag = false)
             val excursions = response.content
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1
             val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
-            Log.d("PagingSource", "NextKey: $nextKey, PrevKey: $prevKey")
+            Log.d("SearchPagingSource", "NextKey: $nextKey, PrevKey: $prevKey")
 
             LoadResult.Page(
                 data = excursions,
