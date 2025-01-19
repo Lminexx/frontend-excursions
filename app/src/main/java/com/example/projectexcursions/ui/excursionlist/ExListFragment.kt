@@ -9,6 +9,7 @@ import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
@@ -56,15 +57,36 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
 
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let { viewModel.searchExcursionsQuery(it)}
+                query?.let {
+                    lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
+                    viewModel.searchExcursionsQuery(it)
+                }
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
                 newText?.let { viewModel.searchExcursionsQuery(it) }
                 return true
             }
         })
+
+        binding.searchView.setOnCloseListener {
+            lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
+            viewModel.searchExcursionsQuery("")
+            lifecycleScope.launch {
+                viewModel.excursions.collectLatest { pagingData ->
+                    adapter.submitData(pagingData)
+                    Log.d("GetAllExcursions", "All excursions was get")
+                }
+            }
+            false
+        }
+
+        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (hasFocus)
+                lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
+        }
     }
 
     private fun subscribe() {
