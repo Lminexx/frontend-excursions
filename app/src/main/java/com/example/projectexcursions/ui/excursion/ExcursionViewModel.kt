@@ -33,7 +33,14 @@ class ExcursionViewModel @Inject constructor(
                     Log.d("ExcursionInDB", "ExcExists")
                 } else {
                     val response = repository.fetchExcursion(id = excursionId)
-                    val excursion = Excursion(response.id, response.title,response.userId, response.description, response.username)
+                    val excursion = Excursion(
+                        response.id,
+                        response.title,
+                        response.userId,
+                        response.description,
+                        response.username,
+                        response.isFavorite
+                    )
                     repository.saveExcursionToDB(excursion)
                     _excursion.value = excursion
                     Log.d("ExcursionIsnInDB", "FetchExcursion")

@@ -43,7 +43,14 @@ class CreateExcursionViewModel @Inject constructor(
                 viewModelScope.launch {
                     try {
                         val response = excursionRepository.createExcursion(excursion)
-                        val respondedExcursion = Excursion(response.id, response.title, response.userId, response.description, response.username)
+                        val respondedExcursion = Excursion(
+                            response.id,
+                            response.title,
+                            response.userId,
+                            response.description,
+                            response.username,
+                            favorite = false
+                        )
                         excursionRepository.saveExcursionToDB(respondedExcursion)
                         _message.value = context.getString(R.string.create_success)
                         _wantComeBack.value = true
