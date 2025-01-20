@@ -39,7 +39,7 @@ class ExcursionViewModel @Inject constructor(
                         response.userId,
                         response.description,
                         response.username,
-                        response.isFavorite
+                        response.favorite
                     )
                     repository.saveExcursionToDB(excursion)
                     _excursion.value = excursion

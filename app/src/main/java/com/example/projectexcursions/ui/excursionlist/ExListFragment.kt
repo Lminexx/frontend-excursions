@@ -52,7 +52,6 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
         }
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
-
         binding.recyclerView.adapter = adapter
 
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
@@ -85,7 +84,7 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
             lifecycleScope.launch {
                 viewModel.excursions.collectLatest { pagingData ->
                     adapter.submitData(pagingData)
-                    Log.d("GetAllExcursions", "All excursions was get")
+                    Log.d("GetAllExcursions2", "All excursions was get")
                 }
             }
             false
@@ -100,9 +99,9 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
     private fun subscribe() {
         lifecycleScope.launch {
             viewModel.excursions.collectLatest { pagingData ->
-                Log.d("excursions", "$pagingData")
+                Log.d("excursions1", "$pagingData")
                 adapter.submitData(pagingData)
-                Log.d("GetAllExcursions", "${viewModel.excursions}")
+                Log.d("GetAllExcursions1", "${viewModel.excursions}")
             }
         }
 
