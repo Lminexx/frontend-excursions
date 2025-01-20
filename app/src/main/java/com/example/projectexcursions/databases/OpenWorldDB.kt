@@ -11,13 +11,13 @@ import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.models.Token
 
-@Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 3)
+@Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 8)
 abstract class OpenWorldDB: RoomDatabase() {
     abstract fun excursionsDao(): ExcursionsDao
 
     abstract fun excursionDao(): ExcursionDao
 
-        abstract fun tokenDao(): TokenDao
+    abstract fun tokenDao(): TokenDao
 
     companion object {
         @Volatile

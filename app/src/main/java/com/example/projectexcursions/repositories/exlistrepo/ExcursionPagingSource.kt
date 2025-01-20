@@ -12,26 +12,32 @@ import javax.inject.Inject
 class ExcursionPagingSource @Inject constructor(
     private val apiService: ApiService
 ): PagingSource<Int, ExcursionsList>() {
+    override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
+        return state.anchorPosition?.let {anchorPosition ->
+            val page = state.closestPageToPosition(anchorPosition)
+            page?.prevKey?.plus(1) ?: page?.nextKey?.minus(1)
+        }
+    }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
         val position = params.key ?: 0
-        Log.d("PagingSource", "Loading page: $position")
+        Log.d("PagingSource1", "Loading page: $position")
         Log.d("Paging", "Offset: $position")
         Log.d("Paging", "limit: ${params.loadSize}")
         return try {
             val response = apiService.getExcursions(offset = position, limit = params.loadSize, isFavorite = false)
             val excursions = response.content
-            Log.d("PagingSource", "$excursions")
+            Log.d("PagingSource2", "$excursions")
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1
             val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
-            Log.d("PagingSource", "NextKey: $nextKey, PrevKey: $prevKey")
+            Log.d("PagingSource3", "NextKey: $nextKey, PrevKey: $prevKey")
 
             LoadResult.Page(
-                    data = excursions,
-                    prevKey = prevKey,
-                    nextKey = nextKey
-                )
+                data = excursions,
+                prevKey = prevKey,
+                nextKey = nextKey
+            )
         } catch (exception: IOException) {
             LoadResult.Error(Exception("Ошибка сети: ${exception.message}", exception))
         } catch (exception: HttpException) {
@@ -41,10 +47,4 @@ class ExcursionPagingSource @Inject constructor(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
-        return state.anchorPosition?.let {anchorPosition ->
-            val page = state.closestPageToPosition(anchorPosition)
-            page?.prevKey?.plus(1) ?: page?.nextKey?.minus(1)
-        }
-    }
 }
