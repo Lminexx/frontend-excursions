@@ -57,30 +57,26 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
-                    lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
                     viewModel.searchExcursionsQuery(query)
-                    Log.d("Searched Excs", "${viewModel.searchedExcursions}")
-                    return true
-                } else {
-                    return false
+                    Log.d("SearchedExcs1", "${viewModel.searchedExcursions}")
                 }
+                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText != null) {
-                    lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
                     viewModel.searchExcursionsQuery(newText)
-                    Log.d("Searched Excs", "${viewModel.searchedExcursions}")
-                    return true
-                } else {
-                    return false
+                    Log.d("SearchedExcs2", "${viewModel.searchedExcursions}")
                 }
+                return true
             }
         })
 
         binding.searchView.setOnCloseListener {
-            lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
-            viewModel.searchExcursionsQuery("")
+            lifecycleScope.launch {
+                adapter.submitData(PagingData.empty())
+                viewModel.searchExcursionsQuery("")
+            }
             lifecycleScope.launch {
                 viewModel.excursions.collectLatest { pagingData ->
                     adapter.submitData(pagingData)
@@ -99,9 +95,17 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
     private fun subscribe() {
         lifecycleScope.launch {
             viewModel.excursions.collectLatest { pagingData ->
-                Log.d("excursions1", "$pagingData")
+                Log.d("excursions", "$pagingData")
                 adapter.submitData(pagingData)
-                Log.d("GetAllExcursions1", "${viewModel.excursions}")
+                Log.d("GetAllExcursions", "${viewModel.excursions}")
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.searchedExcursions.collectLatest { pagingData ->
+                Log.d("searchedExcursions", "$pagingData")
+                adapter.submitData(pagingData)
+                Log.d("GetAllSearchedExcursions", "${viewModel.searchedExcursions}")
             }
         }
 

@@ -33,20 +33,17 @@ class ExListViewModel @Inject constructor(
     private val remoteMediator = ExcursionRemoteMediator(repository)
 
     private val _goToExcursion = MutableLiveData(false)
+    val goToExcursion: LiveData<Boolean> get() = _goToExcursion
 
     private val searchExcursion = MutableStateFlow("")
 
-    val goToExcursion: LiveData<Boolean> get() = _goToExcursion
-
     var selectedExcursionsList: ExcursionsList? = null
 
-    @OptIn(ExperimentalPagingApi::class)
     var excursions: Flow<PagingData<ExcursionsList>> = Pager(
         config = PagingConfig(
             pageSize = 10,
             enablePlaceholders = false
         ),
-        remoteMediator = remoteMediator,
         pagingSourceFactory = { repository.excursionPagingSource() }
     ).flow.cachedIn(viewModelScope)
 
@@ -56,19 +53,14 @@ class ExListViewModel @Inject constructor(
         .distinctUntilChanged()
         .flatMapLatest { query ->
             Log.d("searchedExcursionsTag", query)
-            if (query.isBlank()) {
-                excursions
-            }
-            else {
-                Pager(
-                    config = PagingConfig(
-                        pageSize = 10,
-                        enablePlaceholders = false
-                    ),
-                    pagingSourceFactory = { repository.searchExcursionPagingSource(query) }
-                ).flow
-            }
-        }.cachedIn(viewModelScope)
+            Pager(
+                config = PagingConfig(
+                    pageSize = 10,
+                    enablePlaceholders = false
+                ),
+                pagingSourceFactory = { repository.searchExcursionPagingSource(query) }
+            ).flow.cachedIn(viewModelScope)
+        }
 
     fun clickExcursion(excursionsList: ExcursionsList) {
         selectedExcursionsList = excursionsList

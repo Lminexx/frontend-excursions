@@ -9,5 +9,5 @@ data class ExcursionResponse(
     val userId: Long,
     val description: String,
     val username: String,
-    val favorite: Boolean
+    val favorite: Boolean?
 )
