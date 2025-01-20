@@ -17,7 +17,7 @@ interface ApiService {
     suspend fun getExcursions(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        @Query("favoriteFlag") favoriteFlag: Boolean
+        @Query("isFavorite") isFavorite: Boolean
     ): ExcursionsResponse
 
     @POST("user/login")
@@ -36,6 +36,6 @@ interface ApiService {
         @Query("query") query: String,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        @Query("favoriteFlag") favoriteFlag: Boolean
+        @Query("isFavorite") isFavorite: Boolean
     ): ExcursionsResponse
 }

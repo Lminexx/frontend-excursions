@@ -57,17 +57,25 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
 
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let {
+                if (query != null) {
                     lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
-                    viewModel.searchExcursionsQuery(it)
+                    viewModel.searchExcursionsQuery(query)
+                    Log.d("Searched Excs", "${viewModel.searchedExcursions}")
+                    return true
+                } else {
+                    return false
                 }
-                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
-                newText?.let { viewModel.searchExcursionsQuery(it) }
-                return true
+                if (newText != null) {
+                    lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
+                    viewModel.searchExcursionsQuery(newText)
+                    Log.d("Searched Excs", "${viewModel.searchedExcursions}")
+                    return true
+                } else {
+                    return false
+                }
             }
         })
 
@@ -92,15 +100,9 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
     private fun subscribe() {
         lifecycleScope.launch {
             viewModel.excursions.collectLatest { pagingData ->
+                Log.d("excursions", "$pagingData")
                 adapter.submitData(pagingData)
-                Log.d("GetAllExcursions", "All excursions was get")
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.searchedExcursions.collectLatest { pagingData ->
-                adapter.submitData(pagingData)
-                Log.d("GetAllExcursions", "All excursions was get")
+                Log.d("GetAllExcursions", "${viewModel.excursions}")
             }
         }
 

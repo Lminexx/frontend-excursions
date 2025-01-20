@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.excursionlist
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +10,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.room.util.query
 import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ExcursionRemoteMediator
@@ -55,6 +55,7 @@ class ExListViewModel @Inject constructor(
         .debounce(1000)
         .distinctUntilChanged()
         .flatMapLatest { query ->
+            Log.d("searchedExcursionsTag", query)
             if (query.isBlank()) {
                 excursions
             }

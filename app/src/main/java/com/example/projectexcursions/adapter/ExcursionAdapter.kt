@@ -14,9 +14,11 @@ class ExcursionAdapter(
 ) : PagingDataAdapter<ExcursionsList, ExcursionAdapter.ExcursionViewHolder>(diffCallback) {
 
     var onExcursionClickListener: OnExcursionClickListener? = null
+
     interface OnExcursionClickListener {
         fun onExcursionClick(excursionsList: ExcursionsList)
     }
+
     inner class ExcursionViewHolder(private val binding: ItemExcursionBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(excursionsList: ExcursionsList?) {
             if (excursionsList != null) {

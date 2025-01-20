@@ -11,7 +11,7 @@ import com.example.projectexcursions.net.ExcursionsResponse
 interface ExcursionRepository {
     fun excursionPagingSource(): PagingSource<Int, ExcursionsList>
 
-    fun searchExcursionPagingSource(query: String): SearchExcursionPagingSource
+    fun searchExcursionPagingSource(query: String): PagingSource<Int, ExcursionsList>
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 

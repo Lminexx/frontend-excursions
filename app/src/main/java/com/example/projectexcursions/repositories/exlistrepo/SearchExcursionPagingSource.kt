@@ -27,8 +27,9 @@ class SearchExcursionPagingSource @Inject constructor(
         Log.d("SearchPaging", "Offset: $position")
         Log.d("SearchPaging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.searchExcursions(query = query.trim(), offset = position, limit = params.loadSize, favoriteFlag = false)
+            val response = apiService.searchExcursions(query = query.trim(), offset = position, limit = params.loadSize, isFavorite = false)
             val excursions = response.content
+            Log.d("PagingSource", "$excursions")
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1
             val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
