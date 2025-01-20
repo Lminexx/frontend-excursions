@@ -27,7 +27,8 @@ class SearchExcursionPagingSource @Inject constructor(
         Log.d("SearchPaging", "Offset: $position")
         Log.d("SearchPaging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.searchExcursions(query = query.trim(), offset = position, limit = params.loadSize, isFavorite = false)
+            val response = apiService.searchExcursions(query = query, offset = position, limit = params.loadSize, isFavorite = false)
+            Log.d("SearchPagingSource", "Query: $query")
             val excursions = response.content
             Log.d("PagingSource", "$excursions")
             val pageInfo = response.page
