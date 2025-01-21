@@ -56,9 +56,8 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
 
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query != null) {
+                if (!query.isNullOrEmpty()) {
                     viewModel.searchExcursionsQuery(query)
-                    Log.d("SearchedExcs1", "${viewModel.searchedExcursions}")
                 }
                 return true
             }
@@ -66,22 +65,15 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText != null) {
                     viewModel.searchExcursionsQuery(newText)
-                    Log.d("SearchedExcs2", "${viewModel.searchedExcursions}")
                 }
                 return true
             }
         })
 
         binding.searchView.setOnCloseListener {
+            viewModel.resetSearch()
             lifecycleScope.launch {
                 adapter.submitData(PagingData.empty())
-                viewModel.searchExcursionsQuery("")
-            }
-            lifecycleScope.launch {
-                viewModel.excursions.collectLatest { pagingData ->
-                    adapter.submitData(pagingData)
-                    Log.d("GetAllExcursions2", "All excursions was get")
-                }
             }
             false
         }
@@ -98,14 +90,6 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
                 Log.d("excursions", "$pagingData")
                 adapter.submitData(pagingData)
                 Log.d("GetAllExcursions", "${viewModel.excursions}")
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.searchedExcursions.collectLatest { pagingData ->
-                Log.d("searchedExcursions", "$pagingData")
-                adapter.submitData(pagingData)
-                Log.d("GetAllSearchedExcursions", "${viewModel.searchedExcursions}")
             }
         }
 

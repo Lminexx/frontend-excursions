@@ -37,30 +37,31 @@ class ExListViewModel @Inject constructor(
 
     private val searchExcursion = MutableStateFlow("")
 
+    private val isSearching = MutableStateFlow(false)
+
     var selectedExcursionsList: ExcursionsList? = null
 
-    var excursions: Flow<PagingData<ExcursionsList>> = Pager(
-        config = PagingConfig(
-            pageSize = 10,
-            enablePlaceholders = false
-        ),
-        pagingSourceFactory = { repository.excursionPagingSource() }
-    ).flow.cachedIn(viewModelScope)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    var excursions: Flow<PagingData<ExcursionsList>> = isSearching
+        .flatMapLatest { searching ->
+            if (searching) {
+                searchExcursion
+                    .debounce(1000)
+                    .distinctUntilChanged()
+                    .flatMapLatest { query ->
+                        Pager(
+                            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+                            pagingSourceFactory = { repository.searchExcursionPagingSource(query) }
+                        ).flow
+                    }
+            } else {
+                Pager(
+                    config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+                    pagingSourceFactory = { repository.excursionPagingSource() }
+                ).flow
+            }
+        }.cachedIn(viewModelScope)
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    var searchedExcursions: Flow<PagingData<ExcursionsList>> = searchExcursion
-        .debounce(1000)
-        .distinctUntilChanged()
-        .flatMapLatest { query ->
-            Log.d("searchedExcursionsTag", query)
-            Pager(
-                config = PagingConfig(
-                    pageSize = 10,
-                    enablePlaceholders = false
-                ),
-                pagingSourceFactory = { repository.searchExcursionPagingSource(query) }
-            ).flow.cachedIn(viewModelScope)
-        }
 
     fun clickExcursion(excursionsList: ExcursionsList) {
         selectedExcursionsList = excursionsList
@@ -72,6 +73,12 @@ class ExListViewModel @Inject constructor(
     }
 
     fun searchExcursionsQuery(query: String) {
+        isSearching.value = query.isNotEmpty()
         searchExcursion.value = query
+    }
+
+    fun resetSearch() {
+        isSearching.value = false
+        searchExcursion.value = ""
     }
 }
