@@ -39,7 +39,7 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionsResponse {
         Log.d("FetchingExs", "FetchExcursions")
-        return apiService.getExcursions(offset, limit)
+        return apiService.getExcursions(offset, limit, false)
     }
 
     override suspend fun fetchExcursion(id: Long): ExcursionResponse {
@@ -60,11 +60,11 @@ class ExcursionRepositoryImpl @Inject constructor(
         return apiService.createExcursion(creatingExcursion)
     }
 
-    override suspend fun addFavorite(token: String, id: Long) {
-        //apiService.addFavorite(token, id)
+    override suspend fun addFavorite(id: Long) {
+        apiService.addFavorite(id)
     }
 
-    override suspend fun deleteFavorite(token: String, id: Long) {
-        //apiService.deleteFavorite(token, id)
+    override suspend fun deleteFavorite(id: Long) {
+        apiService.deleteFavorite(id)
     }
 }

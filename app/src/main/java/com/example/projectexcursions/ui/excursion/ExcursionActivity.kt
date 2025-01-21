@@ -43,9 +43,9 @@ class ExcursionActivity : AppCompatActivity() {
             return
         }
         viewModel.loadExcursion(excursionId)
-//        if(viewModel.excursion.value!!.favorite){
-//            binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
-//        }
+        if(viewModel.excursion.value?.favorite == true){
+            binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
+        }
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 

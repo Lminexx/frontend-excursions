@@ -17,7 +17,7 @@ class ExcursionPagingSource @Inject constructor(
         val position = params.key ?: 0
         Log.d("PagingSource", "Loading page: $position")
         return try {
-            val response = apiService.getExcursions(offset = position, limit = params.loadSize)
+            val response = apiService.getExcursions(offset = position, limit = params.loadSize, false)
             val excursions = response.content
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1

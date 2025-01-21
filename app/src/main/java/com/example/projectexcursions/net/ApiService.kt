@@ -19,8 +19,7 @@ interface ApiService {
     suspend fun getExcursions(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        //token: String = null.toString(),
-        //favoriteFlag: Boolean = false
+        @Query("isFavorite") isFavorite: Boolean
     ): ExcursionsResponse
 
     @POST("user/login")
@@ -36,16 +35,10 @@ interface ApiService {
     ): ExcursionResponse
 
     @POST("excursion/favorite")
-    suspend fun addFavorite(
-        token: String,
-        id: Long
-    )
+    suspend fun addFavorite(@Body excursionId: Long)
 
     @DELETE("excursion/favorite")
-    suspend fun deleteFavorite(
-        token: String,
-        id: Long
-    )
+    suspend fun deleteFavorite(@Body excursionId: Long)
 
     //todo миграция с http на https
 }
