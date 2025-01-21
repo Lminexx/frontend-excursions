@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f3ca3d9759d3ebc3f31979088bbf196c",
+    "identityHash": "37ea8ce98d9688922d48ec619e956700",
     "entities": [
       {
         "tableName": "excursions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -31,6 +31,12 @@
             "columnName": "description",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "favorite",
+            "columnName": "favorite",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -44,7 +50,7 @@
       },
       {
         "tableName": "excursion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `username` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `username` TEXT NOT NULL, `favorite` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -74,6 +80,12 @@
             "fieldPath": "username",
             "columnName": "username",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "favorite",
+            "columnName": "favorite",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -116,7 +128,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f3ca3d9759d3ebc3f31979088bbf196c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '37ea8ce98d9688922d48ec619e956700')"
     ]
   }
 }

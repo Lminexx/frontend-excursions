@@ -44,8 +44,8 @@ class ExcursionViewModel @Inject constructor(
                         response.title,
                         response.userId,
                         response.description,
-                        response.username
-                        //response.favorite
+                        response.username,
+                        response.favorite
                     )
                     repository.saveExcursionToDB(excursion)
                     _excursion.value = excursion
@@ -61,14 +61,14 @@ class ExcursionViewModel @Inject constructor(
     fun addFavorite() {
         viewModelScope.launch {
             Log.d("FavoriteExcursion", "AddFavorite")
-            repository.addFavorite(tokenRepository.getToken()!!.token, excursion.value!!.id)
+            excursion.value?.let { repository.addFavorite(it.id) }
         }
     }
 
     fun deleteFavorite() {
         viewModelScope.launch {
             Log.d("FavoriteExcursion", "DeleteFavorite")
-            repository.deleteFavorite(tokenRepository.getToken()!!.token, excursion.value!!.id)
+            excursion.value?.let { repository.deleteFavorite(it.id) }
         }
     }
 

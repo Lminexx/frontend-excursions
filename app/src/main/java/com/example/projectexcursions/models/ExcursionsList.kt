@@ -13,6 +13,6 @@ data class ExcursionsList(
     @PrimaryKey val id: Long,
     val title: String,
     val userId: Long,
-    val description: String
-    //val favorite: Boolean = false
+    val description: String,
+    val favorite: Boolean = false
 ) : Parcelable
