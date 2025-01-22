@@ -11,13 +11,15 @@ import com.example.projectexcursions.net.ExcursionsResponse
 interface ExcursionRepository {
     fun excursionPagingSource(): PagingSource<Int, ExcursionsList>
 
+    fun searchExcursionPagingSource(query: String): PagingSource<Int, ExcursionsList>
+
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
     suspend fun saveExcursionsToDB(excursionsLists: List<ExcursionsList>)
 
     suspend fun saveExcursionToDB(excursion: Excursion)
 
-    suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionsResponse
+    suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean): ExcursionsResponse
 
     suspend fun fetchExcursion(id: Long): ExcursionResponse
 
@@ -28,4 +30,6 @@ interface ExcursionRepository {
     suspend fun deleteAllExcursionsFromExcursion()
 
     suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse
+
+    suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean): ExcursionsResponse
 }

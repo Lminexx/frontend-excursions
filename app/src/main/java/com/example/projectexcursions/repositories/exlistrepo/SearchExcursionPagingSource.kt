@@ -9,8 +9,9 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class ExcursionPagingSource @Inject constructor(
-    private val apiService: ApiService
+class SearchExcursionPagingSource @Inject constructor(
+    private val apiService: ApiService,
+    private val query: String
 ): PagingSource<Int, ExcursionsList>() {
     override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
         return state.anchorPosition?.let {anchorPosition ->
@@ -21,17 +22,19 @@ class ExcursionPagingSource @Inject constructor(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
         val position = params.key ?: 0
-        Log.d("PagingSource1", "Loading page: $position")
-        Log.d("Paging", "Offset: $position")
-        Log.d("Paging", "limit: ${params.loadSize}")
+        Log.d("SearchPagingSource", "Loading page: $position")
+        Log.d("SearchPaging", "Query: ${query.trim()}")
+        Log.d("SearchPaging", "Offset: $position")
+        Log.d("SearchPaging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.getExcursions(offset = position, limit = params.loadSize, isFavorite = false)
+            val response = apiService.searchExcursions(query = query, offset = position, limit = params.loadSize, isFavorite = false)
+            Log.d("SearchPagingSource", "Query: $query")
             val excursions = response.content
-            Log.d("PagingSource2", "$excursions")
+            Log.d("PagingSource", "$excursions")
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1
             val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
-            Log.d("PagingSource3", "NextKey: $nextKey, PrevKey: $prevKey")
+            Log.d("SearchPagingSource", "NextKey: $nextKey, PrevKey: $prevKey")
 
             LoadResult.Page(
                 data = excursions,
