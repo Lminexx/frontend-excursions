@@ -14,5 +14,6 @@ data class Excursion(
     val title: String,
     val userId: Long,
     val description: String,
-    val username: String
+    val username: String,
+    val favorite: Boolean?
 ): Parcelable

@@ -1,8 +1,6 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
 import android.util.Log
-import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.models.CreatingExcursion
@@ -22,6 +20,8 @@ class ExcursionRepositoryImpl @Inject constructor(
 ) : ExcursionRepository {
 
     override fun excursionPagingSource() = ExcursionPagingSource(apiService)
+  
+    override fun searchExcursionPagingSource(query: String) = SearchExcursionPagingSource(apiService, query)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -35,9 +35,9 @@ class ExcursionRepositoryImpl @Inject constructor(
         excursionDao.insert(excursion)
     }
 
-    override suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionsResponse {
+    override suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean): ExcursionsResponse {
         Log.d("FetchingExs", "FetchExcursions")
-        return apiService.getExcursions(offset, limit)
+        return apiService.getExcursions(offset, limit, isFavorite)
     }
 
     override suspend fun fetchExcursion(id: Long): ExcursionResponse {
@@ -56,5 +56,16 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
         return apiService.createExcursion(creatingExcursion)
+    }
+
+    //вроде как не нужен, но на всякий случай оставлю
+    override suspend fun searchExcursions(
+        query: String,
+        offset: Int,
+        limit: Int,
+        isFavorite: Boolean
+    ): ExcursionsResponse {
+        Log.d("FetchingExs", "FetchExcursions")
+        return apiService.searchExcursions(query, offset, limit, isFavorite)
     }
 }
