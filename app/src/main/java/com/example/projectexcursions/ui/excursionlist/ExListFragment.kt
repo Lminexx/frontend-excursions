@@ -72,9 +72,6 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
 
         binding.searchView.setOnCloseListener {
             viewModel.resetSearch()
-            lifecycleScope.launch {
-                adapter.submitData(PagingData.empty())
-            }
             false
         }
 
