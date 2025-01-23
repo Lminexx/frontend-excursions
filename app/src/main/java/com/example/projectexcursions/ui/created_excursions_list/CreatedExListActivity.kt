@@ -1,19 +1,15 @@
-package com.example.projectexcursions.ui.excursionlist
+package com.example.projectexcursions.ui.created_excursions_list
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.SearchView
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
-import com.example.projectexcursions.databinding.FragmentExcursionsListBinding
+import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,36 +18,30 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
+class CreatedExListActivity: AppCompatActivity() {
 
-    private lateinit var binding: FragmentExcursionsListBinding
+    private lateinit var binding: ExcursionsListBinding
     @Inject
     lateinit var adapter: ExcursionAdapter
-    private val viewModel: ExListViewModel by viewModels()
+    private val viewModel: CreatedExListViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentExcursionsListBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ExcursionsListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         initCallback()
         subscribe()
     }
 
     private fun initCallback() {
-        adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener {
+        adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
             override fun onExcursionClick(excursionsList: ExcursionsList) {
                 viewModel.clickExcursion(excursionsList)
             }
         }
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
@@ -83,18 +73,18 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
 
     private fun subscribe() {
         lifecycleScope.launch {
-            viewModel.excursions.collectLatest { pagingData ->
+            viewModel.createdExcursions.collectLatest { pagingData ->
                 Log.d("excursions", "$pagingData")
                 adapter.submitData(pagingData)
-                Log.d("GetAllExcursions", "${viewModel.excursions}")
+                Log.d("GetAllExcursions", "${viewModel.createdExcursions}")
             }
         }
 
-        viewModel.goToExcursion.observe(viewLifecycleOwner) { wantGoToEx ->
+        viewModel.goToExcursion.observe(this) { wantGoToEx ->
             if (wantGoToEx) {
                 val excursion = viewModel.selectedExcursionsList
                 if (excursion != null) {
-                    val intent = requireContext().createExcursionActivityIntent(excursionId = excursion.id)
+                    val intent = this.createExcursionActivityIntent(excursionId = excursion.id)
                     startActivity(intent)
                     viewModel.goneToExcursion()
                 }
