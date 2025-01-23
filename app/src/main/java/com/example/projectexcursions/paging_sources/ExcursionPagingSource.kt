@@ -1,4 +1,4 @@
-package com.example.projectexcursions.repositories.exlistrepo
+package com.example.projectexcursions.paging_sources
 
 import android.util.Log
 import androidx.paging.PagingSource
@@ -46,5 +46,4 @@ class ExcursionPagingSource @Inject constructor(
             LoadResult.Error(Exception("Неизвестная ошибка: ${exception.message}", exception))
         }
     }
-
 }

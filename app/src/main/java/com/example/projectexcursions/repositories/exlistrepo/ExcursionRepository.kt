@@ -13,6 +13,8 @@ interface ExcursionRepository {
 
     fun searchExcursionPagingSource(query: String): PagingSource<Int, ExcursionsList>
 
+    fun createdExcursionsPagingSource(): PagingSource<Int, ExcursionsList>
+
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
     suspend fun saveExcursionsToDB(excursionsLists: List<ExcursionsList>)
@@ -32,4 +34,6 @@ interface ExcursionRepository {
     suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse
 
     suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean): ExcursionsResponse
+
+    suspend fun getCreatedExcursions(offset: Int, limit: Int): ExcursionsResponse
 }

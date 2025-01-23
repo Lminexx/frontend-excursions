@@ -1,4 +1,4 @@
-package com.example.projectexcursions.repositories.exlistrepo
+package com.example.projectexcursions.paging_sources
 
 import android.util.Log
 import androidx.paging.PagingSource

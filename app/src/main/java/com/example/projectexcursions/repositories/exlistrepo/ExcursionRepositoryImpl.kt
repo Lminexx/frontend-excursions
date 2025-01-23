@@ -1,6 +1,7 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
 import android.util.Log
+import androidx.paging.PagingSource
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.models.CreatingExcursion
@@ -9,6 +10,9 @@ import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
+import com.example.projectexcursions.paging_sources.CreatedExcursionsPagingSource
+import com.example.projectexcursions.paging_sources.ExcursionPagingSource
+import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import javax.inject.Inject
 
@@ -22,6 +26,8 @@ class ExcursionRepositoryImpl @Inject constructor(
     override fun excursionPagingSource() = ExcursionPagingSource(apiService)
   
     override fun searchExcursionPagingSource(query: String) = SearchExcursionPagingSource(apiService, query)
+
+    override fun createdExcursionsPagingSource() = CreatedExcursionsPagingSource(apiService)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -67,5 +73,9 @@ class ExcursionRepositoryImpl @Inject constructor(
     ): ExcursionsResponse {
         Log.d("FetchingExs", "FetchExcursions")
         return apiService.searchExcursions(query, offset, limit, isFavorite)
+    }
+
+    override suspend fun getCreatedExcursions(offset: Int, limit: Int): ExcursionsResponse {
+        return apiService.createdExcursions(offset, limit)
     }
 }
