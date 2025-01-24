@@ -23,11 +23,9 @@ class ExcursionRepositoryImpl @Inject constructor(
     private val tokenRepository: TokenRepository
 ) : ExcursionRepository {
 
-    override fun excursionPagingSource() = ExcursionPagingSource(apiService)
+    override fun excursionPagingSource(isMine: Boolean) = ExcursionPagingSource(apiService, isMine)
   
     override fun searchExcursionPagingSource(query: String) = SearchExcursionPagingSource(apiService, query)
-
-    override fun createdExcursionsPagingSource() = CreatedExcursionsPagingSource(apiService)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -41,9 +39,9 @@ class ExcursionRepositoryImpl @Inject constructor(
         excursionDao.insert(excursion)
     }
 
-    override suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean): ExcursionsResponse {
+    override suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse {
         Log.d("FetchingExs", "FetchExcursions")
-        return apiService.getExcursions(offset, limit, isFavorite)
+        return apiService.getExcursions(offset, limit, isFavorite, isMine)
     }
 
     override suspend fun fetchExcursion(id: Long): ExcursionResponse {
@@ -73,9 +71,5 @@ class ExcursionRepositoryImpl @Inject constructor(
     ): ExcursionsResponse {
         Log.d("FetchingExs", "FetchExcursions")
         return apiService.searchExcursions(query, offset, limit, isFavorite)
-    }
-
-    override suspend fun getCreatedExcursions(offset: Int, limit: Int): ExcursionsResponse {
-        return apiService.createdExcursions(offset, limit)
     }
 }

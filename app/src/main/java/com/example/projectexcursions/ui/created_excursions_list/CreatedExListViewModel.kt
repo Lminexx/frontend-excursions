@@ -50,7 +50,7 @@ class CreatedExListViewModel @Inject constructor(
             } else {
                 Pager(
                     config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                    pagingSourceFactory = { repository.createdExcursionsPagingSource() }
+                    pagingSourceFactory = { repository.excursionPagingSource(true) }
                 ).flow
             }
         }.cachedIn(viewModelScope)
