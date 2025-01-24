@@ -10,7 +10,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 class ExcursionPagingSource @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val isMine: Boolean
 ): PagingSource<Int, ExcursionsList>() {
     override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
         return state.anchorPosition?.let {anchorPosition ->
@@ -25,7 +26,7 @@ class ExcursionPagingSource @Inject constructor(
         Log.d("Paging", "Offset: $position")
         Log.d("Paging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.getExcursions(offset = position, limit = params.loadSize, isFavorite = false)
+            val response = apiService.getExcursions(offset = position, limit = params.loadSize, isFavorite = false, isMine = isMine)
             val excursions = response.content
             Log.d("PagingSource2", "$excursions")
             val pageInfo = response.page

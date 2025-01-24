@@ -39,7 +39,7 @@ class ExcursionRemoteMediator @Inject constructor(
         }
         return try {
             Log.d("Page", "$page")
-            val response = repository.fetchExcursions(page, state.config.pageSize, false)
+            val response = repository.fetchExcursions(page, state.config.pageSize, false, isMine = false)
             Log.d("ExcursionsGetter", "$response")
             val excursions = response.content
             Log.d("ExcursionsToSave", "Page: $page, Excursions: ${excursions.size}")

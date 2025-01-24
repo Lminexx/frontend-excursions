@@ -17,7 +17,8 @@ interface ApiService {
     suspend fun getExcursions(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        @Query("isFavorite") isFavorite: Boolean
+        @Query("isFavorite") isFavorite: Boolean,
+        @Query("myList") isMine: Boolean
     ): ExcursionsResponse
 
     @POST("user/login")
@@ -38,12 +39,5 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("isFavorite") isFavorite: Boolean,
         //@Query("isMine") isMine: Boolean
-    ): ExcursionsResponse
-
-    //эндпоинт временный и не факт что таким и останется
-    @GET("excursion/my")
-    suspend fun createdExcursions(
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int
     ): ExcursionsResponse
 }
