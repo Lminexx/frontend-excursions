@@ -64,9 +64,9 @@
 
         <Button
             android:id="@+id/createdExcursionsList"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="0dp"
             android:layout_marginTop="34dp"
             android:background="@drawable/button_pattern_1"
             android:text="@string/my_exc_list"
