@@ -1,7 +1,5 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
-import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
@@ -13,7 +11,7 @@ import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 interface ExcursionRepository {
     fun excursionPagingSource(isMine: Boolean): ExcursionPagingSource
 
-    fun searchExcursionPagingSource(query: String): SearchExcursionPagingSource
+    fun searchExcursionPagingSource(query: String, isMine: Boolean): SearchExcursionPagingSource
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
@@ -33,5 +31,5 @@ interface ExcursionRepository {
 
     suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse
 
-    suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean): ExcursionsResponse
+    suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse
 }

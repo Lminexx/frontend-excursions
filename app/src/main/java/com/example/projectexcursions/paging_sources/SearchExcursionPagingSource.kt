@@ -11,7 +11,8 @@ import javax.inject.Inject
 
 class SearchExcursionPagingSource @Inject constructor(
     private val apiService: ApiService,
-    private val query: String
+    private val query: String,
+    private val isMine: Boolean
 ): PagingSource<Int, ExcursionsList>() {
     override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
         return state.anchorPosition?.let {anchorPosition ->
@@ -27,7 +28,7 @@ class SearchExcursionPagingSource @Inject constructor(
         Log.d("SearchPaging", "Offset: $position")
         Log.d("SearchPaging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.searchExcursions(query = query, offset = position, limit = params.loadSize, isFavorite = false)
+            val response = apiService.searchExcursions(query = query, offset = position, limit = params.loadSize, isFavorite = false, isMine = isMine)
             Log.d("SearchPagingSource", "Query: $query")
             val excursions = response.content
             Log.d("PagingSource", "$excursions")

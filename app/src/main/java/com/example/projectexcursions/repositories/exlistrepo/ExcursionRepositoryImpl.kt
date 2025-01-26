@@ -24,7 +24,7 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override fun excursionPagingSource(isMine: Boolean) = ExcursionPagingSource(apiService, isMine)
   
-    override fun searchExcursionPagingSource(query: String) = SearchExcursionPagingSource(apiService, query)
+    override fun searchExcursionPagingSource(query: String, isMine: Boolean) = SearchExcursionPagingSource(apiService, query, isMine)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -66,9 +66,10 @@ class ExcursionRepositoryImpl @Inject constructor(
         query: String,
         offset: Int,
         limit: Int,
-        isFavorite: Boolean
+        isFavorite: Boolean,
+        isMine: Boolean
     ): ExcursionsResponse {
         Log.d("FetchingExs", "FetchExcursions")
-        return apiService.searchExcursions(query, offset, limit, isFavorite)
+        return apiService.searchExcursions(query, offset, limit, isFavorite, isMine)
     }
 }
