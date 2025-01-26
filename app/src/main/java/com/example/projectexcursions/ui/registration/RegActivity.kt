@@ -42,6 +42,7 @@ class RegActivity: AppCompatActivity() {
             if (wannaComeBack) {
                 startActivity(Intent(this@RegActivity, AuthActivity::class.java))
                 viewModel.cameBack()
+                finish()
             }
         }
 

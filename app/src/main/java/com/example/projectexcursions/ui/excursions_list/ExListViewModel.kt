@@ -50,7 +50,7 @@ class ExListViewModel @Inject constructor(
                     .flatMapLatest { query ->
                         Pager(
                             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                            pagingSourceFactory = { repository.searchExcursionPagingSource(query) }
+                            pagingSourceFactory = { repository.searchExcursionPagingSource(query, isMine = false) }
                         ).flow
                     }
             } else {

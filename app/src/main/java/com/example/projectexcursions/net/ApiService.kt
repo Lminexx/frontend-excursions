@@ -38,6 +38,6 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("isFavorite") isFavorite: Boolean,
-        //@Query("isMine") isMine: Boolean
+        @Query("myList") isMine: Boolean
     ): ExcursionsResponse
 }
