@@ -67,4 +67,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_ex_fav_hollow" />
 
+    <ImageButton
+        android:id="@+id/deleteExcursion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        app:layout_constraintBottom_toTopOf="@id/buttonComeback"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/ic_ex_del" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

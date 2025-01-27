@@ -19,7 +19,8 @@ interface ApiService {
     suspend fun getExcursions(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
-        @Query("isFavorite") isFavorite: Boolean
+        @Query("isFavorite") isFavorite: Boolean,
+        @Query("myList") myList: Boolean
     ): ExcursionsResponse
 
     @POST("user/login")
@@ -29,16 +30,19 @@ interface ApiService {
     @GET("excursion/{id}")
     suspend fun getExcursion(@Path("id") id: Long): ExcursionResponse
 
+    @DELETE("excursion/{id}")
+    suspend fun deleteExcursion(@Path("id") id: Long)
+
     @POST("excursion/create")
     suspend fun createExcursion(
         @Body creatingExcursion: CreatingExcursion
     ): ExcursionResponse
 
-    @POST("excursion/favorite")
-    suspend fun addFavorite(@Body excursionId: Long)
+    @POST("excursion/{id}/favorite")
+    suspend fun addFavorite(@Path("id") id: Long)
 
-    @DELETE("excursion/favorite")
-    suspend fun deleteFavorite(@Body excursionId: Long)
+    @POST("excursion/{id}/unFavorite")
+    suspend fun deleteFavorite(@Path("id") id: Long)
 
     //todo миграция с http на https
 }

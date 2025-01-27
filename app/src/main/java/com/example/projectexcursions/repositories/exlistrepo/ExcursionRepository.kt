@@ -9,7 +9,7 @@ import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
 
 interface ExcursionRepository {
-    fun excursionPagingSource(): PagingSource<Int, ExcursionsList>
+    fun excursionPagingSource(isFavorite: Boolean): PagingSource<Int, ExcursionsList>
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
@@ -17,9 +17,11 @@ interface ExcursionRepository {
 
     suspend fun saveExcursionToDB(excursion: Excursion)
 
-    suspend fun fetchExcursions(offset: Int, limit: Int): ExcursionsResponse
+    suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean): ExcursionsResponse
 
     suspend fun fetchExcursion(id: Long): ExcursionResponse
+
+    suspend fun deleteExcursion(id: Long)
 
     suspend fun getExcursionFromDB(id: Long): Excursion?
 

@@ -14,10 +14,13 @@ class ExcursionAdapter(
 ) : PagingDataAdapter<ExcursionsList, ExcursionAdapter.ExcursionViewHolder>(diffCallback) {
 
     var onExcursionClickListener: OnExcursionClickListener? = null
+
     interface OnExcursionClickListener {
         fun onExcursionClick(excursionsList: ExcursionsList)
     }
-    inner class ExcursionViewHolder(private val binding: ItemExcursionBinding) : RecyclerView.ViewHolder(binding.root) {
+
+    inner class ExcursionViewHolder(private val binding: ItemExcursionBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(excursionsList: ExcursionsList?) {
             if (excursionsList != null) {
                 binding.tvExcursionTitle.text = excursionsList.title
@@ -32,8 +35,7 @@ class ExcursionAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExcursionViewHolder {
         val binding = ItemExcursionBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
-        )
+            LayoutInflater.from(parent.context), parent, false)
         return ExcursionViewHolder(binding)
     }
 
