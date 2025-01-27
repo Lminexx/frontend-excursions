@@ -30,6 +30,16 @@ class ExcursionViewModel @Inject constructor(
     private val _favorite = MutableLiveData<Boolean>()
     val favorite: LiveData<Boolean> get() = _favorite
 
+    private val _deleteExcursion = MutableLiveData<Boolean>()
+    val deleteExcursion:LiveData<Boolean> get() = _deleteExcursion
+
+    private val _username = MutableLiveData<String>()
+    val username: LiveData<String> get() = _username
+
+    init {
+        getUsername()
+    }
+
     fun loadExcursion(excursionId: Long) {
         viewModelScope.launch {
             try {
@@ -58,6 +68,13 @@ class ExcursionViewModel @Inject constructor(
         }
     }
 
+    private fun getUsername() {
+            val token = tokenRepository.getCachedToken()
+            val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
+            val name = decodedToken?.get("username")!!.asString()
+            _username.value = name!!
+    }
+
     fun addFavorite() {
         viewModelScope.launch {
             Log.d("FavoriteExcursion", "AddFavorite")
@@ -69,6 +86,13 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d("FavoriteExcursion", "DeleteFavorite")
             excursion.value?.let { repository.deleteFavorite(it.id) }
+        }
+    }
+
+    fun deleteExcursion(){
+        viewModelScope.launch {
+            Log.d("DeleteEx", "DeleteExcursion")
+            excursion.value?.let { repository.deleteExcursion(it.id) }
         }
     }
 

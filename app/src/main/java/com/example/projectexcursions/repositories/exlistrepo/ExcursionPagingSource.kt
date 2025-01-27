@@ -10,14 +10,15 @@ import java.io.IOException
 import javax.inject.Inject
 
 class ExcursionPagingSource @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val isFavorite: Boolean
 ): PagingSource<Int, ExcursionsList>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
         val position = params.key ?: 0
         Log.d("PagingSource", "Loading page: $position")
         return try {
-            val response = apiService.getExcursions(offset = position, limit = params.loadSize, false)
+            val response = apiService.getExcursions(offset = position, limit = params.loadSize, isFavorite, false)
             val excursions = response.content
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1

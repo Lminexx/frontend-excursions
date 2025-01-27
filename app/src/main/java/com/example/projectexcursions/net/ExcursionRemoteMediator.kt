@@ -23,13 +23,18 @@ class ExcursionRemoteMediator @Inject constructor(
                 repository.deleteAllExcursionsFromExcursions()
                 0
             }
+
             LoadType.PREPEND -> {
                 Log.d("LoadType", "LoadTypePrepended")
             }
+
             LoadType.APPEND -> {
                 Log.d("RemoteMediator", "Pages size: ${state.pages.size}")
                 state.pages.forEachIndexed { index, page ->
-                    Log.d("RemoteMediator", "Page $index, NextKey: ${page.nextKey}, PrevKey: ${page.prevKey}")
+                    Log.d(
+                        "RemoteMediator",
+                        "Page $index, NextKey: ${page.nextKey}, PrevKey: ${page.prevKey}"
+                    )
                 }
                 Log.d("LoadType", "LoadTypeAppended")
                 val nextKey = state.pages.lastOrNull()?.nextKey
@@ -40,7 +45,7 @@ class ExcursionRemoteMediator @Inject constructor(
         }
         return try {
             Log.d("Page", "$page")
-            val response = repository.fetchExcursions(page, state.config.pageSize)
+            val response = repository.fetchExcursions(page, state.config.pageSize, true)
             Log.d("ExcursionsGetter", "$response")
             val excursions = response.content
             Log.d("ExcursionsToSave", "Page: $page, Excursions: ${excursions.size}")

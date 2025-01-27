@@ -40,6 +40,7 @@ class ExListFragment: Fragment(R.layout.fragment_excursions_list) {
         super.onViewCreated(view, savedInstanceState)
         initCallback()
         subscribe()
+
     }
 
     private fun initCallback() {

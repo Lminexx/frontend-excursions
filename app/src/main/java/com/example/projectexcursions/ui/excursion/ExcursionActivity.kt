@@ -43,7 +43,7 @@ class ExcursionActivity : AppCompatActivity() {
             return
         }
         viewModel.loadExcursion(excursionId)
-        if(viewModel.excursion.value?.favorite == true){
+        if (viewModel.excursion.value?.favorite == true) {
             binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
         }
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
@@ -65,12 +65,16 @@ class ExcursionActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.favorite.observe(this){favorite->
-            if(favorite){
+        viewModel.favorite.observe(this) { favorite ->
+            if (favorite) {
                 viewModel.addFavorite()
-            }else{
+            } else {
                 viewModel.deleteFavorite()
             }
+        }
+
+        viewModel.deleteExcursion.observe(this) { deleteExcursion ->
+            if (deleteExcursion) viewModel.deleteExcursion()
         }
     }
 
@@ -98,6 +102,28 @@ class ExcursionActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     )
                         .show()
+                }
+            }
+        }
+        binding.deleteExcursion.setOnClickListener {
+            lifecycleScope.launch {
+                if (viewModel.username.value != viewModel.excursion.value?.username){
+                    Toast.makeText(
+                        this@ExcursionActivity,
+                        this@ExcursionActivity.getString(R.string.error_delete_excursion),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                } else if(!viewModel.checkAuthStatus()){
+                Toast.makeText(
+                    this@ExcursionActivity,
+                    this@ExcursionActivity.getString(R.string.error_favorite),
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+                }else{
+                    startActivity(Intent(this@ExcursionActivity, MainActivity::class.java))
+                    viewModel.clickComeback()
                 }
             }
         }
