@@ -46,7 +46,6 @@ class AuthActivity: AppCompatActivity() {
                 val intent = Intent(this@AuthActivity, RegActivity::class.java)
                 startActivityForResult(intent, REG_REQUEST_CODE)
                 viewModel.goneToReg()
-                finish()
             }
         }
 
