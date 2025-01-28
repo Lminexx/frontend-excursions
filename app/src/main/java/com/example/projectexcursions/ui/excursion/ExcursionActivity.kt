@@ -73,9 +73,6 @@ class ExcursionActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.deleteExcursion.observe(this) { deleteExcursion ->
-            if (deleteExcursion) viewModel.deleteExcursion()
-        }
     }
 
     private fun initCallback() {
@@ -107,23 +104,24 @@ class ExcursionActivity : AppCompatActivity() {
         }
         binding.deleteExcursion.setOnClickListener {
             lifecycleScope.launch {
-                if (viewModel.username.value != viewModel.excursion.value?.username){
+                if (viewModel.username.value != viewModel.excursion.value?.username) {
                     Toast.makeText(
                         this@ExcursionActivity,
                         this@ExcursionActivity.getString(R.string.error_delete_excursion),
                         Toast.LENGTH_SHORT
                     )
                         .show()
-                } else if(!viewModel.checkAuthStatus()){
-                Toast.makeText(
-                    this@ExcursionActivity,
-                    this@ExcursionActivity.getString(R.string.error_favorite),
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
-                }else{
+                } else if (!viewModel.checkAuthStatus()) {
+                    Toast.makeText(
+                        this@ExcursionActivity,
+                        this@ExcursionActivity.getString(R.string.error_favorite),
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                } else {
                     startActivity(Intent(this@ExcursionActivity, MainActivity::class.java))
                     viewModel.clickComeback()
+                    viewModel.deleteExcursion()
                 }
             }
         }
