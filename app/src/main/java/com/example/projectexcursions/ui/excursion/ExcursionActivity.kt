@@ -61,6 +61,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.buttonComeback.setOnClickListener {
             startActivity(Intent(this@ExcursionActivity, MainActivity::class.java))
             viewModel.clickComeback()
+            finish()
         }
     }
 

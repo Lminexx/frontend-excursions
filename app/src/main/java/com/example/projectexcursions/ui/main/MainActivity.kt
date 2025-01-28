@@ -1,6 +1,6 @@
 package com.example.projectexcursions.ui.main
 
-import com.example.projectexcursions.ui.excursionlist.ExListFragment
+import com.example.projectexcursions.ui.excursions_list.ExListFragment
 import FavFragment
 import com.example.projectexcursions.ui.map.MapFragment
 import android.app.Activity
