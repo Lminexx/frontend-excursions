@@ -1,4 +1,4 @@
-package com.example.projectexcursions.repositories.exlistrepo
+package com.example.projectexcursions.paging_sources
 
 import android.util.Log
 import androidx.paging.PagingSource
@@ -9,9 +9,9 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class SearchExcursionPagingSource @Inject constructor(
+class ExcursionPagingSource @Inject constructor(
     private val apiService: ApiService,
-    private val query: String
+    private val isMine: Boolean
 ): PagingSource<Int, ExcursionsList>() {
     override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
         return state.anchorPosition?.let {anchorPosition ->
@@ -22,19 +22,17 @@ class SearchExcursionPagingSource @Inject constructor(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
         val position = params.key ?: 0
-        Log.d("SearchPagingSource", "Loading page: $position")
-        Log.d("SearchPaging", "Query: ${query.trim()}")
-        Log.d("SearchPaging", "Offset: $position")
-        Log.d("SearchPaging", "limit: ${params.loadSize}")
+        Log.d("PagingSource1", "Loading page: $position")
+        Log.d("Paging", "Offset: $position")
+        Log.d("Paging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.searchExcursions(query = query, offset = position, limit = params.loadSize, isFavorite = false)
-            Log.d("SearchPagingSource", "Query: $query")
+            val response = apiService.getExcursions(offset = position, limit = params.loadSize, isFavorite = false, isMine = isMine)
             val excursions = response.content
-            Log.d("PagingSource", "$excursions")
+            Log.d("PagingSource2", "$excursions")
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1
             val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
-            Log.d("SearchPagingSource", "NextKey: $nextKey, PrevKey: $prevKey")
+            Log.d("PagingSource3", "NextKey: $nextKey, PrevKey: $prevKey")
 
             LoadResult.Page(
                 data = excursions,
@@ -49,5 +47,4 @@ class SearchExcursionPagingSource @Inject constructor(
             LoadResult.Error(Exception("Неизвестная ошибка: ${exception.message}", exception))
         }
     }
-
 }

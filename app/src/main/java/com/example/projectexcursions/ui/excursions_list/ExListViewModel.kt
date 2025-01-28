@@ -1,6 +1,5 @@
-package com.example.projectexcursions.ui.excursionlist
+package com.example.projectexcursions.ui.excursions_list
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -41,7 +40,7 @@ class ExListViewModel @Inject constructor(
 
     var selectedExcursionsList: ExcursionsList? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalPagingApi::class)
     var excursions: Flow<PagingData<ExcursionsList>> = isSearching
         .flatMapLatest { searching ->
             if (searching) {
@@ -51,13 +50,14 @@ class ExListViewModel @Inject constructor(
                     .flatMapLatest { query ->
                         Pager(
                             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                            pagingSourceFactory = { repository.searchExcursionPagingSource(query) }
+                            pagingSourceFactory = { repository.searchExcursionPagingSource(query, isMine = false) }
                         ).flow
                     }
             } else {
                 Pager(
                     config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                    pagingSourceFactory = { repository.excursionPagingSource() }
+                    pagingSourceFactory = { repository.excursionPagingSource(false) },
+                    remoteMediator = remoteMediator
                 ).flow
             }
         }.cachedIn(viewModelScope)
