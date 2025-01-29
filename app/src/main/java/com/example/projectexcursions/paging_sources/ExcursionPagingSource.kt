@@ -9,7 +9,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class ExcursionPagingSource @Inject constructor(
+class ExcursionPagingSource (
     private val apiService: ApiService,
     private val isFavorite: Boolean,
     private val isMine: Boolean

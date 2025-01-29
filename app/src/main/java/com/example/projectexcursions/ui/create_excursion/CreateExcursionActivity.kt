@@ -27,7 +27,6 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun initCallback() {
-        binding.buttonComeback.setOnClickListener { viewModel.clickComeBack() }
         binding.buttonCreateExcursion.setOnClickListener { viewModel.clickCreateExcursion() }
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
