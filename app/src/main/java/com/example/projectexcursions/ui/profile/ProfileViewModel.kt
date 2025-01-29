@@ -29,6 +29,9 @@ class ProfileViewModel @Inject constructor(
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
 
+    private val _goToCreatedExcs = MutableLiveData(false)
+    val goToCreatedExcs: LiveData<Boolean> get() = _goToCreatedExcs
+
     init {
         loadUser()
     }

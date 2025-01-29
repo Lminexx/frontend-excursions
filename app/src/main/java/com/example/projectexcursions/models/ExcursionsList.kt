@@ -14,5 +14,6 @@ data class ExcursionsList(
     val title: String,
     val userId: Long,
     val description: String,
-    val favorite: Boolean = false
-) : Parcelable
+    val favorite: Boolean = false,
+    val username: String?
+): Parcelable

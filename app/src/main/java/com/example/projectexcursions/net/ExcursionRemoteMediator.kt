@@ -3,7 +3,6 @@ package com.example.projectexcursions.net
 import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
-import androidx.paging.PagingData
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.example.projectexcursions.models.ExcursionsList
@@ -45,7 +44,7 @@ class ExcursionRemoteMediator @Inject constructor(
         }
         return try {
             Log.d("Page", "$page")
-            val response = repository.fetchExcursions(page, state.config.pageSize, true)
+            val response = repository.fetchExcursions(page, state.config.pageSize, false, isMine = false)
             Log.d("ExcursionsGetter", "$response")
             val excursions = response.content
             Log.d("ExcursionsToSave", "Page: $page, Excursions: ${excursions.size}")

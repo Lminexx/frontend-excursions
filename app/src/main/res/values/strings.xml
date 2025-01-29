@@ -43,4 +43,6 @@
     <string name="error_favorite">Сначала авторизуйтесь</string>
     <string name="favorite"> Добавить\Удалить избранное </string>
     <string name="error_delete_excursion"> Необходимо быть владельцем экскурсии </string>
+    <string name="search_hint">Найти экскурсию</string>
+    <string name="my_exc_list">Мои экскурсии</string>
 </resources>

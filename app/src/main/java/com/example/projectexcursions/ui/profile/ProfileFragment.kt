@@ -11,6 +11,7 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.UsernameNotFoundException
 import com.example.projectexcursions.databinding.FragmentProfileBinding
 import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
+import com.example.projectexcursions.ui.created_excursions_list.CreatedExListActivity
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,6 +40,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
     private fun initCallback() {
         binding.buttCreateExcursion.setOnClickListener { viewModel.clickCreateExcursion() }
         binding.buttLogOut.setOnClickListener { viewModel.clickComeBack() }
+        binding.createdExcursionsList.setOnClickListener { viewModel.createdExcsList() }
     }
 
     private fun subscribe() {
@@ -50,7 +52,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
         }
 
         viewModel.username.observe(viewLifecycleOwner) {
-            username -> binding.userNicknameTextView.text = username ?: throw UsernameNotFoundException("Usera net v tokene")
+            username -> binding.userNickname.text = username ?: throw UsernameNotFoundException("Usera net v tokene")
         }
 
         viewModel.wantComeBack.observe(viewLifecycleOwner) {wannaLogOut ->
@@ -58,6 +60,12 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
                 viewModel.logout()
                 startActivity(Intent(requireContext(), MainActivity::class.java))
                 viewModel.cameBack()
+            }
+        }
+
+        viewModel.goToCreatedExcs.observe(viewLifecycleOwner) {wannaCreated ->
+            if (wannaCreated) {
+                startActivity(Intent(requireContext(), CreatedExListActivity::class.java))
             }
         }
     }

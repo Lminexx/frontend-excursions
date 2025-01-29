@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include
+            android:id="@+id/shimmer_view"
+            layout="@layout/shimmer_excursion_activity"/>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
     <TextView
         android:id="@+id/excursionTitle"
         android:layout_width="0dp"
