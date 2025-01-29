@@ -49,7 +49,7 @@ class CreateExcursionViewModel @Inject constructor(
                             response.userId,
                             response.description,
                             response.username,
-                            favorite = false
+                            response.favorite
                         )
                         excursionRepository.saveExcursionToDB(respondedExcursion)
                         _message.value = context.getString(R.string.create_success)

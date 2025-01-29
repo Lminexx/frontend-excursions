@@ -19,7 +19,8 @@ class ExcursionAdapter(
         fun onExcursionClick(excursionsList: ExcursionsList)
     }
 
-    inner class ExcursionViewHolder(private val binding: ItemExcursionBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ExcursionViewHolder(private val binding: ItemExcursionBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(excursionsList: ExcursionsList?) {
             if (excursionsList != null) {
                 binding.tvExcursionTitle.text = excursionsList.title

@@ -16,4 +16,13 @@ interface ExcursionDao {
 
     @Query("delete from excursion")
     suspend fun clearAll()
+
+    @Query("update excursion set favorite = 1 where id = :id")
+    suspend fun addFavorite(id: Long)
+
+    @Query("update excursion set favorite = 0 where id = :id")
+    suspend fun deleteFavorite(id: Long)
+
+    @Query("delete from excursion where id = :id")
+    suspend fun deleteExcursion(id: Long)
 }

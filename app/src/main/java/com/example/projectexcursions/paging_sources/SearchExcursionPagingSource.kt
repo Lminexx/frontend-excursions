@@ -14,12 +14,6 @@ class SearchExcursionPagingSource @Inject constructor(
     private val query: String,
     private val isMine: Boolean
 ): PagingSource<Int, ExcursionsList>() {
-    override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
-        return state.anchorPosition?.let {anchorPosition ->
-            val page = state.closestPageToPosition(anchorPosition)
-            page?.prevKey?.plus(1) ?: page?.nextKey?.minus(1)
-        }
-    }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
         val position = params.key ?: 0
@@ -38,10 +32,10 @@ class SearchExcursionPagingSource @Inject constructor(
             Log.d("SearchPagingSource", "NextKey: $nextKey, PrevKey: $prevKey")
 
             LoadResult.Page(
-                data = excursions,
-                prevKey = prevKey,
-                nextKey = nextKey
-            )
+                    data = excursions,
+                    prevKey = prevKey,
+                    nextKey = nextKey
+                )
         } catch (exception: IOException) {
             LoadResult.Error(Exception("Ошибка сети: ${exception.message}", exception))
         } catch (exception: HttpException) {
@@ -51,4 +45,10 @@ class SearchExcursionPagingSource @Inject constructor(
         }
     }
 
+    override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
+        return state.anchorPosition?.let {anchorPosition ->
+            val page = state.closestPageToPosition(anchorPosition)
+            page?.prevKey?.plus(1) ?: page?.nextKey?.minus(1)
+        }
+    }
 }
