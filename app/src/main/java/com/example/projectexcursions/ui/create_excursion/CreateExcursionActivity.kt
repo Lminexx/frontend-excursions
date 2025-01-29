@@ -27,20 +27,11 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun initCallback() {
-        binding.buttonComeback.setOnClickListener { viewModel.clickComeBack() }
         binding.buttonCreateExcursion.setOnClickListener { viewModel.clickCreateExcursion() }
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 
     private fun subscribe() {
-        viewModel.wantComeBack.observe(this) { wannaComeBack ->
-            if (wannaComeBack) {
-                startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
-                viewModel.cameBack()
-                finish()
-            }
-        }
-
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
                 Log.d("WantCreate", "WantCreate")

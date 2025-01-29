@@ -1,14 +1,15 @@
 package com.example.projectexcursions.ui.excursions_list
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
@@ -22,11 +23,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ExListFragment: Fragment(R.layout.excursions_list) {
+class ExListFragment : Fragment(R.layout.excursions_list) {
 
     private lateinit var binding: ExcursionsListBinding
+
     @Inject
     lateinit var adapter: ExcursionAdapter
+
     private val viewModel: ExListViewModel by viewModels()
 
     override fun onCreateView(
@@ -40,8 +43,20 @@ class ExListFragment: Fragment(R.layout.excursions_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initData()
         initCallback()
         subscribe()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding.shimmerLayout.stopShimmer()
+    }
+
+    private fun initData() {
+        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.adapter = adapter
+        showShimmer()
     }
 
     private fun initCallback() {
@@ -51,10 +66,7 @@ class ExListFragment: Fragment(R.layout.excursions_list) {
             }
         }
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
-        binding.recyclerView.adapter = adapter
-
-        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (!query.isNullOrEmpty()) {
                     viewModel.searchExcursionsQuery(query)
@@ -84,9 +96,22 @@ class ExListFragment: Fragment(R.layout.excursions_list) {
     private fun subscribe() {
         lifecycleScope.launch {
             viewModel.excursions.collectLatest { pagingData ->
-                Log.d("excursions", "$pagingData")
                 adapter.submitData(pagingData)
-                Log.d("GetAllExcursions", "${viewModel.excursions}")
+            }
+        }
+
+        adapter.addLoadStateListener { loadState ->
+            when (loadState.source.refresh) {
+                is LoadState.Loading -> {
+                    showShimmer()
+                }
+                is LoadState.NotLoading -> {
+                    hideShimmer()
+                }
+                is LoadState.Error -> {
+                    showShimmer()
+                    Toast.makeText(requireContext(), "Connection error", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -100,5 +125,17 @@ class ExListFragment: Fragment(R.layout.excursions_list) {
                 }
             }
         }
+    }
+
+    private fun showShimmer() {
+        binding.shimmerLayout.visibility = View.VISIBLE
+        binding.shimmerLayout.startShimmer()
+        binding.recyclerView.visibility = View.GONE
+    }
+
+    private fun hideShimmer() {
+        binding.shimmerLayout.stopShimmer()
+        binding.shimmerLayout.visibility = View.GONE
+        binding.recyclerView.visibility = View.VISIBLE
     }
 }

@@ -43,19 +43,6 @@
         android:textColor="@color/white"
         android:textSize="16sp"
         android:background="@drawable/button_pattern_2"
-        app:layout_constraintBottom_toTopOf="@id/buttonComeback"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/buttonComeback"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/button_pattern_1"
-        android:text="@string/come_back"
-        android:textColor="@color/blue"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
