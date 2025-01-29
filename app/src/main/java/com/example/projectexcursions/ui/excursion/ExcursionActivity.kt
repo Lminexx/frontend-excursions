@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -42,6 +43,8 @@ class ExcursionActivity : AppCompatActivity() {
             finish()
             return
         }
+
+        showShimmer()
         viewModel.loadExcursion(excursionId)
         if (viewModel.excursion.value?.favorite == true) {
             binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
@@ -56,6 +59,7 @@ class ExcursionActivity : AppCompatActivity() {
 
         viewModel.excursion.observe(this) { excursion ->
             if (excursion != null) {
+                hideShimmer()
                 binding.excursionTitle.text = excursion.title
                 binding.excursionAuthor.text = excursion.username
                 binding.excursionDescription.text = excursion.description
@@ -134,4 +138,20 @@ class ExcursionActivity : AppCompatActivity() {
             Intent(this, ExcursionActivity::class.java)
                 .putExtra(EXTRA_EXCURSION_ID, excursionId)
     }
+
+    private fun showShimmer() {
+        binding.shimmerLayout.visibility = View.VISIBLE
+        binding.excursionTitle.visibility = View.GONE
+        binding.excursionAuthor.visibility = View.GONE
+        binding.excursionDescription.visibility = View.GONE
+        binding.shimmerLayout.startShimmer()
+    }
+
+    private fun hideShimmer() {
+        binding.shimmerLayout.stopShimmer()
+        binding.shimmerLayout.visibility = View.GONE
+        binding.excursionTitle.visibility = View.VISIBLE
+        binding.excursionAuthor.visibility = View.VISIBLE
+        binding.excursionDescription.visibility = View.VISIBLE
+        }
 }

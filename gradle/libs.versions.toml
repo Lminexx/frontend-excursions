@@ -25,6 +25,7 @@ material = "1.12.0"
 retrofit2KotlinxSerializationConverter = "0.8.0"
 room = "2.6.1"
 playServicesMaps = "19.0.0"
+shimmerVersion = "0.5.0"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -38,6 +39,7 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+facebook-shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmerVersion" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 java-jwt = { module = "com.auth0:java-jwt", version.ref = "javaJwt" }

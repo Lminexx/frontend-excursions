@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "3928ea011479bab1e437b88cd83b626f",
+    "version": 2,
+    "identityHash": "f3ca3d9759d3ebc3f31979088bbf196c",
     "entities": [
       {
         "tableName": "excursions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `username` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -31,18 +31,6 @@
             "columnName": "description",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "favorite",
-            "columnName": "favorite",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "username",
-            "columnName": "username",
-            "affinity": "TEXT",
-            "notNull": false
           }
         ],
         "primaryKey": {
@@ -56,7 +44,7 @@
       },
       {
         "tableName": "excursion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `username` TEXT NOT NULL, `favorite` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `username` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -87,12 +75,6 @@
             "columnName": "username",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "favorite",
-            "columnName": "favorite",
-            "affinity": "INTEGER",
-            "notNull": false
           }
         ],
         "primaryKey": {
@@ -134,7 +116,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3928ea011479bab1e437b88cd83b626f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f3ca3d9759d3ebc3f31979088bbf196c')"
     ]
   }
 }

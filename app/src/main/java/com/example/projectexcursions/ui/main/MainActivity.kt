@@ -1,6 +1,6 @@
 package com.example.projectexcursions.ui.main
 
-import com.example.projectexcursions.ui.excursionlist.ExListFragment
+import com.example.projectexcursions.ui.excursions_list.ExListFragment
 import com.example.projectexcursions.ui.favorite_excursions.FavFragment
 import com.example.projectexcursions.ui.map.MapFragment
 import android.app.Activity
@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
                         else {
                             val intent = Intent(this@MainActivity, AuthActivity::class.java)
                             startActivityForResult(intent, AUTH_REQUEST_CODE)
+                            finish()
                         }
                     }
                 }

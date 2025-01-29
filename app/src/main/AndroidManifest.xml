@@ -42,5 +42,9 @@
             android:name="com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name="com.example.projectexcursions.ui.created_excursions_list.CreatedExListActivity"
+            android:exported="true">
+        </activity>
     </application>
 </manifest>
