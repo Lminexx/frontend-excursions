@@ -2,10 +2,13 @@ package com.example.projectexcursions.ui.created_excursions_list
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.adapter.ExcursionAdapter
@@ -30,6 +33,7 @@ class CreatedExListActivity: AppCompatActivity() {
         binding = ExcursionsListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initData()
         initCallback()
         subscribe()
     }
@@ -40,9 +44,6 @@ class CreatedExListActivity: AppCompatActivity() {
                 viewModel.clickExcursion(excursionsList)
             }
         }
-
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = adapter
 
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -71,12 +72,33 @@ class CreatedExListActivity: AppCompatActivity() {
         }
     }
 
+    private fun initData() {
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
+        showShimmer()
+    }
+
     private fun subscribe() {
         lifecycleScope.launch {
             viewModel.createdExcursions.collectLatest { pagingData ->
                 Log.d("excursions", "$pagingData")
                 adapter.submitData(pagingData)
                 Log.d("GetAllExcursions", "${viewModel.createdExcursions}")
+            }
+        }
+
+        adapter.addLoadStateListener { loadState ->
+            when (loadState.source.refresh) {
+                is LoadState.Loading -> {
+                    showShimmer()
+                }
+                is LoadState.NotLoading -> {
+                    hideShimmer()
+                }
+                is LoadState.Error -> {
+                    showShimmer()
+                    Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -90,5 +112,17 @@ class CreatedExListActivity: AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun showShimmer() {
+        binding.shimmerLayout.visibility = View.VISIBLE
+        binding.shimmerLayout.startShimmer()
+        binding.recyclerView.visibility = View.GONE
+    }
+
+    private fun hideShimmer() {
+        binding.shimmerLayout.stopShimmer()
+        binding.shimmerLayout.visibility = View.GONE
+        binding.recyclerView.visibility = View.VISIBLE
     }
 }
