@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -108,7 +109,8 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
                     hideShimmer()
                 }
                 is LoadState.Error -> {
-                    hideShimmer()
+                    showShimmer()
+                    Toast.makeText(requireContext(), "Connection error", Toast.LENGTH_SHORT).show()
                 }
             }
         }
