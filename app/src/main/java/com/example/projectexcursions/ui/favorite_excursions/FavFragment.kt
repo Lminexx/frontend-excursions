@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
-import com.example.projectexcursions.adapter.FavAdapter
 import com.example.projectexcursions.databinding.FragmentFavBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
