@@ -35,7 +35,8 @@ class ExcursionAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExcursionViewHolder {
         val binding = ItemExcursionBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false)
+            LayoutInflater.from(parent.context), parent, false
+        )
         return ExcursionViewHolder(binding)
     }
 

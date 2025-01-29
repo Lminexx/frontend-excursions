@@ -53,6 +53,7 @@ class AuthActivity: AppCompatActivity() {
             if (wannaComeBack) {
                 startActivity(Intent(this@AuthActivity, MainActivity::class.java))
                 viewModel.cameBack()
+                finish()
             }
         }
 
