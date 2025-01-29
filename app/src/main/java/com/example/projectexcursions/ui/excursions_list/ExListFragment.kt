@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
 import com.example.projectexcursions.databinding.ExcursionsListBinding
@@ -91,6 +92,10 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
             if (hasFocus)
                 lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
         }
+
+        binding.swipeRefresh.setOnRefreshListener {
+            adapter.refresh()
+        }
     }
 
     private fun subscribe() {
@@ -101,6 +106,7 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         }
 
         adapter.addLoadStateListener { loadState ->
+            binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
                     showShimmer()
