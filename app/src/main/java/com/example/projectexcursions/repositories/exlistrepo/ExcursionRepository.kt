@@ -9,7 +9,7 @@ import com.example.projectexcursions.paging_sources.ExcursionPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 
 interface ExcursionRepository {
-    fun excursionPagingSource(isMine: Boolean): ExcursionPagingSource
+    fun excursionPagingSource(isFavorite: Boolean, isMine: Boolean): ExcursionPagingSource
 
     fun searchExcursionPagingSource(query: String, isMine: Boolean): SearchExcursionPagingSource
 
@@ -23,6 +23,8 @@ interface ExcursionRepository {
 
     suspend fun fetchExcursion(id: Long): ExcursionResponse
 
+    suspend fun deleteExcursion(id: Long)
+
     suspend fun getExcursionFromDB(id: Long): Excursion?
 
     suspend fun deleteAllExcursionsFromExcursions()
@@ -30,6 +32,10 @@ interface ExcursionRepository {
     suspend fun deleteAllExcursionsFromExcursion()
 
     suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse
+
+    suspend fun addFavorite(id:Long)
+
+    suspend fun deleteFavorite(id:Long)
 
     suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse
 }

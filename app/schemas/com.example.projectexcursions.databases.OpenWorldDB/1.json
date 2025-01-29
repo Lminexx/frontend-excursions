@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3928ea011479bab1e437b88cd83b626f",
+    "identityHash": "9637b5123f5f2d133f1073f43d69522d",
     "entities": [
       {
         "tableName": "excursions",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "excursion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `username` TEXT NOT NULL, `favorite` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `username` TEXT NOT NULL, `favorite` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -92,7 +92,7 @@
             "fieldPath": "favorite",
             "columnName": "favorite",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -134,7 +134,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3928ea011479bab1e437b88cd83b626f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9637b5123f5f2d133f1073f43d69522d')"
     ]
   }
 }

@@ -22,8 +22,8 @@ class ExcursionRepositoryImpl @Inject constructor(
     private val tokenRepository: TokenRepository
 ) : ExcursionRepository {
 
-    override fun excursionPagingSource(isMine: Boolean) = ExcursionPagingSource(apiService, isMine)
-  
+    override fun excursionPagingSource(isFavorite:Boolean, isMine: Boolean) = ExcursionPagingSource(apiService, isFavorite, isMine)
+
     override fun searchExcursionPagingSource(query: String, isMine: Boolean) = SearchExcursionPagingSource(apiService, query, isMine)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
@@ -48,6 +48,12 @@ class ExcursionRepositoryImpl @Inject constructor(
         return apiService.getExcursion(id)
     }
 
+    override suspend fun deleteExcursion(id: Long){
+        Log.d("DeleteEx", "DeleteExcursion")
+        excursionDao.deleteExcursion(id)
+        apiService.deleteExcursion(id)
+    }
+
     override suspend fun getExcursionFromDB(id: Long): Excursion? {
         Log.d("GettingEx", "GetExcursion")
         return excursionDao.getExcursionById(id)
@@ -59,6 +65,18 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
         return apiService.createExcursion(creatingExcursion)
+    }
+
+    override suspend fun addFavorite(id: Long) {
+        Log.d("FavoriteExcursion", "addFavorite")
+        apiService.addFavorite(id)
+        excursionDao.addFavorite(id)
+    }
+
+    override suspend fun deleteFavorite(id: Long) {
+        Log.d("FavoriteExcursion", "deleteFavorite")
+        apiService.deleteFavorite(id)
+        excursionDao.deleteFavorite(id)
     }
 
     //вроде как не нужен, но на всякий случай оставлю
