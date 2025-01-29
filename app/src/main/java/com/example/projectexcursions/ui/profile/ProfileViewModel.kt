@@ -73,4 +73,8 @@ class ProfileViewModel @Inject constructor(
     fun cameBack() {
         _wantComeBack.value = false
     }
+
+    fun createdExcsList() {
+        _goToCreatedExcs.value = true
+    }
 }
