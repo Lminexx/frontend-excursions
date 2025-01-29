@@ -37,7 +37,7 @@ class FavViewModel @Inject constructor(
             enablePlaceholders = false
         ),
         remoteMediator = remoteMediator,
-        pagingSourceFactory = { repository.excursionPagingSource(true) }
+        pagingSourceFactory = { repository.excursionPagingSource(true, false) }
     ).flow.cachedIn(viewModelScope)
 
     fun clickExcursion(excursionsList: ExcursionsList) {
