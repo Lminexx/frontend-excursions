@@ -76,6 +76,7 @@ buildTypes {
 
 dependencies {
 
+    implementation(libs.facebook.shimmer)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.recyclerview)

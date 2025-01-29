@@ -56,8 +56,7 @@ class ExListViewModel @Inject constructor(
             } else {
                 Pager(
                     config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                    pagingSourceFactory = { repository.excursionPagingSource(false) },
-                    remoteMediator = remoteMediator
+                    pagingSourceFactory = { repository.excursionPagingSource(false) }
                 ).flow
             }
         }.cachedIn(viewModelScope)
