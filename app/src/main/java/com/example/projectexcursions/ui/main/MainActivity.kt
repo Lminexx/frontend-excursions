@@ -52,13 +52,13 @@ class MainActivity : AppCompatActivity() {
                         else {
                             val intent = Intent(this@MainActivity, AuthActivity::class.java)
                             startActivityForResult(intent, AUTH_REQUEST_CODE)
-                            finish()
                         }
                     }
                 }
             }
         }
     }
+
     private fun initCallBack() {
         binding.botNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
