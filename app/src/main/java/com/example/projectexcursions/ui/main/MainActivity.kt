@@ -62,10 +62,10 @@ class MainActivity : AppCompatActivity() {
     private fun initCallBack() {
         binding.botNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.list -> viewModel.clickExList()
-                R.id.fav -> viewModel.clickFav()
-                R.id.map -> viewModel.clickMap()
-                R.id.profile -> viewModel.clickProfile()
+                R.id.list -> viewModel.changeMenuItem("list")
+                R.id.fav -> viewModel.changeMenuItem("fav")
+                R.id.map -> viewModel.changeMenuItem("map")
+                R.id.profile -> viewModel.changeMenuItem("profile")
             }
             true
         }
@@ -77,6 +77,11 @@ class MainActivity : AppCompatActivity() {
             .setReorderingAllowed(true)
             .commit()
     }
+
+    fun updateBottomNavSelectionForLogout() {
+        binding.botNavView.selectedItemId = R.id.list
+    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
