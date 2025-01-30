@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.main
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,9 @@ open class MainViewModel @Inject constructor(
     private val repository: TokenRepository
 ) : ViewModel() {
 
+    private val _isAuth = MutableLiveData<Boolean>()
+    val isAuth: LiveData<Boolean> get() = _isAuth
+
     private val _menuItem = MutableLiveData<String?>()
     val menuItem: LiveData<String?> get() = _menuItem
 
@@ -19,20 +23,10 @@ open class MainViewModel @Inject constructor(
         _menuItem.value = null
     }
 
-    fun clickExList() {
-        _menuItem.value = "list"
-    }
-
-    fun clickFav() {
-        _menuItem.value = "fav"
-    }
-
-    fun clickMap() {
-        _menuItem.value = "map"
-    }
-
-    fun clickProfile() {
-        _menuItem.value = "profile"
+    fun changeMenuItem(newMenuItem: String?) {
+        Log.d("MenuItemHasChanged", newMenuItem.toString())
+        _menuItem.value = newMenuItem
+        Log.d("MenuItem", "${_menuItem.value}")
     }
 
     suspend fun checkAuthStatus(): Boolean {
