@@ -2,10 +2,12 @@ package com.example.projectexcursions.ui.profile
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.projectexcursions.R
 import com.example.projectexcursions.UsernameNotFoundException
@@ -13,12 +15,14 @@ import com.example.projectexcursions.databinding.FragmentProfileBinding
 import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.created_excursions_list.CreatedExListActivity
 import com.example.projectexcursions.ui.main.MainActivity
+import com.example.projectexcursions.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ProfileFragment: Fragment(R.layout.fragment_profile) {
 
     private lateinit var binding: FragmentProfileBinding
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: ProfileViewModel by viewModels()
 
     override fun onCreateView(
@@ -57,9 +61,9 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
 
         viewModel.wantComeBack.observe(viewLifecycleOwner) {wannaLogOut ->
             if (wannaLogOut) {
+                Log.d("WantLogOut", "true")
+                (requireActivity() as? MainActivity)?.updateBottomNavSelectionForLogout()
                 viewModel.logout()
-                startActivity(Intent(requireContext(), MainActivity::class.java))
-                viewModel.cameBack()
             }
         }
 
