@@ -46,13 +46,13 @@ class ProfileViewModel @Inject constructor(
                 Log.d("UsernameCheck2", _username.value!!)
             } else {
                 _message.value = "Username not found in token"
-                //throw UsernameNotFoundException("Username not found in token")
             }
         }
     }
 
     fun logout() {
         viewModelScope.launch {
+            Log.d("DeleteToken", "true")
             val token = repository.getCachedToken()
             repository.deleteToken(token!!.token)
         }
