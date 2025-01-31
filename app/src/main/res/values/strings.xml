@@ -45,4 +45,12 @@
     <string name="error_delete_excursion"> Необходимо быть владельцем экскурсии </string>
     <string name="search_hint">Найти экскурсию</string>
     <string name="my_exc_list">Мои экскурсии</string>
+    <string name="add_to_fav">Добавить в избранное</string>
+    <string name="delete_exc">Удалить экскурсию</string>
+    <string name="you_want">Вы хотите</string>
+    <string name="or">или</string>
+    <string name="reg_string_qm">Зарегестрироваться?</string>
+    <string name="authorize">Войдите</string>
+    <string name="open">Откройте</string>
+    <string name="your_world">свой мир</string>
 </resources>

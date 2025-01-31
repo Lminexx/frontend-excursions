@@ -9,10 +9,22 @@
         android:id="@+id/shimmerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <include
-            android:id="@+id/shimmer_view"
-            layout="@layout/shimmer_excursion_activity"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
+            <include
+                android:id="@+id/shimmer_view"
+                layout="@layout/shimmer_excursion_activity"/>
+
+            <View
+                android:id="@+id/shimmer_deleteExcursion"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:background="@color/biryuzoviy"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
     <TextView
@@ -64,4 +76,15 @@
         app:layout_constraintLeft_toRightOf="@id/excursionTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_ex_fav_hollow" />
+
+    <ImageButton
+        android:id="@+id/deleteExcursion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:contentDescription="@string/delete_exc"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/ic_ex_del" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -78,10 +78,6 @@ class RegViewModel @Inject constructor(
         return regex.matches(input)
     }
 
-    fun clickComeBack() {
-        _wantComeBack.value = true
-    }
-
     fun cameBack() {
         _wantComeBack.value = false
     }

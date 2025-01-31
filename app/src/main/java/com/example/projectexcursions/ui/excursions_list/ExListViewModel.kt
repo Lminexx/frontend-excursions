@@ -50,13 +50,13 @@ class ExListViewModel @Inject constructor(
                     .flatMapLatest { query ->
                         Pager(
                             config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                            pagingSourceFactory = { repository.searchExcursionPagingSource(query, isMine = false) }
+                            pagingSourceFactory = { repository.searchExcursionPagingSource(query, isFavorite = false, isMine = false) }
                         ).flow
                     }
             } else {
                 Pager(
                     config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                    pagingSourceFactory = { repository.excursionPagingSource(false, false) }
+                    pagingSourceFactory = { repository.excursionPagingSource(isFavorite = false, isMine = false) }
                 ).flow
             }
         }.cachedIn(viewModelScope)

@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.excursions_list
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,12 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
+import com.example.projectexcursions.ui.excursions_list.ExListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -27,10 +28,8 @@ import javax.inject.Inject
 class ExListFragment : Fragment(R.layout.excursions_list) {
 
     private lateinit var binding: ExcursionsListBinding
-
     @Inject
     lateinit var adapter: ExcursionAdapter
-
     private val viewModel: ExListViewModel by viewModels()
 
     override fun onCreateView(
@@ -64,6 +63,7 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener {
             override fun onExcursionClick(excursionsList: ExcursionsList) {
                 viewModel.clickExcursion(excursionsList)
+                Log.d("BindExcursion", excursionsList.title)
             }
         }
 

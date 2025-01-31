@@ -12,7 +12,8 @@ import javax.inject.Inject
 class SearchExcursionPagingSource @Inject constructor(
     private val apiService: ApiService,
     private val query: String,
-    private val isMine: Boolean
+    private val isMine: Boolean,
+    private val isFavorite: Boolean
 ): PagingSource<Int, ExcursionsList>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ExcursionsList> {
@@ -22,7 +23,7 @@ class SearchExcursionPagingSource @Inject constructor(
         Log.d("SearchPaging", "Offset: $position")
         Log.d("SearchPaging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.searchExcursions(query = query, offset = position, limit = params.loadSize, isFavorite = false, isMine = isMine)
+            val response = apiService.searchExcursions(query = query, offset = position, limit = params.loadSize, isFavorite = isFavorite, isMine = isMine)
             Log.d("SearchPagingSource", "Query: $query")
             val excursions = response.content
             Log.d("PagingSource", "$excursions")

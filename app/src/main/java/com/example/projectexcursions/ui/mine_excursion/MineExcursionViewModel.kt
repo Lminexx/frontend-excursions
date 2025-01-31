@@ -1,4 +1,4 @@
-package com.example.projectexcursions.ui.excursion
+package com.example.projectexcursions.ui.mine_excursion
 
 import android.text.BoringLayout
 import android.util.Log
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ExcursionViewModel @Inject constructor(
+class MineExcursionViewModel @Inject constructor(
     private val apiService: ApiService,
     private val repository: ExcursionRepository,
     private val tokenRepository: TokenRepository
@@ -90,6 +90,17 @@ class ExcursionViewModel @Inject constructor(
             Log.d("FavoriteExcursion", "DeleteFavorite")
             excursion.value?.let { repository.deleteFavorite(it.id) }
         }
+    }
+
+    fun deleteExcursion(){
+        viewModelScope.launch {
+            Log.d("DeleteEx", "DeleteExcursion")
+            excursion.value?.let { repository.deleteExcursion(it.id) }
+        }
+    }
+
+    fun clickComeback() {
+        _wantComeBack.value = true
     }
 
     fun cameBack() {
