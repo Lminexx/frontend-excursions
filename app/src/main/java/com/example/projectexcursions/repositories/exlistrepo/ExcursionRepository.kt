@@ -37,5 +37,7 @@ interface ExcursionRepository {
 
     suspend fun deleteFavorite(id:Long)
 
+    suspend fun checkFav(excursionId: Long): Boolean
+
     suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse
 }

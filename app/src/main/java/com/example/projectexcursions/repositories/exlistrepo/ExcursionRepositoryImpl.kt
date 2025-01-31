@@ -50,8 +50,11 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override suspend fun deleteExcursion(id: Long){
         Log.d("DeleteEx", "DeleteExcursion")
-        excursionDao.deleteExcursion(id)
-        apiService.deleteExcursion(id)
+        val response = apiService.deleteExcursion(id)
+        if (response.isDeleted)
+            excursionDao.deleteExcursion(id)
+        else
+            Log.e("DeleteExc", "PisyaPopa")
     }
 
     override suspend fun getExcursionFromDB(id: Long): Excursion? {
@@ -77,6 +80,11 @@ class ExcursionRepositoryImpl @Inject constructor(
         Log.d("FavoriteExcursion", "deleteFavorite")
         apiService.deleteFavorite(id)
         excursionDao.deleteFavorite(id)
+    }
+
+    override suspend fun checkFav(excursionId: Long): Boolean {
+        val excursion = excursionDao.getExcursionById(excursionId)
+        return excursion!!.favorite
     }
 
     //вроде как не нужен, но на всякий случай оставлю

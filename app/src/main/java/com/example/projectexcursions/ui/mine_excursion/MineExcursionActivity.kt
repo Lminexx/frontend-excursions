@@ -25,8 +25,6 @@ class MineExcursionActivity : AppCompatActivity() {
 
     private lateinit var binding: MineActivityExcursionBinding
 
-    private var isFavorite: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = MineActivityExcursionBinding.inflate(layoutInflater)
@@ -49,10 +47,6 @@ class MineExcursionActivity : AppCompatActivity() {
 
         viewModel.loadExcursion(excursionId)
 
-        if (viewModel.excursion.value?.favorite == true) {
-            binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
-        }
-
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 
@@ -67,6 +61,10 @@ class MineExcursionActivity : AppCompatActivity() {
                 binding.excursionTitle.text = excursion.title
                 binding.excursionAuthor.text = excursion.username
                 binding.excursionDescription.text = excursion.description
+                if (viewModel.excursion.value!!.favorite)
+                    viewModel.fav()
+                else
+                    viewModel.notFav()
             } else {
                 Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT).show()
             }
@@ -74,9 +72,9 @@ class MineExcursionActivity : AppCompatActivity() {
 
         viewModel.favorite.observe(this) { favorite ->
             if (favorite) {
-                viewModel.addFavorite()
+                binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
             } else {
-                viewModel.deleteFavorite()
+                binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_hollow)
             }
         }
     }
@@ -85,47 +83,17 @@ class MineExcursionActivity : AppCompatActivity() {
         binding.favoriteButton.setOnClickListener {
             lifecycleScope.launch {
                 if (viewModel.checkAuthStatus()) {
-                    if (isFavorite) {
-                        binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_hollow)
-                        isFavorite = false
-                        viewModel.clickNotFavorite()
-                    } else {
-                        binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
-                        isFavorite = true
-                        viewModel.clickFavorite()
-                    }
+                    viewModel.clickFavorite()
                 } else {
-                    Toast.makeText(
-                        this@MineExcursionActivity,
-                        this@MineExcursionActivity.getString(R.string.error_favorite),
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    Toast.makeText(this@MineExcursionActivity, this@MineExcursionActivity.getString(R.string.error_favorite), Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
         binding.deleteExcursion.setOnClickListener {
             lifecycleScope.launch {
-                if (viewModel.username.value != viewModel.excursion.value?.username) {
-                    Toast.makeText(
-                        this@MineExcursionActivity,
-                        this@MineExcursionActivity.getString(R.string.error_delete_excursion),
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                } else if (!viewModel.checkAuthStatus()) {
-                    Toast.makeText(
-                        this@MineExcursionActivity,
-                        this@MineExcursionActivity.getString(R.string.error_favorite),
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                } else {
-                    startActivity(Intent(this@MineExcursionActivity, MainActivity::class.java))
-                    viewModel.clickComeback()
-                    viewModel.deleteExcursion()
-                }
+                viewModel.deleteExcursion()
+                finish()
             }
         }
     }
