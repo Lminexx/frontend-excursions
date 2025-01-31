@@ -11,7 +11,7 @@ import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 interface ExcursionRepository {
     fun excursionPagingSource(isFavorite: Boolean, isMine: Boolean): ExcursionPagingSource
 
-    fun searchExcursionPagingSource(query: String, isMine: Boolean): SearchExcursionPagingSource
+    fun searchExcursionPagingSource(query: String, isMine: Boolean, isFavorite: Boolean): SearchExcursionPagingSource
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
