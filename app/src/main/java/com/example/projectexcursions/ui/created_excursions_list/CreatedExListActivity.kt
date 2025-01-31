@@ -39,6 +39,18 @@ class CreatedExListActivity: AppCompatActivity() {
         subscribe()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        adapter.refresh()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        hideShimmer()
+    }
+
     private fun initCallback() {
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
             override fun onExcursionClick(excursionsList: ExcursionsList) {

@@ -34,8 +34,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     private fun subscribe() {
         viewModel.wantComeBack.observe(this) { wannaComeBack ->
             if (wannaComeBack) {
-                startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
-                viewModel.cameBack()
+                finish()
             }
         }
 
@@ -46,7 +45,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val description = binding.excursionDescription.text.toString().trim()
                 if (viewModel.isExcursionCorrect(this, title, description)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
-                    startActivity(Intent(this@CreateExcursionActivity, MainActivity::class.java))
+                    finish()
                 }
             }
         }

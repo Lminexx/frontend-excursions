@@ -78,18 +78,26 @@ class ExcursionViewModel @Inject constructor(
             _username.value = name!!
     }
 
-    fun addFavorite() {
+    private fun addFavorite() {
         viewModelScope.launch {
             Log.d("FavoriteExcursion", "AddFavorite")
             excursion.value?.let { repository.addFavorite(it.id) }
         }
     }
 
-    fun deleteFavorite() {
+    private fun deleteFavorite() {
         viewModelScope.launch {
             Log.d("FavoriteExcursion", "DeleteFavorite")
             excursion.value?.let { repository.deleteFavorite(it.id) }
         }
+    }
+
+    fun fav() {
+        _favorite.value = true
+    }
+
+    fun notFav() {
+        _favorite.value = false
     }
 
     fun cameBack() {
@@ -97,11 +105,18 @@ class ExcursionViewModel @Inject constructor(
     }
 
     fun clickFavorite() {
-        _favorite.value = true
+        if (_excursion.value!!.favorite) {
+            deleteFavorite()
+            notFav()
+        } else {
+            addFavorite()
+            fav()
+        }
     }
 
-    fun clickNotFavorite() {
-        _favorite.value = false
+    suspend fun isFavorite(): Boolean {
+        val id = _excursion.value!!.id
+        return repository.checkFav(id)
     }
 
     suspend fun checkAuthStatus(): Boolean {

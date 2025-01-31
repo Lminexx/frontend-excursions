@@ -23,8 +23,6 @@ class ExcursionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityExcursionBinding
 
-    private var isFavorite: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExcursionBinding.inflate(layoutInflater)
@@ -47,10 +45,6 @@ class ExcursionActivity : AppCompatActivity() {
 
         viewModel.loadExcursion(excursionId)
 
-        if (viewModel.excursion.value?.favorite == true) {
-            binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
-        }
-
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 
@@ -65,6 +59,10 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionTitle.text = excursion.title
                 binding.excursionAuthor.text = excursion.username
                 binding.excursionDescription.text = excursion.description
+                if (viewModel.excursion.value!!.favorite)
+                    viewModel.fav()
+                else
+                    viewModel.notFav()
             } else {
                 Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT).show()
             }
@@ -72,9 +70,9 @@ class ExcursionActivity : AppCompatActivity() {
 
         viewModel.favorite.observe(this) { favorite ->
             if (favorite) {
-                viewModel.addFavorite()
+                binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
             } else {
-                viewModel.deleteFavorite()
+                binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_hollow)
             }
         }
     }
@@ -83,21 +81,9 @@ class ExcursionActivity : AppCompatActivity() {
         binding.favoriteButton.setOnClickListener {
             lifecycleScope.launch {
                 if (viewModel.checkAuthStatus()) {
-                    if (isFavorite) {
-                        binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_hollow)
-                        isFavorite = false
-                        viewModel.clickNotFavorite()
-                    } else {
-                        binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
-                        isFavorite = true
-                        viewModel.clickFavorite()
-                    }
+                    viewModel.clickFavorite()
                 } else {
-                    Toast.makeText(
-                        this@ExcursionActivity,
-                        this@ExcursionActivity.getString(R.string.error_favorite),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@ExcursionActivity, this@ExcursionActivity.getString(R.string.error_favorite), Toast.LENGTH_SHORT).show()
                 }
             }
         }

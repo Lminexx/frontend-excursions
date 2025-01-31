@@ -30,7 +30,7 @@ interface ApiService {
 
 
     @DELETE("excursion/{id}")
-    suspend fun deleteExcursion(@Path("id") id: Long)
+    suspend fun deleteExcursion(@Path("id") id: Long): DeleteResponse
 
     @POST("excursion/create")
     suspend fun createExcursion(

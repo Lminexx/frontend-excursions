@@ -47,6 +47,12 @@ class FavFragment : Fragment(R.layout.excursions_list) {
         subscribe()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        adapter.refresh()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         binding.shimmerLayout.stopShimmer()
