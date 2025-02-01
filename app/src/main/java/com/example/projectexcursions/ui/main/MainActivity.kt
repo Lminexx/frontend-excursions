@@ -7,6 +7,7 @@ import android.app.Activity
 import android.content.Intent
 import com.example.projectexcursions.ui.profile.ProfileFragment
 import android.os.Bundle
+import android.provider.ContactsContract.Profile
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -57,7 +58,12 @@ class MainActivity : AppCompatActivity() {
                         if (isAuth)
                             replaceFragment(FavFragment())
                         else {
-                            replaceFragment(NotAuthFragment())
+                            replaceFragment(NotAuthFragment().apply {
+                                arguments = Bundle().apply {
+                                    putString("prev_frag", "fav")
+                                    putInt("AUTH_REQUEST_CODE", AUTH_REQUEST_CODE)
+                                }
+                            })
                         }
                     }
                 "map" -> replaceFragment(MapFragment())
@@ -67,8 +73,12 @@ class MainActivity : AppCompatActivity() {
                         if (isAuth)
                             replaceFragment(ProfileFragment())
                         else {
-                            val intent = Intent(this@MainActivity, AuthActivity::class.java)
-                            startActivityForResult(intent, AUTH_REQUEST_CODE)
+                            replaceFragment(NotAuthFragment().apply {
+                                arguments = Bundle().apply {
+                                    putString("prev_frag", "profile")
+                                    putInt("AUTH_REQUEST_CODE", AUTH_REQUEST_CODE)
+                                }
+                            })
                         }
                     }
                 }
@@ -109,11 +119,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        Log.d("MainActivity", "onActivityResult called: requestCode=$requestCode, resultCode=$resultCode")
+
         if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val isAuth = data?.getBooleanExtra(AuthActivity.EXTRA_AUTH_STATUS, false) ?: false
-            Log.d("AuthDataNaN?","$data")
+            val prevFrag = data?.getStringExtra("prev_frag")
+            Log.d("MainActivity", "Auth success, prev_frag: $prevFrag")
+
             if (isAuth) {
-                replaceFragment(ProfileFragment())
+                when (prevFrag) {
+                    "fav" -> replaceFragment(FavFragment())
+                    "profile" -> replaceFragment(ProfileFragment())
+                    else -> replaceFragment(ExListFragment())
+                }
+            } else {
+                replaceFragment(ExListFragment())
             }
         }
     }

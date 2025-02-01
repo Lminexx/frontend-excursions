@@ -45,7 +45,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val description = binding.excursionDescription.text.toString().trim()
                 if (viewModel.isExcursionCorrect(this, title, description)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
-                    finish()
                 }
             }
         }

@@ -19,6 +19,16 @@ class NotAuthFragment : Fragment(R.layout.not_auth_fragment) {
     private lateinit var binding: NotAuthFragmentBinding
     private val viewModel: NotAuthViewModel by viewModels()
 
+    private var prevFrag: String? = null
+    private var AUTH_REQUEST_CODE: Int? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        AUTH_REQUEST_CODE = arguments?.getInt("AUTH_REQUEST_CODE")
+        prevFrag = arguments?.getString("prev_frag")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,13 +51,10 @@ class NotAuthFragment : Fragment(R.layout.not_auth_fragment) {
 
     private fun subscribe() {
         viewModel.wantAuth.observe(viewLifecycleOwner) { wannaAuth ->
-            if (wannaAuth)
-                startActivity(Intent(requireContext(), AuthActivity::class.java))
-        }
-
-        viewModel.wantReg.observe(viewLifecycleOwner) { wannaReg ->
-            if (wannaReg)
-                startActivity(Intent(requireContext(), RegActivity::class.java))
+            if (wannaAuth) {
+                val intent = Intent(requireContext(), AuthActivity::class.java).putExtra("prev_frag", prevFrag)
+                requireActivity().startActivityForResult(intent, 1001)
+            }
         }
     }
 }

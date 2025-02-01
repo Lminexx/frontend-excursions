@@ -12,14 +12,7 @@ class NotAuthViewModel @Inject constructor(): ViewModel() {
     private val _wantAuth = MutableLiveData<Boolean>()
     val wantAuth: LiveData<Boolean> get() = _wantAuth
 
-    private val _wantReg = MutableLiveData<Boolean>()
-    val wantReg: LiveData<Boolean> get() = _wantReg
-
     fun wantAuth() {
         _wantAuth.value = true
-    }
-
-    fun wantReg() {
-        _wantReg.value = true
     }
 }

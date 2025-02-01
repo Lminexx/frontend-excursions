@@ -105,18 +105,22 @@ class ExcursionViewModel @Inject constructor(
     }
 
     fun clickFavorite() {
-        if (_excursion.value!!.favorite) {
-            deleteFavorite()
-            notFav()
-        } else {
-            addFavorite()
-            fav()
-        }
-    }
+        _excursion.value?.let { currentExcursion ->
+            val isCurrentlyFavorite = currentExcursion.favorite
+            val updatedExcursion = currentExcursion.copy(favorite = !isCurrentlyFavorite)
 
-    suspend fun isFavorite(): Boolean {
-        val id = _excursion.value!!.id
-        return repository.checkFav(id)
+            _excursion.value = updatedExcursion
+
+            viewModelScope.launch {
+                if (isCurrentlyFavorite) {
+                    Log.d("FavoriteExcursion", "Removing from favorites")
+                    repository.deleteFavorite(currentExcursion.id)
+                } else {
+                    Log.d("FavoriteExcursion", "Adding to favorites")
+                    repository.addFavorite(currentExcursion.id)
+                }
+            }
+        }
     }
 
     suspend fun checkAuthStatus(): Boolean {
