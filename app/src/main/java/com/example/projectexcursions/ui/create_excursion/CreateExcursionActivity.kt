@@ -2,6 +2,8 @@ package com.example.projectexcursions.ui.create_excursion
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.Toast
@@ -27,7 +29,13 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun initCallback() {
-        binding.buttonCreateExcursion.setOnClickListener { viewModel.clickCreateExcursion() }
+        binding.buttonCreateExcursion.setOnClickListener {
+            it.isClickable = false
+            Handler(Looper.getMainLooper()).postDelayed({
+                it.isClickable = true
+            }, 1000)
+            viewModel.clickCreateExcursion()
+        }
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 

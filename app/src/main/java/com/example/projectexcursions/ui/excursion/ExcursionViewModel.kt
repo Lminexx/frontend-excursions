@@ -78,20 +78,6 @@ class ExcursionViewModel @Inject constructor(
             _username.value = name!!
     }
 
-    private fun addFavorite() {
-        viewModelScope.launch {
-            Log.d("FavoriteExcursion", "AddFavorite")
-            excursion.value?.let { repository.addFavorite(it.id) }
-        }
-    }
-
-    private fun deleteFavorite() {
-        viewModelScope.launch {
-            Log.d("FavoriteExcursion", "DeleteFavorite")
-            excursion.value?.let { repository.deleteFavorite(it.id) }
-        }
-    }
-
     fun fav() {
         _favorite.value = true
     }

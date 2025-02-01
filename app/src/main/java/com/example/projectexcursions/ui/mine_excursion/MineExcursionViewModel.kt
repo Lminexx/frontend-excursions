@@ -12,6 +12,8 @@ import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import okio.IOException
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,11 +32,12 @@ class MineExcursionViewModel @Inject constructor(
     private val _favorite = MutableLiveData<Boolean>()
     val favorite: LiveData<Boolean> get() = _favorite
 
-    private val _deleteExcursion = MutableLiveData<Boolean>()
-    val deleteExcursion:LiveData<Boolean> get() = _deleteExcursion
-
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
+
+    //todo надо сделать везде такое для вывода сообщений об ошибках
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> get() = _message
 
     init {
         if (tokenRepository.getCachedToken() != null)
@@ -78,24 +81,18 @@ class MineExcursionViewModel @Inject constructor(
             _username.value = name!!
     }
 
-    fun addFavorite() {
-        viewModelScope.launch {
-            Log.d("FavoriteExcursion", "AddFavorite")
-            excursion.value?.let { repository.addFavorite(it.id) }
-        }
-    }
-
-    private fun deleteFavorite() {
-        viewModelScope.launch {
-            Log.d("FavoriteExcursion", "DeleteFavorite")
-            excursion.value?.let { repository.deleteFavorite(it.id) }
-        }
-    }
-
     fun deleteExcursion(){
-        viewModelScope.launch {
-            Log.d("DeleteEx", "DeleteExcursion")
-            excursion.value?.let { repository.deleteExcursion(it.id) }
+        try {
+            viewModelScope.launch {
+                Log.d("DeleteEx", "DeleteExcursion")
+                excursion.value?.let { repository.deleteExcursion(it.id) }
+            }
+        } catch (http: HttpException) {
+            _message.value = http.message
+        } catch (io: IOException) {
+            _message.value = io.message
+        } catch (e: Exception) {
+            _message.value = e.message
         }
     }
 
@@ -112,18 +109,22 @@ class MineExcursionViewModel @Inject constructor(
     }
 
     fun clickFavorite() {
-        if (_excursion.value!!.favorite) {
-            deleteFavorite()
-            notFav()
-        } else {
-            addFavorite()
-            fav()
-        }
-    }
+        _excursion.value?.let { currentExcursion ->
+            val isCurrentlyFavorite = currentExcursion.favorite
+            val updatedExcursion = currentExcursion.copy(favorite = !isCurrentlyFavorite)
 
-    suspend fun isFavorite(): Boolean {
-        val id = _excursion.value!!.id
-        return repository.checkFav(id)
+            _excursion.value = updatedExcursion
+
+            viewModelScope.launch {
+                if (isCurrentlyFavorite) {
+                    Log.d("FavoriteExcursion", "Removing from favorites")
+                    repository.deleteFavorite(currentExcursion.id)
+                } else {
+                    Log.d("FavoriteExcursion", "Adding to favorites")
+                    repository.addFavorite(currentExcursion.id)
+                }
+            }
+        }
     }
 
     suspend fun checkAuthStatus(): Boolean {

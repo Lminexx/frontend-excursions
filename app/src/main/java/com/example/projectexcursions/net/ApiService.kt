@@ -2,6 +2,7 @@ package com.example.projectexcursions.net
 
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.User
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -30,7 +31,7 @@ interface ApiService {
 
 
     @DELETE("excursion/{id}")
-    suspend fun deleteExcursion(@Path("id") id: Long): DeleteResponse
+    suspend fun deleteExcursion(@Path("id") id: Long): Response<Unit>
 
     @POST("excursion/create")
     suspend fun createExcursion(

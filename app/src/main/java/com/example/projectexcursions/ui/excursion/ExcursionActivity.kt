@@ -3,6 +3,8 @@ package com.example.projectexcursions.ui.excursion
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.Toast
@@ -50,7 +52,8 @@ class ExcursionActivity : AppCompatActivity() {
 
     private fun subscribe() {
         viewModel.wantComeBack.observe(this) { wannaComeback ->
-            if (wannaComeback) viewModel.cameBack()
+            if (wannaComeback)
+                viewModel.cameBack()
         }
 
         viewModel.excursion.observe(this) { excursion ->
@@ -79,6 +82,10 @@ class ExcursionActivity : AppCompatActivity() {
 
     private fun initCallback() {
         binding.favoriteButton.setOnClickListener {
+            it.isClickable = false
+            Handler(Looper.getMainLooper()).postDelayed({
+                it.isClickable = true
+            }, 1000)
             lifecycleScope.launch {
                 if (viewModel.checkAuthStatus()) {
                     viewModel.clickFavorite()
