@@ -11,7 +11,7 @@ import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 interface ExcursionRepository {
     fun excursionPagingSource(isFavorite: Boolean, isMine: Boolean): ExcursionPagingSource
 
-    fun searchExcursionPagingSource(query: String, isMine: Boolean): SearchExcursionPagingSource
+    fun searchExcursionPagingSource(query: String, isMine: Boolean, isFavorite: Boolean): SearchExcursionPagingSource
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
@@ -36,6 +36,8 @@ interface ExcursionRepository {
     suspend fun addFavorite(id:Long)
 
     suspend fun deleteFavorite(id:Long)
+
+    suspend fun checkFav(excursionId: Long): Boolean
 
     suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse
 }

@@ -1,7 +1,6 @@
 package com.example.projectexcursions.repositories.exlistrepo
 
 import android.util.Log
-import androidx.paging.PagingSource
 import com.example.projectexcursions.databases.daos.ExcursionDao
 import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.models.CreatingExcursion
@@ -24,7 +23,7 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override fun excursionPagingSource(isFavorite:Boolean, isMine: Boolean) = ExcursionPagingSource(apiService, isFavorite, isMine)
 
-    override fun searchExcursionPagingSource(query: String, isMine: Boolean) = SearchExcursionPagingSource(apiService, query, isMine)
+    override fun searchExcursionPagingSource(query: String, isMine: Boolean, isFavorite: Boolean) = SearchExcursionPagingSource(apiService, query, isMine, isFavorite)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -50,8 +49,14 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override suspend fun deleteExcursion(id: Long){
         Log.d("DeleteEx", "DeleteExcursion")
-        excursionDao.deleteExcursion(id)
-        apiService.deleteExcursion(id)
+        val response = apiService.deleteExcursion(id)
+        if (response.isSuccessful) {
+            val responseId = response.message()
+            excursionDao.deleteExcursion(id)
+            Log.d("DeleteExResponse", responseId)
+        } else {
+            Log.d("DeleteExNotResponse", "PisyaPopa(")
+        }
     }
 
     override suspend fun getExcursionFromDB(id: Long): Excursion? {
@@ -77,6 +82,11 @@ class ExcursionRepositoryImpl @Inject constructor(
         Log.d("FavoriteExcursion", "deleteFavorite")
         apiService.deleteFavorite(id)
         excursionDao.deleteFavorite(id)
+    }
+
+    override suspend fun checkFav(excursionId: Long): Boolean {
+        val excursion = excursionDao.getExcursionById(excursionId)
+        return excursion!!.favorite
     }
 
     //вроде как не нужен, но на всякий случай оставлю
