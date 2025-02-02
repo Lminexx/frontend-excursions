@@ -20,10 +20,9 @@ class TokenRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getToken(): Token? {
-        if (cachedToken == null) {
-            val token = tokenDao.getLatestToken()
-            cachedToken = token
-        }
+        val token = tokenDao.getLatestToken()
+        cachedToken = token
+        Log.d("GetToken", cachedToken?.token ?: "null")
         return cachedToken
     }
 
@@ -35,6 +34,7 @@ class TokenRepositoryImpl @Inject constructor(
     override suspend fun deleteToken(token: String) {
         tokenDao.deleteToken(token)
         cachedToken = null
+        Log.d("DeletedCachedToken", cachedToken?.token ?: "null")
     }
 
     override suspend fun getTokens(): List<Token?> {

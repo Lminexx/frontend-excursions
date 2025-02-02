@@ -25,7 +25,6 @@ class ProfileViewModel @Inject constructor(
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
-    //временная заглушка
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
 
@@ -35,6 +34,7 @@ class ProfileViewModel @Inject constructor(
     init {
         loadUser()
     }
+
     private fun loadUser() {
         viewModelScope.launch {
             val token = repository.getCachedToken()
@@ -54,7 +54,9 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d("DeleteToken", "true")
             val token = repository.getCachedToken()
-            repository.deleteToken(token!!.token)
+            Log.d("DeleteToken", token!!.token)
+            repository.deleteToken(token.token)
+            Log.d("DeletedToken", token.token)
         }
     }
 

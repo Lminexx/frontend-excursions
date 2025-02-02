@@ -62,8 +62,8 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
         viewModel.wantComeBack.observe(viewLifecycleOwner) {wannaLogOut ->
             if (wannaLogOut) {
                 Log.d("WantLogOut", "true")
-                (requireActivity() as? MainActivity)?.updateBottomNavSelectionForLogout()
                 viewModel.logout()
+                (requireActivity() as? MainActivity)?.updateBottomNavSelectionToList()
             }
         }
 

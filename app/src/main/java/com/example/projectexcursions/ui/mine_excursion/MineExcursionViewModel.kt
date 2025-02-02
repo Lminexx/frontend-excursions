@@ -1,4 +1,4 @@
-package com.example.projectexcursions.ui.excursion
+package com.example.projectexcursions.ui.mine_excursion
 
 import android.text.BoringLayout
 import android.util.Log
@@ -12,10 +12,12 @@ import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import okio.IOException
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
-class ExcursionViewModel @Inject constructor(
+class MineExcursionViewModel @Inject constructor(
     private val apiService: ApiService,
     private val repository: ExcursionRepository,
     private val tokenRepository: TokenRepository
@@ -30,11 +32,12 @@ class ExcursionViewModel @Inject constructor(
     private val _favorite = MutableLiveData<Boolean>()
     val favorite: LiveData<Boolean> get() = _favorite
 
-    private val _deleteExcursion = MutableLiveData<Boolean>()
-    val deleteExcursion:LiveData<Boolean> get() = _deleteExcursion
-
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
+
+    //todo надо сделать везде такое для вывода сообщений об ошибках
+    private val _message = MutableLiveData<String>()
+    val message: LiveData<String> get() = _message
 
     init {
         if (tokenRepository.getCachedToken() != null)
@@ -78,16 +81,31 @@ class ExcursionViewModel @Inject constructor(
             _username.value = name!!
     }
 
+    fun deleteExcursion(){
+        try {
+            viewModelScope.launch {
+                Log.d("DeleteEx", "DeleteExcursion")
+                excursion.value?.let { repository.deleteExcursion(it.id) }
+            }
+        } catch (http: HttpException) {
+            _message.value = http.message
+        } catch (io: IOException) {
+            _message.value = io.message
+        } catch (e: Exception) {
+            _message.value = e.message
+        }
+    }
+
+    fun cameBack() {
+        _wantComeBack.value = false
+    }
+
     fun fav() {
         _favorite.value = true
     }
 
     fun notFav() {
         _favorite.value = false
-    }
-
-    fun cameBack() {
-        _wantComeBack.value = false
     }
 
     fun clickFavorite() {

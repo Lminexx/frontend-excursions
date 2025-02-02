@@ -34,18 +34,9 @@ class RegActivity: AppCompatActivity() {
 
             viewModel.validateAndRegister(this, login, password, repPass)
         }
-        binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
     }
 
     private fun subscribe() {
-        viewModel.wantComeBack.observe(this) {wannaComeBack ->
-            if (wannaComeBack) {
-                startActivity(Intent(this@RegActivity, AuthActivity::class.java))
-                viewModel.cameBack()
-                finish()
-            }
-        }
-
         viewModel.regStatus.observe(this) { isSuccessful ->
             if (isSuccessful) {
                 val username = viewModel.username.value!!

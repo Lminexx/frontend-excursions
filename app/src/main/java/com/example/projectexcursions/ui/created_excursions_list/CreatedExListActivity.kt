@@ -15,6 +15,7 @@ import com.example.projectexcursions.adapter.ExcursionAdapter
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
+import com.example.projectexcursions.ui.mine_excursion.MineExcursionActivity.Companion.createMineExcursionActivityIntent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -36,6 +37,18 @@ class CreatedExListActivity: AppCompatActivity() {
         initData()
         initCallback()
         subscribe()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        adapter.refresh()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        hideShimmer()
     }
 
     private fun initCallback() {
@@ -70,6 +83,10 @@ class CreatedExListActivity: AppCompatActivity() {
             if (hasFocus)
                 lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
         }
+
+        binding.swipeRefresh.setOnRefreshListener {
+            adapter.refresh()
+        }
     }
 
     private fun initData() {
@@ -88,6 +105,7 @@ class CreatedExListActivity: AppCompatActivity() {
         }
 
         adapter.addLoadStateListener { loadState ->
+            binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
                     showShimmer()
@@ -106,7 +124,7 @@ class CreatedExListActivity: AppCompatActivity() {
             if (wantGoToEx) {
                 val excursion = viewModel.selectedExcursionsList
                 if (excursion != null) {
-                    val intent = this.createExcursionActivityIntent(excursionId = excursion.id)
+                    val intent = this.createMineExcursionActivityIntent(excursionId = excursion.id)
                     startActivity(intent)
                     viewModel.goneToExcursion()
                 }

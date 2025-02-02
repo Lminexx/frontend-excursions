@@ -25,6 +25,8 @@ class AuthActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
+
+        setResult(Activity.RESULT_CANCELED)
         setContentView(binding.root)
         initCallback()
         subscribe()
@@ -33,8 +35,15 @@ class AuthActivity: AppCompatActivity() {
     private fun subscribe() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
-                val intent = createAuthResultIntent(true)
-                setResult(Activity.RESULT_OK, intent)
+                val prevFrag = intent.getStringExtra("prev_frag")
+                Log.d("AuthActivity", "Success auth, prev_frag: $prevFrag")
+
+                val resultIntent = createAuthResultIntent(true)
+                resultIntent.putExtra("prev_frag", prevFrag)
+
+                Log.d("AuthActivity", "Setting result OK")
+                setResult(Activity.RESULT_OK, resultIntent)
+
                 finish()
             } else {
                 Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()
@@ -51,8 +60,6 @@ class AuthActivity: AppCompatActivity() {
 
         viewModel.wantComeBack.observe(this) { wannaComeBack ->
             if (wannaComeBack) {
-                startActivity(Intent(this@AuthActivity, MainActivity::class.java))
-                viewModel.cameBack()
                 finish()
             }
         }
