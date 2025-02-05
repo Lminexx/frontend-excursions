@@ -28,15 +28,27 @@ class SearchExcursionPagingSource @Inject constructor(
             val excursions = response.content
             Log.d("PagingSource", "$excursions")
             val pageInfo = response.page
-            val prevKey = if (position == 0) null else position - 1
-            val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
-            Log.d("SearchPagingSource", "NextKey: $nextKey, PrevKey: $prevKey")
+            if (excursions.isNotEmpty()) {
+                val prevKey = if (position == 0) null else position - 1
+                val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
+                Log.d("PagingSource3", "NextKey: $nextKey, PrevKey: $prevKey")
 
-            LoadResult.Page(
+                LoadResult.Page(
                     data = excursions,
                     prevKey = prevKey,
                     nextKey = nextKey
                 )
+            } else {
+                val prevKey = null
+                val nextKey = null
+                Log.d("PagingSource3", "NextKey: $nextKey, PrevKey: $prevKey")
+
+                LoadResult.Page(
+                    data = excursions,
+                    prevKey = prevKey,
+                    nextKey = nextKey
+                )
+            }
         } catch (exception: IOException) {
             LoadResult.Error(Exception("Ошибка сети: ${exception.message}", exception))
         } catch (exception: HttpException) {

@@ -11,7 +11,7 @@ import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.mapview.MapView
 
-class MapFragment:Fragment(R.layout.fragment_map) {
+class MapFragment : Fragment(R.layout.fragment_map) {
 
     private val viewModel: MapViewModel by viewModels()
     private lateinit var mapView: MapView
@@ -19,9 +19,9 @@ class MapFragment:Fragment(R.layout.fragment_map) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         MapKitFactory.initialize(requireContext())
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,14 +38,12 @@ class MapFragment:Fragment(R.layout.fragment_map) {
 
     override fun onStart() {
         super.onStart()
-
         MapKitFactory.getInstance().onStart()
         mapView.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-
         MapKitFactory.getInstance().onStop()
         super.onStop()
     }
