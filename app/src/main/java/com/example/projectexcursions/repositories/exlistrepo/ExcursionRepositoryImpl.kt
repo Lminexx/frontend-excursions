@@ -9,9 +9,12 @@ import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
+import com.example.projectexcursions.net.PhotoResponse
 import com.example.projectexcursions.paging_sources.ExcursionPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 class ExcursionRepositoryImpl @Inject constructor(
@@ -99,5 +102,9 @@ class ExcursionRepositoryImpl @Inject constructor(
     ): ExcursionsResponse {
         Log.d("FetchingExs", "FetchExcursions")
         return apiService.searchExcursions(query, offset, limit, isFavorite, isMine)
+    }
+
+    override suspend fun uploadPhoto(fileName: RequestBody, file: MultipartBody.Part, excursionId: RequestBody): PhotoResponse {
+        return apiService.uploadPhoto(fileName, file, excursionId)
     }
 }
