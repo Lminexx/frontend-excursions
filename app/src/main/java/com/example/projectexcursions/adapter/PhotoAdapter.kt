@@ -1,0 +1,44 @@
+package com.example.projectexcursions.adapter
+
+import android.content.Context
+import android.net.Uri
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.example.projectexcursions.databinding.ItemPhotoBinding
+import com.example.projectexcursions.ui.fullscreen.FullScreenPhotoActivity
+
+class PhotoAdapter(private val context: Context, private var photoList: List<Uri>)
+    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val binding = ItemPhotoBinding.inflate(LayoutInflater.from(context), parent, false)
+        return PhotoViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val imageUri = photoList[position]
+        val photoHolder = holder as PhotoViewHolder
+        photoHolder.bind(imageUri)
+
+        holder.itemView.setOnClickListener {
+            val intent = FullScreenPhotoActivity.createIntent(context, photoList, position)
+            context.startActivity(intent)
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return photoList.size
+    }
+
+    fun updatePhotos(newPhotos: List<Uri>) {
+        photoList = newPhotos
+        notifyDataSetChanged()
+    }
+
+    inner class PhotoViewHolder(private val binding: ItemPhotoBinding): RecyclerView.ViewHolder(binding.root) {
+        fun bind(imageUri: Uri) {
+            binding.imageView.setImageURI(imageUri)
+        }
+    }
+}

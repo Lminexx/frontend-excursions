@@ -53,4 +53,6 @@
     <string name="authorize">Войдите</string>
     <string name="open">Откройте</string>
     <string name="your_world">свой мир</string>
+    <string name="pick_photo">Выбрать фото</string>
+    <string name="photo">Фото</string>
 </resources>

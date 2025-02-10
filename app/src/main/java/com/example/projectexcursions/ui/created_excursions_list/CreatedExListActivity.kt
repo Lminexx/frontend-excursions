@@ -108,7 +108,7 @@ class CreatedExListActivity: AppCompatActivity() {
             binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
-                    showShimmer()
+                    hideShimmer()
                 }
                 is LoadState.NotLoading -> {
                     hideShimmer()

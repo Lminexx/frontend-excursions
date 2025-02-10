@@ -5,8 +5,11 @@ import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
+import com.example.projectexcursions.net.PhotoResponse
 import com.example.projectexcursions.paging_sources.ExcursionPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 interface ExcursionRepository {
     fun excursionPagingSource(isFavorite: Boolean, isMine: Boolean): ExcursionPagingSource
@@ -40,4 +43,6 @@ interface ExcursionRepository {
     suspend fun checkFav(excursionId: Long): Boolean
 
     suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse
+
+    suspend fun uploadPhoto(fileName: RequestBody, file: MultipartBody.Part, excursionId: RequestBody): PhotoResponse
 }
