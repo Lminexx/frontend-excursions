@@ -13,6 +13,8 @@ import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -42,13 +44,21 @@ class CreateExcursionViewModel @Inject constructor(
     private val _selectedImages = MutableLiveData<List<Uri>>(emptyList())
     val selectedImages: LiveData<List<Uri>> get() = _selectedImages
 
+    private val _isUploaded = MutableLiveData<Boolean>()
+    val isUploaded: LiveData<Boolean> get() = _isUploaded
+
     private fun getFileFromUri(context: Context, uri: Uri): File {
-        val stream = context.contentResolver.openInputStream(uri)
-        val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir)
-        tempFile.outputStream().use { stream?.copyTo(it) }
+        val fileName = "upload_${System.currentTimeMillis()}.jpg"
+        val tempFile = File(context.cacheDir, fileName)
+
+        context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            tempFile.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+
         return tempFile
     }
-
 
     fun createExcursion(context: Context, title: String, description: String) {
         Log.d("CreatingExcursion", "CreatingExcursion")
@@ -67,12 +77,10 @@ class CreateExcursionViewModel @Inject constructor(
                 excursionRepository.saveExcursionToDB(respondedExcursion)
 
                 _message.value = context.getString(R.string.create_success)
-                _wantComeBack.value = true
 
                 if (_selectedImages.value?.isNotEmpty() == true) {
                     uploadPhotos(context, response.id)
                 }
-
             } catch (e: Exception) {
                 _message.value = "Error: ${e.message}"
                 Log.e("CreatingExcursionError", e.message!!)
@@ -95,29 +103,35 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun uploadPhotos(context: Context, excursionId: Long) {
+    private fun uploadPhotos(context: Context, excursionId: Long) {
         viewModelScope.launch {
-            selectedImages.value?.forEach { uri ->
-                try {
-                    val file = getFileFromUri(context, uri)
-                    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                    val multipartBody = MultipartBody.Part.createFormData(
-                        "file", file.name, requestFile
-                    )
-                    val fileNamePart = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
-                    val excursionIdPart = excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            val jobs = mutableListOf<Job>()
 
-                    val response = excursionRepository.uploadPhoto(fileNamePart, multipartBody, excursionIdPart)
-                    Log.d("PhotoUpload", "Uploaded photo: ${response.url}")
-                } catch (e: Exception) {
-                    Log.e("PhotoUploadError", "Error uploading photo: ${e.message}")
+            _selectedImages.value?.forEach { uri ->
+                val job = launch {
+                    try {
+                        val file = getFileFromUri(context, uri)
+
+                        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                        val multipartBody =
+                            MultipartBody.Part.createFormData("file", file.name, requestFile)
+                        val fileName = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
+                        val excursionIdRequest =
+                            excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+
+                        val response = excursionRepository.uploadPhoto(fileName, multipartBody, excursionIdRequest)
+                        Log.d("PhotoUpload", "Uploaded photo: ${response.url}")
+                    } catch (e: Exception) {
+                        Log.e("PhotoUploadError", "Error uploading photo: ${e.message}")
+                    }
                 }
+                jobs.add(job)
             }
+            jobs.forEach { it.join() }
+            _selectedImages.postValue(emptyList())
+            _wantComeBack.value = true
         }
-        _selectedImages.value = emptyList()
     }
-
-
 
     fun clickCreateExcursion() {
         _createExcursion.value = true

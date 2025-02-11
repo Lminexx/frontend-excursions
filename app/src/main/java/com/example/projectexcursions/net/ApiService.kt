@@ -59,10 +59,15 @@ interface ApiService {
     ): ExcursionsResponse
 
     @Multipart
-    @POST("photo/upload")
+    @POST("excursion/photo/upload")
     suspend fun uploadPhoto(
         @Part("fileName") fileName: RequestBody,
         @Part file: MultipartBody.Part,
         @Part("excursionId") excursionId: RequestBody
     ): PhotoResponse
+
+    @GET("excursion/photo/{id}")
+    suspend fun downloadPhoto(
+
+    )
 }
