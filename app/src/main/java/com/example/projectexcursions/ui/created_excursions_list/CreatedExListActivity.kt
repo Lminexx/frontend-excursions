@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -43,13 +44,6 @@ class CreatedExListActivity: AppCompatActivity() {
         super.onResume()
 
         adapter.refresh()
-        lifecycleScope.launch {
-            viewModel.createdExcursions.collectLatest { pagingData ->
-                Log.d("excursions", "$pagingData")
-                adapter.submitData(pagingData)
-                Log.d("GetAllExcursions", "${viewModel.createdExcursions}")
-            }
-        }
     }
 
     override fun onDestroy() {
@@ -132,7 +126,7 @@ class CreatedExListActivity: AppCompatActivity() {
                 val excursion = viewModel.selectedExcursionsList
                 if (excursion != null) {
                     val intent = this.createMineExcursionActivityIntent(excursionId = excursion.id)
-                    startActivity(intent)
+                    mineExcursionLauncher.launch(intent)
                     viewModel.goneToExcursion()
                 }
             }
@@ -149,5 +143,13 @@ class CreatedExListActivity: AppCompatActivity() {
         binding.shimmerLayout.stopShimmer()
         binding.shimmerLayout.visibility = View.GONE
         binding.recyclerView.visibility = View.VISIBLE
+    }
+
+    private val mineExcursionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            adapter.refresh()
+        }
     }
 }

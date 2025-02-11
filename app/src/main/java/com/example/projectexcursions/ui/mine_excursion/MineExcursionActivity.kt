@@ -117,6 +117,7 @@ class MineExcursionActivity : AppCompatActivity() {
             }, 1000)
             lifecycleScope.launch {
                 viewModel.deleteExcursion()
+                setResult(RESULT_OK)
                 finish()
             }
         }
@@ -130,6 +131,7 @@ class MineExcursionActivity : AppCompatActivity() {
         binding.excursionDescription.visibility = View.GONE
         binding.deleteExcursion.visibility = View.GONE
         binding.favoriteButton.visibility = View.GONE
+        binding.recyclerViewImages.visibility = View.GONE
     }
 
     private fun hideShimmer() {
@@ -140,6 +142,7 @@ class MineExcursionActivity : AppCompatActivity() {
         binding.excursionDescription.visibility = View.VISIBLE
         binding.deleteExcursion.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
+        binding.recyclerViewImages.visibility = View.VISIBLE
     }
 
     companion object {
