@@ -11,7 +11,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
+import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,8 +24,8 @@ import kotlinx.coroutines.launch
 class ExcursionActivity : AppCompatActivity() {
 
     private val viewModel: ExcursionViewModel by viewModels()
-
     private lateinit var binding: ActivityExcursionBinding
+    private lateinit var adapter: PhotoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,9 +45,14 @@ class ExcursionActivity : AppCompatActivity() {
             return
         }
 
+        adapter = PhotoAdapter(this, listOf())
+        binding.recyclerViewImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewImages.adapter = adapter
+
         showShimmer()
 
         viewModel.loadExcursion(excursionId)
+        viewModel.loadPhotos(excursionId)
 
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
@@ -78,6 +85,12 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_hollow)
             }
         }
+
+        viewModel.photos.observe(this) { photos ->
+            if (photos.isNotEmpty()) {
+                adapter.updatePhotos(photos)
+            }
+        }
     }
 
     private fun initCallback() {
@@ -103,6 +116,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.excursionAuthor.visibility = View.GONE
         binding.excursionDescription.visibility = View.GONE
         binding.favoriteButton.visibility = View.GONE
+        binding.recyclerViewImages.visibility = View.GONE
     }
 
     private fun hideShimmer() {
@@ -112,6 +126,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.excursionAuthor.visibility = View.VISIBLE
         binding.excursionDescription.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
+        binding.recyclerViewImages.visibility = View.VISIBLE
     }
 
     companion object {

@@ -43,6 +43,13 @@ class CreatedExListActivity: AppCompatActivity() {
         super.onResume()
 
         adapter.refresh()
+        lifecycleScope.launch {
+            viewModel.createdExcursions.collectLatest { pagingData ->
+                Log.d("excursions", "$pagingData")
+                adapter.submitData(pagingData)
+                Log.d("GetAllExcursions", "${viewModel.createdExcursions}")
+            }
+        }
     }
 
     override fun onDestroy() {

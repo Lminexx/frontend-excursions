@@ -11,7 +11,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
+import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.databinding.MineActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
@@ -24,8 +26,8 @@ import kotlinx.coroutines.launch
 class MineExcursionActivity : AppCompatActivity() {
 
     private val viewModel: MineExcursionViewModel by viewModels()
-
     private lateinit var binding: MineActivityExcursionBinding
+    private lateinit var adapter: PhotoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,9 +47,14 @@ class MineExcursionActivity : AppCompatActivity() {
             return
         }
 
+        adapter = PhotoAdapter(this, listOf())
+        binding.recyclerViewImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewImages.adapter = adapter
+
         showShimmer()
 
         viewModel.loadExcursion(excursionId)
+        viewModel.loadPhotos(excursionId)
 
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
@@ -78,6 +85,12 @@ class MineExcursionActivity : AppCompatActivity() {
                 binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
             } else {
                 binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_hollow)
+            }
+        }
+
+        viewModel.photos.observe(this) { photos ->
+            if (photos.isNotEmpty()) {
+                adapter.updatePhotos(photos)
             }
         }
     }

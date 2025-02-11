@@ -107,4 +107,8 @@ class ExcursionRepositoryImpl @Inject constructor(
     override suspend fun uploadPhoto(fileName: RequestBody, file: MultipartBody.Part, excursionId: RequestBody): PhotoResponse {
         return apiService.uploadPhoto(fileName, file, excursionId)
     }
+
+    override suspend fun loadPhotos(id: Long): List<PhotoResponse> {
+        return apiService.loadPhotos(id)
+    }
 }

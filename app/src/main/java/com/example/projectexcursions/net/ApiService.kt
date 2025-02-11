@@ -67,7 +67,5 @@ interface ApiService {
     ): PhotoResponse
 
     @GET("excursion/photo/{id}")
-    suspend fun downloadPhoto(
-
-    )
+    suspend fun loadPhotos(@Path("id") id: Long): List<PhotoResponse>
 }

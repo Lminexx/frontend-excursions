@@ -14,7 +14,6 @@ import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -43,9 +42,6 @@ class CreateExcursionViewModel @Inject constructor(
 
     private val _selectedImages = MutableLiveData<List<Uri>>(emptyList())
     val selectedImages: LiveData<List<Uri>> get() = _selectedImages
-
-    private val _isUploaded = MutableLiveData<Boolean>()
-    val isUploaded: LiveData<Boolean> get() = _isUploaded
 
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
