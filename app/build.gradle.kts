@@ -76,6 +76,7 @@ buildTypes {
 
 dependencies {
 
+    implementation(libs.glide)
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.facebook.shimmer)
     implementation(libs.androidx.lifecycle.runtime.ktx)

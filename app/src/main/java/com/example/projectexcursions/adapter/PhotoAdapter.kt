@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.projectexcursions.databinding.ItemPhotoBinding
 import com.example.projectexcursions.ui.fullscreen.FullScreenPhotoActivity
 
@@ -38,7 +39,9 @@ class PhotoAdapter(private val context: Context, private var photoList: List<Uri
 
     inner class PhotoViewHolder(private val binding: ItemPhotoBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(imageUri: Uri) {
-            binding.imageView.setImageURI(imageUri)
+            Glide.with(binding.imageView.context)
+                .load(imageUri)
+                .into(binding.imageView)
         }
     }
 }

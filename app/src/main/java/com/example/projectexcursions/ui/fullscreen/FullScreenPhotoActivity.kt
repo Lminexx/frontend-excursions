@@ -1,11 +1,11 @@
 package com.example.projectexcursions.ui.fullscreen
 
+import FullScreenPhotoAdapter
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.projectexcursions.adapter.FullScreenPhotoAdapter
 import com.example.projectexcursions.databinding.ActivityFullScreenPhotoBinding
 
 class FullScreenPhotoActivity : AppCompatActivity() {

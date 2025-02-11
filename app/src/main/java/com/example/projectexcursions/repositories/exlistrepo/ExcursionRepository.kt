@@ -45,4 +45,6 @@ interface ExcursionRepository {
     suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse
 
     suspend fun uploadPhoto(fileName: RequestBody, file: MultipartBody.Part, excursionId: RequestBody): PhotoResponse
+
+    suspend fun loadPhotos(id: Long): List<PhotoResponse>
 }

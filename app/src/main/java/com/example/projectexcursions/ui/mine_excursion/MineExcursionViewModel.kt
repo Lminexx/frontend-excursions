@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.mine_excursion
 
+import android.net.Uri
 import android.text.BoringLayout
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -39,6 +40,9 @@ class MineExcursionViewModel @Inject constructor(
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
 
+    private val _photos = MutableLiveData<List<Uri>>()
+    val photos: LiveData<List<Uri>> get() = _photos
+
     init {
         if (tokenRepository.getCachedToken() != null)
             getUsername()
@@ -70,6 +74,20 @@ class MineExcursionViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("LoadExcursion", e.message!!)
                 _excursion.value = null
+            }
+        }
+    }
+
+    fun loadPhotos(excursionId: Long) {
+        viewModelScope.launch {
+            try {
+                val response = repository.loadPhotos(excursionId)
+                if (response.isNotEmpty()) {
+                    val photoUris = response.map { Uri.parse(it.url) }
+                    _photos.value = photoUris
+                }
+            } catch (e: Exception) {
+                Log.e("LoadPhotos", e.message ?: "Unknown error")
             }
         }
     }

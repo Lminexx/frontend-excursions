@@ -1,5 +1,4 @@
-package com.example.projectexcursions.adapter
-
+import com.bumptech.glide.Glide
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -26,7 +25,9 @@ class FullScreenPhotoAdapter(private val photos: List<Uri>) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(uri: Uri) {
-            binding.imageViewFull.setImageURI(uri)
+            Glide.with(binding.root.context)
+                .load(uri)
+                .into(binding.imageViewFull)
         }
     }
 }
