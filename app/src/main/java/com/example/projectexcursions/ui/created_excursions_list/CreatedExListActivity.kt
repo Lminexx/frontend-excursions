@@ -40,12 +40,6 @@ class CreatedExListActivity: AppCompatActivity() {
         subscribe()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        adapter.refresh()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
 

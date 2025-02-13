@@ -55,4 +55,7 @@
     <string name="your_world">свой мир</string>
     <string name="pick_photo">Выбрать фото</string>
     <string name="photo">Фото</string>
+    <string name="loading">Загружаем</string>
+    <string name="enjoy_using_it">Приятного пользования!!!</string>
+    <string name="please_register">Пожалуйста, зарегистрируйтесь</string>
 </resources>

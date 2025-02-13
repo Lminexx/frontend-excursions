@@ -18,6 +18,7 @@ import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.databinding.MineActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.mine_excursion.MineExcursionActivity.Companion.createMineExcursionActivityIntent
+import com.example.projectexcursions.ui.utilies.ProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -62,7 +63,7 @@ class MineExcursionActivity : AppCompatActivity() {
     private fun subscribe() {
         viewModel.wantComeBack.observe(this) { wannaComeback ->
             if (wannaComeback)
-                viewModel.cameBack()
+                finish()
         }
 
         viewModel.excursion.observe(this) { excursion ->
@@ -89,9 +90,7 @@ class MineExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.photos.observe(this) { photos ->
-            if (photos.isNotEmpty()) {
-                adapter.updatePhotos(photos)
-            }
+            adapter.updatePhotos(photos)
         }
     }
 
@@ -116,9 +115,9 @@ class MineExcursionActivity : AppCompatActivity() {
                 it.isClickable = true
             }, 1000)
             lifecycleScope.launch {
+
                 viewModel.deleteExcursion()
                 setResult(RESULT_OK)
-                finish()
             }
         }
     }

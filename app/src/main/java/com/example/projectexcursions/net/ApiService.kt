@@ -68,4 +68,7 @@ interface ApiService {
 
     @GET("excursion/photo/{id}")
     suspend fun loadPhotos(@Path("id") id: Long): List<PhotoResponse>
+
+    @POST("user/validToken")
+    suspend fun validateToken()
 }

@@ -3,6 +3,9 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ItemFullscreenPhotoBinding
 
 class FullScreenPhotoAdapter(private val photos: List<Uri>) :
@@ -27,6 +30,9 @@ class FullScreenPhotoAdapter(private val photos: List<Uri>) :
         fun bind(uri: Uri) {
             Glide.with(binding.root.context)
                 .load(uri)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.color.lighter_blue)
                 .into(binding.imageViewFull)
         }
     }

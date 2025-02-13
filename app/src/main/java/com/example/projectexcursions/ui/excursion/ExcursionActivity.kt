@@ -87,9 +87,7 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.photos.observe(this) { photos ->
-            if (photos.isNotEmpty()) {
-                adapter.updatePhotos(photos)
-            }
+            adapter.updatePhotos(photos)
         }
     }
 
