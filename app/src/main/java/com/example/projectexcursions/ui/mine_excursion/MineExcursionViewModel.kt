@@ -104,6 +104,7 @@ class MineExcursionViewModel @Inject constructor(
             viewModelScope.launch {
                 Log.d("DeleteEx", "DeleteExcursion")
                 excursion.value?.let { repository.deleteExcursion(it.id) }
+                _wantComeBack.value = true
             }
         } catch (http: HttpException) {
             _message.value = http.message

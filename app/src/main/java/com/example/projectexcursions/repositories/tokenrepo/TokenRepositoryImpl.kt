@@ -5,6 +5,7 @@ import com.auth0.android.jwt.Claim
 import com.example.projectexcursions.models.Token
 import com.auth0.android.jwt.JWT
 import com.example.projectexcursions.databases.daos.TokenDao
+import com.example.projectexcursions.net.ApiService
 import javax.inject.Inject
 
 
@@ -67,5 +68,9 @@ class TokenRepositoryImpl @Inject constructor(
         else
             null
         Log.d("GetCachedToken","$cachedToken")
+    }
+
+    override suspend fun validateToken(apiService: ApiService) {
+        return apiService.validateToken()
     }
 }

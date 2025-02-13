@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
+import com.example.projectexcursions.ui.utilies.ProgressBar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,6 +28,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
     private lateinit var adapter: PhotoAdapter
     private lateinit var binding: ActivityExcursionCreateBinding
+    private lateinit var progressBar: ProgressBar
     private val viewModel: CreateExcursionViewModel by viewModels()
 
     private val REQUEST_CODE_PERMISSION = 1003
@@ -46,6 +48,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         binding.recyclerViewSelectedImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.recyclerViewSelectedImages.setHasFixedSize(true)
         binding.recyclerViewSelectedImages.adapter = adapter
+        progressBar = ProgressBar()
     }
 
     private fun initCallback() {
@@ -77,6 +80,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val description = binding.excursionDescription.text.toString().trim()
                 if (viewModel.isExcursionCorrect(this, title, description)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
+                    progressBar.show(this)
                 }
             }
         }

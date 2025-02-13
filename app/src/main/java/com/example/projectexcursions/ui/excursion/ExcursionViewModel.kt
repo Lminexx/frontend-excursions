@@ -80,10 +80,8 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = repository.loadPhotos(excursionId)
-                if (response.isNotEmpty()) {
-                    val photoUris = response.map { Uri.parse(it.url) }
-                    _photos.value = photoUris
-                }
+                val photoUris = response.map { Uri.parse(it.url) }
+                _photos.value = photoUris
             } catch (e: Exception) {
                 Log.e("LoadPhotos", e.message ?: "Unknown error")
             }
