@@ -71,4 +71,11 @@ interface ApiService {
 
     @POST("user/validToken")
     suspend fun validateToken()
+
+    @Multipart
+    @POST("user/avatar/upload")
+    suspend fun uploadAvatar(
+        @Part("fileName") fileName: RequestBody,
+        @Part file: MultipartBody.Part
+    )
 }
