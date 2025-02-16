@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.registration
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -35,6 +36,9 @@ class RegViewModel @Inject constructor(
 
     private val _password = MutableLiveData<String>()
     val password: LiveData<String> get() = _password
+
+    private val _profilePicture = MutableLiveData<Uri>()
+    val profilePicture: LiveData<Uri> get() = _profilePicture
 
 
     fun validateAndRegister(context: Context, login: String, password: String, repeatPassword: String) {
@@ -76,6 +80,10 @@ class RegViewModel @Inject constructor(
     private fun isInputLangValid(input: String): Boolean {
         val regex = "^[a-zA-Z0-9!@#\$%^&*()_+{}\\[\\]:;<>,.?~\\-=\\s]*\$".toRegex()
         return regex.matches(input)
+    }
+
+    fun addProfilePicture(image: Uri){
+        _profilePicture.value=image
     }
 
     fun cameBack() {
