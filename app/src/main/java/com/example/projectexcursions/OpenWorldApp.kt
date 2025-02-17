@@ -33,18 +33,27 @@ class OpenWorldApp : Application() {
         applicationScope.launch {
             try {
                 tokenRepository.validateToken(apiService)
-                Toast.makeText(applicationContext, R.string.enjoy_using_it, Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.enjoy_using_it, Toast.LENGTH_SHORT)
+                    .show()
             } catch (http: HttpException) {
                 when (http.code()) {
                     401 -> {
-                        tokenRepository.deleteToken(tokenRepository.getCachedToken()!!.token)
-                        Toast.makeText(applicationContext, R.string.please_register, Toast.LENGTH_LONG).show()
+                        if (tokenRepository.getToken()!=null) {
+                            tokenRepository.deleteToken(tokenRepository.getCachedToken()!!.token)
+                            Toast.makeText(
+                                applicationContext,
+                                R.string.please_register,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
-                    else -> Toast.makeText(applicationContext, http.message, Toast.LENGTH_SHORT).show()
+
+                    else -> Toast.makeText(applicationContext, http.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
-            }
-            catch (e: Exception) {
-                Toast.makeText(applicationContext, e.message ?: "Unknown error", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(applicationContext, e.message ?: "Unknown error", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
