@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.excursion
 
+import android.net.Uri
 import android.text.BoringLayout
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -8,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiService
+import com.example.projectexcursions.net.PhotoResponse
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +37,9 @@ class ExcursionViewModel @Inject constructor(
 
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
+
+    private val _photos = MutableLiveData<List<Uri>>()
+    val photos: LiveData<List<Uri>> get() = _photos
 
     init {
         if (tokenRepository.getCachedToken() != null)
@@ -67,6 +72,18 @@ class ExcursionViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("LoadExcursion", e.message!!)
                 _excursion.value = null
+            }
+        }
+    }
+
+    fun loadPhotos(excursionId: Long) {
+        viewModelScope.launch {
+            try {
+                val response = repository.loadPhotos(excursionId)
+                val photoUris = response.map { Uri.parse(it.url) }
+                _photos.value = photoUris
+            } catch (e: Exception) {
+                Log.e("LoadPhotos", e.message ?: "Unknown error")
             }
         }
     }
