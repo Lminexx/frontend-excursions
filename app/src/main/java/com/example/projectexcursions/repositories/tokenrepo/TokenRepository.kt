@@ -2,8 +2,10 @@ package com.example.projectexcursions.repositories.tokenrepo
 
 import com.auth0.android.jwt.Claim
 import com.example.projectexcursions.models.Token
+import com.example.projectexcursions.net.ApiService
 
 interface TokenRepository {
+
     suspend fun saveToken(token: Token)
 
     suspend fun getToken(): Token?
@@ -19,4 +21,6 @@ interface TokenRepository {
     fun getCachedToken(): Token?
 
     suspend fun deleteToken(token: String)
+
+    suspend fun validateToken(apiService: ApiService)
 }
