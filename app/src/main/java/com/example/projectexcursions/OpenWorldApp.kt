@@ -28,8 +28,6 @@ class OpenWorldApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
-
         applicationScope.launch {
             try {
                 tokenRepository.validateToken(apiService)
