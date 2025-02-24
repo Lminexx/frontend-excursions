@@ -28,6 +28,10 @@ class OpenWorldApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
+        Log.d("YandexMap", "API Key: ${BuildConfig.MAPKIT_API_KEY}")
+        MapKitFactory.initialize(applicationContext)
+
         applicationScope.launch {
             try {
                 tokenRepository.validateToken(apiService)
