@@ -39,6 +39,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
 
         initCallback()
         subscribe()
+        binding.userPhoto.setImageURI(viewModel.getAvatar())
     }
 
     private fun initCallback() {

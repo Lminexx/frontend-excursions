@@ -11,7 +11,7 @@ import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.models.Token
 
-@Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 1)
+@Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 2)
 abstract class OpenWorldDB: RoomDatabase() {
     abstract fun excursionsDao(): ExcursionsDao
 

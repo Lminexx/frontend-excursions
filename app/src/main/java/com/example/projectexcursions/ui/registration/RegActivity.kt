@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,16 +15,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toIcon
 import com.example.projectexcursions.R
-import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.databinding.ActivityRegBinding
-import com.example.projectexcursions.ui.auth.AuthActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class RegActivity : AppCompatActivity() {
 
-    private lateinit var adapter: PhotoAdapter
     private lateinit var binding: ActivityRegBinding
     private val viewModel: RegViewModel by viewModels()
 
@@ -47,7 +46,7 @@ class RegActivity : AppCompatActivity() {
         }
 
         binding.buttonAddAvatar.setOnClickListener {
-            checkPermissionsAndProceed()
+            openImagePicker()
         }
     }
 
@@ -56,8 +55,9 @@ class RegActivity : AppCompatActivity() {
             if (isSuccessful) {
                 val username = viewModel.username.value!!
                 val password = viewModel.password.value!!
+                val avatar = viewModel.avatar.value!!
                 Log.d("DataBeforeSend", "$username, $password")
-                val intent = createRegIntent(username, password, true)
+                val intent = createRegIntent(username, password, avatar, true)
                 Log.d("RegIntent", "CreateRegIntent")
                 setResult(Activity.RESULT_OK, intent)
                 finish()
@@ -81,54 +81,31 @@ class RegActivity : AppCompatActivity() {
             Toast.makeText(this, finalMessage, Toast.LENGTH_SHORT).show()
         }
 
+        viewModel.avatar.observe(this) { picture ->
+            binding.buttonAddAvatar.setImageURI(picture)
+            binding.buttonAddAvatar.alpha = 1F
+        }
+
     }
 
     private val pickImages =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val clipData = result.data?.clipData
-                var pictureUri: Uri = Uri.EMPTY
-                if (clipData != null) {
-                    pictureUri = clipData.getItemAt(0).uri
+            if (result.resultCode == RESULT_OK) {
+                val data: Intent? = result.data
+                var pictureUri: Uri? = data?.data
+                if (pictureUri != null) {
+                    viewModel.addProfilePicture(pictureUri)
                 } else {
                     result.data?.data?.let { pictureUri = it }
                 }
-                if (pictureUri != Uri.EMPTY) {
-                    viewModel.addProfilePicture(pictureUri)
-                }
             }
         }
 
-    private fun checkPermissionsAndProceed() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES), REQUEST_CODE_PERMISSION
-                )
-            } else {
-                openImagePicker()
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSION
-                )
-            } else {
-                openImagePicker()
-            }
-        }
-    }
 
     private fun openImagePicker() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
             type = "image/*"
-            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         }
         pickImages.launch(intent)
     }
@@ -137,15 +114,18 @@ class RegActivity : AppCompatActivity() {
         const val EXTRA_REG_STATUS = "EXTRA_REG_STATUS"
         const val EXTRA_REG_USERNAME = "EXTRA_REG_USERNAME"
         const val EXTRA_REG_PASSWORD = "EXTRA_REG_PASSWORD"
+        const val EXTRA_REG_AVATAR = "EXTRA_REG_AVATAR"
 
         private fun createRegIntent(
             username: String,
             password: String,
+            avatar: Uri,
             isRegSuccess: Boolean
         ): Intent =
             Intent().apply {
                 putExtra(EXTRA_REG_USERNAME, username)
                 putExtra(EXTRA_REG_PASSWORD, password)
+                putExtra(EXTRA_REG_AVATAR, avatar)
                 putExtra(EXTRA_REG_STATUS, isRegSuccess)
                 Log.d("CreateIntent", "Intent created")
             }

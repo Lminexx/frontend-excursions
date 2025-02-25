@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.profile
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -58,6 +59,10 @@ class ProfileViewModel @Inject constructor(
             repository.deleteToken(token.token)
             Log.d("DeletedToken", token.token)
         }
+    }
+
+    fun getAvatar():Uri?{
+        return repository.getAvatar()
     }
 
     fun clickCreateExcursion() {

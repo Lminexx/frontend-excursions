@@ -1,8 +1,11 @@
 package com.example.projectexcursions.repositories.tokenrepo
 
+import android.net.Uri
 import com.auth0.android.jwt.Claim
 import com.example.projectexcursions.models.Token
 import com.example.projectexcursions.net.ApiService
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 interface TokenRepository {
 
@@ -23,4 +26,8 @@ interface TokenRepository {
     suspend fun deleteToken(token: String)
 
     suspend fun validateToken(apiService: ApiService)
+
+    suspend fun uploadAvatar(uri: Uri, fileName: RequestBody, file: MultipartBody.Part, apiService: ApiService)
+
+    fun getAvatar():Uri?
 }
