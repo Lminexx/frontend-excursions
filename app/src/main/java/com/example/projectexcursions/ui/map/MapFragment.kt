@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.map
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -19,15 +20,24 @@ import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.layers.GeoObjectTapEvent
 import com.yandex.mapkit.layers.GeoObjectTapListener
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
+import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
-import com.yandex.mapkit.map.TextStyle
+import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.mapkit.search.Response
+import com.yandex.mapkit.search.SearchFactory
+import com.yandex.mapkit.search.SearchManagerType
+import com.yandex.mapkit.search.SearchOptions
+import com.yandex.mapkit.search.SearchType
+import com.yandex.mapkit.search.Session
+import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 
 class MapFragment : Fragment(R.layout.fragment_map) {
@@ -38,6 +48,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var placemark: PlacemarkMapObject
     private lateinit var mapView: MapView
     private lateinit var binding: FragmentMapBinding
+    private lateinit var map: Map
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        MapKitFactory.initialize(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +64,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         Log.d("onCreateView", "")
         binding = FragmentMapBinding.inflate(inflater, container, false)
         mapView = binding.mapview
+        map = mapView.mapWindow.map
 
         checkPermissions()
         subscribe()
@@ -62,26 +80,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         viewModel.startLocationTracker()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initCallback() {
         Log.d("initCallback","")
-        val geoObjectTapListener = GeoObjectTapListener {
-            val point =
-                it.geoObject.geometry.firstOrNull()?.point ?: return@GeoObjectTapListener true
-            mapView.mapWindow.map.cameraPosition.run {
-                val position = CameraPosition(point, zoom, azimuth, tilt)
-                mapView.mapWindow.map.move(position, Animation(Animation.Type.SMOOTH, 1f), null)
-            }
-
-            val selectionMetadata =
-                it.geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
-            mapView.mapWindow.map.selectGeoObject(selectionMetadata)
-            Toast.makeText(requireContext(),
-                "Tapped ${it.geoObject.name} id = ${selectionMetadata.objectId}",
-                Toast.LENGTH_SHORT).show()
-
-            true
-        }
-        mapView.mapWindow.map.addTapListener(geoObjectTapListener)
+        map.addTapListener(geoObjectTapListener())
+        map.mapObjects.addTapListener(mapTapListener())//реализацию этой штуки надо будет поменять, это для тестов
     }
 
     private fun subscribe() {
@@ -145,7 +148,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private fun setLocation(point:Point) {
         Log.d("setLocation","")
         try {
-            mapView.mapWindow.map.move(
+            map.move(
                 CameraPosition(
                     point,
                     17.0f,
@@ -161,30 +164,98 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun setPin(point: Point) {
+    private fun setPin(point: Point, name: String? = null) {
         Log.d("setPin", "")
+
         val imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.ic_location_pin)
 
-        if (this::placemark.isInitialized) {
-            mapView.mapWindow.map.mapObjects.remove(placemark)
-        }
-
-        placemark = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
+        placemark = map.mapObjects.addPlacemark().apply {
             val iconStyle = IconStyle().apply { scale = 0.4f }
             geometry = point
             setIcon(imageProvider, iconStyle)
             addTapListener { _, tappedPoint ->
-                Log.d(
-                    "PlacemarkTap",
-                    "Tapped point: ${tappedPoint.latitude}, ${tappedPoint.longitude}"
-                )
                 Toast.makeText(
                     requireContext(),
-                    "Tapped the point (${tappedPoint.latitude}, ${tappedPoint.longitude})",
+                    "Tapped the point $name: (${tappedPoint.latitude}, ${tappedPoint.longitude})",
                     Toast.LENGTH_SHORT
                 ).show()
                 true
             }
         }
     }
+
+    private fun geoObjectTapListener(): GeoObjectTapListener {
+        val geoObjectTapListener = GeoObjectTapListener { event ->
+            val geoObject = event.geoObject
+            Log.d("GeoObject", "Тап по объекту: ${geoObject.name ?: "Без имени"}")
+            val point = geoObject.geometry.firstOrNull()?.point
+
+            if (point != null) {
+                map.move(
+                    CameraPosition(point, 17.0f, 0.0f, 0.0f),
+                    Animation(Animation.Type.SMOOTH, 1f),
+                    null
+                )
+            }
+
+            val name = geoObject.name ?: "Неизвестное место"
+            val description = geoObject.descriptionText ?: "Нет описания"
+            val metadata = geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
+
+            Toast.makeText(requireContext(), "Название: $name\nОписание: $description", Toast.LENGTH_SHORT).show()
+            Log.d("GeoObject", "Название: $name, Описание: $description")
+
+            Log.d("GeoObject", "Название: $name, Описание: $description")
+
+            if (metadata != null) {
+                map.selectGeoObject(metadata)
+                Log.d("GeoObject", "Выбран объект с ID: ${metadata.objectId}")
+            } else {
+                Log.e("GeoObject", "Метаданные умерли(((")
+            }
+
+            return@GeoObjectTapListener true
+        }
+        return geoObjectTapListener
+    }
+
+    private fun mapTapListener(): MapObjectTapListener {
+        val mapTapListener = MapObjectTapListener { _, point ->
+            Log.d("MapTap", "Кликнули по карте в точке: ${point.latitude}, ${point.longitude}")
+            Toast.makeText(requireContext(), "Клик в ${point.latitude}, ${point.longitude}", Toast.LENGTH_SHORT).show()
+            true
+        }
+        return mapTapListener
+    }
+
+    private fun search() {
+        val searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
+        val searchOptions = SearchOptions().apply {
+            searchTypes = SearchType.BIZ.value or SearchType.GEO.value
+            resultPageSize = 20
+        }
+
+        val searchSessionListener = object : Session.SearchListener {
+            override fun onSearchResponse(response: Response) {
+                Log.d("Search", "Найдено объектов: ${response.collection.children.size}")
+                map.mapObjects.clear()
+
+                response.collection.children.forEach { searchResult ->
+                    val point = searchResult.obj?.geometry?.firstOrNull()?.point
+                    val name = searchResult.obj?.name ?: "Без имени"
+
+                    if (point != null) {
+                        setPin(point, name)
+                    }
+                }
+            }
+
+            override fun onSearchError(error: Error) {
+                Toast.makeText(requireContext(), "Ошибка поиска: $error", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
+        searchManager.submit("кафе", visibleRegion, searchOptions, searchSessionListener)
+        }
 }

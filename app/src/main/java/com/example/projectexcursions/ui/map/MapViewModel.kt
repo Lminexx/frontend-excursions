@@ -11,7 +11,9 @@ import com.yandex.mapkit.location.Location
 import com.yandex.mapkit.location.LocationListener
 import com.yandex.mapkit.location.LocationStatus
 import com.yandex.mapkit.location.Purpose
+import com.yandex.mapkit.map.VisibleRegion
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.logging.Filter
 import javax.inject.Inject
 
@@ -21,16 +23,12 @@ class MapViewModel @Inject constructor() : ViewModel() {
     private val _curPoint = MutableLiveData<Point>()
     val curPoint: LiveData<Point> get() = _curPoint
 
+    private val region = MutableStateFlow<VisibleRegion?>(null)
+
+
     fun startLocationTracker() {
         val locationManager = MapKitFactory.getInstance().createLocationManager()
-        locationManager.subscribeForLocationUpdates(
-            0.0,
-            3000,
-            0.9,
-            true,
-            FilteringMode.ON,
-            Purpose.GENERAL,
-            object : LocationListener {
+        locationManager.requestSingleUpdate(object : LocationListener {
             override fun onLocationUpdated(location: Location) {
                 Log.d("startLocationTracker", "onLocationUpdated")
                 _curPoint.value = location.position
@@ -45,5 +43,9 @@ class MapViewModel @Inject constructor() : ViewModel() {
                 }
             }
         })
+    }
+
+    fun setVisibleRegion(region: VisibleRegion) {
+        this.region.value = region
     }
 }
