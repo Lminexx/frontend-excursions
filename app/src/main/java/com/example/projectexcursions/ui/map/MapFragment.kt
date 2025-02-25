@@ -19,7 +19,10 @@ import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.layers.GeoObjectTapEvent
+import com.yandex.mapkit.layers.GeoObjectTapListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
@@ -61,6 +64,24 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun initCallback() {
         Log.d("initCallback","")
+        val geoObjectTapListener = GeoObjectTapListener {
+            val point =
+                it.geoObject.geometry.firstOrNull()?.point ?: return@GeoObjectTapListener true
+            mapView.mapWindow.map.cameraPosition.run {
+                val position = CameraPosition(point, zoom, azimuth, tilt)
+                mapView.mapWindow.map.move(position, Animation(Animation.Type.SMOOTH, 1f), null)
+            }
+
+            val selectionMetadata =
+                it.geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
+            mapView.mapWindow.map.selectGeoObject(selectionMetadata)
+            Toast.makeText(requireContext(),
+                "Tapped ${it.geoObject.name} id = ${selectionMetadata.objectId}",
+                Toast.LENGTH_SHORT).show()
+
+            true
+        }
+        mapView.mapWindow.map.addTapListener(geoObjectTapListener)
     }
 
     private fun subscribe() {
