@@ -19,7 +19,7 @@ import com.example.projectexcursions.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ProfileFragment: Fragment(R.layout.fragment_profile) {
+class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private lateinit var binding: FragmentProfileBinding
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -39,7 +39,13 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
 
         initCallback()
         subscribe()
-        binding.userPhoto.setImageURI(viewModel.getAvatar())
+
+        val uri = viewModel.getAvatar()
+        if (uri.toString() != null.toString()) {
+            binding.userPhoto.setImageURI(uri)
+        } else{
+            binding.userPhoto.setBackgroundResource(R.drawable.ic_app_v3)
+        }
     }
 
     private fun initCallback() {
@@ -49,18 +55,19 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
     }
 
     private fun subscribe() {
-        viewModel.wantCreate.observe(viewLifecycleOwner) {wannaCreate ->
+        viewModel.wantCreate.observe(viewLifecycleOwner) { wannaCreate ->
             if (wannaCreate) {
                 startActivity(Intent(requireContext(), CreateExcursionActivity::class.java))
                 viewModel.isCreating()
             }
         }
 
-        viewModel.username.observe(viewLifecycleOwner) {
-            username -> binding.userNickname.text = username ?: throw UsernameNotFoundException("Usera net v tokene")
+        viewModel.username.observe(viewLifecycleOwner) { username ->
+            binding.userNickname.text =
+                username ?: throw UsernameNotFoundException("Usera net v tokene")
         }
 
-        viewModel.wantComeBack.observe(viewLifecycleOwner) {wannaLogOut ->
+        viewModel.wantComeBack.observe(viewLifecycleOwner) { wannaLogOut ->
             if (wannaLogOut) {
                 Log.d("WantLogOut", "true")
                 viewModel.logout()
@@ -68,7 +75,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
             }
         }
 
-        viewModel.goToCreatedExcs.observe(viewLifecycleOwner) {wannaCreated ->
+        viewModel.goToCreatedExcs.observe(viewLifecycleOwner) { wannaCreated ->
             if (wannaCreated) {
                 startActivity(Intent(requireContext(), CreatedExListActivity::class.java))
             }
