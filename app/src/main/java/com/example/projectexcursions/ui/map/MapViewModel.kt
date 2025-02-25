@@ -6,10 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.location.FilteringMode
 import com.yandex.mapkit.location.Location
 import com.yandex.mapkit.location.LocationListener
 import com.yandex.mapkit.location.LocationStatus
+import com.yandex.mapkit.location.Purpose
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.logging.Filter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +23,14 @@ class MapViewModel @Inject constructor() : ViewModel() {
 
     fun startLocationTracker() {
         val locationManager = MapKitFactory.getInstance().createLocationManager()
-        locationManager.requestSingleUpdate(object : LocationListener {
+        locationManager.subscribeForLocationUpdates(
+            0.0,
+            3000,
+            0.9,
+            true,
+            FilteringMode.ON,
+            Purpose.GENERAL,
+            object : LocationListener {
             override fun onLocationUpdated(location: Location) {
                 Log.d("startLocationTracker", "onLocationUpdated")
                 _curPoint.value = location.position
@@ -34,7 +44,6 @@ class MapViewModel @Inject constructor() : ViewModel() {
                     LocationStatus.RESET -> Log.d("Location", "Reset")
                 }
             }
-
         })
     }
 }
