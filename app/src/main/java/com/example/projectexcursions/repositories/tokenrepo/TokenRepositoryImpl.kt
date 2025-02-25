@@ -1,19 +1,24 @@
 package com.example.projectexcursions.repositories.tokenrepo
 
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import com.auth0.android.jwt.Claim
 import com.example.projectexcursions.models.Token
 import com.auth0.android.jwt.JWT
 import com.example.projectexcursions.databases.daos.TokenDao
 import com.example.projectexcursions.net.ApiService
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 
 class TokenRepositoryImpl @Inject constructor(
-    private val tokenDao: TokenDao
+    private val tokenDao: TokenDao,
 ): TokenRepository {
 
     private var cachedToken: Token? = null
+    private var avatar: Uri? = null
 
     override suspend fun saveToken(token: Token) {
         tokenDao.insertToken(token)
@@ -23,6 +28,9 @@ class TokenRepositoryImpl @Inject constructor(
     override suspend fun getToken(): Token? {
         val token = tokenDao.getLatestToken()
         cachedToken = token
+        if (token != null) {
+            avatar = tokenDao.getAvatar(token.token).toUri()
+        }
         Log.d("GetToken", cachedToken?.token ?: "null")
         return cachedToken
     }
@@ -72,5 +80,18 @@ class TokenRepositoryImpl @Inject constructor(
 
     override suspend fun validateToken(apiService: ApiService) {
         return apiService.validateToken()
+    }
+
+    override suspend fun uploadAvatar(uri: Uri, fileName: RequestBody, file: MultipartBody.Part, apiService: ApiService) {
+        val token = getCachedToken()
+        if (token != null) {
+            tokenDao.updateAvatar(token.token, uri.toString())
+        }
+        avatar = uri
+        apiService.uploadAvatar(fileName, file)
+    }
+
+    override fun getAvatar(): Uri? {
+        return avatar
     }
 }

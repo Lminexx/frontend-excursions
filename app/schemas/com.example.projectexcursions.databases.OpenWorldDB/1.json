@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9637b5123f5f2d133f1073f43d69522d",
+    "identityHash": "e0152b2ea6569342bb5cd50e1b3fc4a0",
     "entities": [
       {
         "tableName": "excursions",
@@ -106,7 +106,7 @@
       },
       {
         "tableName": "tokens",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `token` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `token` TEXT NOT NULL, `avatarUri` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -117,6 +117,12 @@
           {
             "fieldPath": "token",
             "columnName": "token",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatarUri",
+            "columnName": "avatarUri",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -134,7 +140,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9637b5123f5f2d133f1073f43d69522d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e0152b2ea6569342bb5cd50e1b3fc4a0')"
     ]
   }
 }
