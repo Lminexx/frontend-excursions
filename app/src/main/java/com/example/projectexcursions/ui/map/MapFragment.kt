@@ -3,6 +3,8 @@ package com.example.projectexcursions.ui.map
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +14,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.projectexcursions.BuildConfig
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.yandex.mapkit.Animation
@@ -35,12 +36,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var mapView: MapView
     private lateinit var binding: FragmentMapBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d("onCreate", "")
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -49,7 +44,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         Log.d("onCreateView", "")
         binding = FragmentMapBinding.inflate(inflater, container, false)
         mapView = binding.mapview
-        placemark = mapView.mapWindow.map.mapObjects.addPlacemark()
 
         checkPermissions()
         subscribe()
@@ -60,28 +54,20 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     override fun onResume() {
         super.onResume()
-        checkPermissions()
+
+        Log.d("onResume", "")
+        viewModel.startLocationTracker()
     }
 
     private fun initCallback() {
         Log.d("initCallback","")
-        val placemarkTapListener = MapObjectTapListener { _, point ->
-            Toast.makeText(
-                requireContext(),
-                "Tapped the point (${point.longitude}, ${point.latitude})",
-                Toast.LENGTH_SHORT
-            ).show()
-            true
-        }
-        placemark.addTapListener(placemarkTapListener)
     }
 
     private fun subscribe() {
         Log.d("subscribe","")
         viewModel.curPoint.observe(viewLifecycleOwner) {curPoint ->
             Log.d("subscribe","curPoint: ${curPoint.latitude}, ${curPoint.longitude}")
-            setOnCreateLocation(curPoint)
-            setPin(curPoint)
+            setLocation(curPoint)
         }
     }
 
@@ -93,10 +79,10 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     override fun onStop() {
+        super.onStop()
         mapView.onStop()
         Log.d("onStart","")
         MapKitFactory.getInstance().onStop()
-        super.onStop()
     }
 
     @Deprecated("Deprecated in Java")
@@ -124,7 +110,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
             Log.d("Permissions Granted", "YEES")
-            viewModel.startLocationTracker()
+            Handler(Looper.getMainLooper()).postDelayed({
+                viewModel.startLocationTracker()
+            }, 1000)
         } else {
             Log.d("Permissions Denied", "no(((")
             ActivityCompat.requestPermissions(requireActivity(),
@@ -133,8 +121,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun setOnCreateLocation(point:Point) {
-        Log.d("setOnCreateLocation","")
+    private fun setLocation(point:Point) {
+        Log.d("setLocation","")
         try {
             mapView.mapWindow.map.move(
                 CameraPosition(
@@ -146,28 +134,36 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
+            setPin(point)
         } catch (eNull: NullPointerException) {
             Toast.makeText(requireContext(), "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun setPin(point: Point) {
-        Log.d("setPin","")
+        Log.d("setPin", "")
         val imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.ic_location_pin)
-        placemark.apply {
+
+        if (this::placemark.isInitialized) {
+            mapView.mapWindow.map.mapObjects.remove(placemark)
+        }
+
+        placemark = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
             val iconStyle = IconStyle().apply { scale = 0.4f }
             geometry = point
             setIcon(imageProvider, iconStyle)
-            setText(
-                "",
-                TextStyle()
-            )
+            addTapListener { _, tappedPoint ->
+                Log.d(
+                    "PlacemarkTap",
+                    "Tapped point: ${tappedPoint.latitude}, ${tappedPoint.longitude}"
+                )
+                Toast.makeText(
+                    requireContext(),
+                    "Tapped the point (${tappedPoint.latitude}, ${tappedPoint.longitude})",
+                    Toast.LENGTH_SHORT
+                ).show()
+                true
+            }
         }
     }
-    /*
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.d("onViewCreated","")
-        viewModel.startLocationTracker()
-    }*/
 }
