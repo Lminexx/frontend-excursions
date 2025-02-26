@@ -54,6 +54,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         super.onCreate(savedInstanceState)
 
         MapKitFactory.initialize(requireContext())
+        checkPermissions()
+
     }
 
     override fun onCreateView(
@@ -66,7 +68,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         mapView = binding.mapview
         map = mapView.mapWindow.map
 
-        checkPermissions()
         subscribe()
         initCallback()
 
@@ -185,46 +186,10 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private fun geoObjectTapListener(): GeoObjectTapListener {
-        val geoObjectTapListener = GeoObjectTapListener { event ->
-            val geoObject = event.geoObject
-            Log.d("GeoObject", "Тап по объекту: ${geoObject.name ?: "Без имени"}")
-            val point = geoObject.geometry.firstOrNull()?.point
-
-            if (point != null) {
-                map.move(
-                    CameraPosition(point, 17.0f, 0.0f, 0.0f),
-                    Animation(Animation.Type.SMOOTH, 1f),
-                    null
-                )
-            }
-
-            val name = geoObject.name ?: "Неизвестное место"
-            val description = geoObject.descriptionText ?: "Нет описания"
-            val metadata = geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
-
-            Toast.makeText(requireContext(), "Название: $name\nОписание: $description", Toast.LENGTH_SHORT).show()
-            Log.d("GeoObject", "Название: $name, Описание: $description")
-
-            Log.d("GeoObject", "Название: $name, Описание: $description")
-
-            if (metadata != null) {
-                map.selectGeoObject(metadata)
-                Log.d("GeoObject", "Выбран объект с ID: ${metadata.objectId}")
-            } else {
-                Log.e("GeoObject", "Метаданные умерли(((")
-            }
-
-            return@GeoObjectTapListener true
-        }
         return geoObjectTapListener
     }
 
     private fun mapTapListener(): MapObjectTapListener {
-        val mapTapListener = MapObjectTapListener { _, point ->
-            Log.d("MapTap", "Кликнули по карте в точке: ${point.latitude}, ${point.longitude}")
-            Toast.makeText(requireContext(), "Клик в ${point.latitude}, ${point.longitude}", Toast.LENGTH_SHORT).show()
-            true
-        }
         return mapTapListener
     }
 
@@ -257,5 +222,44 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
         val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
         searchManager.submit("кафе", visibleRegion, searchOptions, searchSessionListener)
+    }
+
+    private val geoObjectTapListener = GeoObjectTapListener { event ->
+        val geoObject = event.geoObject
+        Log.d("GeoObject", "Тап по объекту: ${geoObject.name ?: "Без имени"}")
+        val point = geoObject.geometry.firstOrNull()?.point
+
+        if (point != null) {
+            map.move(
+                CameraPosition(point, 17.0f, 0.0f, 0.0f),
+                Animation(Animation.Type.SMOOTH, 1f),
+                null
+            )
         }
+
+        val name = geoObject.name ?: "Неизвестное место"
+        val description = geoObject.descriptionText ?: "Нет описания"
+        val metadata = geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
+
+        Toast.makeText(requireContext(),
+            "Название: $name\nОписание: $description\n" +
+                    "Координаты: ${point?.latitude ?: "null"}, ${point?.longitude ?: "null"}", Toast.LENGTH_SHORT).show()
+        Log.d("GeoObject", "Название: $name, Описание: $description")
+
+        Log.d("GeoObject", "Название: $name, Описание: $description")
+
+        if (metadata != null) {
+            map.selectGeoObject(metadata)
+            Log.d("GeoObject", "Выбран объект с ID: ${metadata.objectId}")
+        } else {
+            Log.e("GeoObject", "Метаданные умерли(((")
+        }
+        return@GeoObjectTapListener true
+    }
+
+    private val mapTapListener = MapObjectTapListener { _, point ->
+        Log.d("MapTap", "Кликнули по карте в точке: ${point.latitude}, ${point.longitude}")
+        Toast.makeText(requireContext(), "Клик в ${point.latitude}, ${point.longitude}", Toast.LENGTH_SHORT).show()
+        true
+    }
 }
