@@ -16,8 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor() : ViewModel() {
 
-    private val _curPoint = MutableLiveData<Point>()
-    val curPoint: LiveData<Point> get() = _curPoint
+    private val _curPoint = MutableLiveData<Point?>()
+    val curPoint: LiveData<Point?> get() = _curPoint
 
     private val _searchResults = MutableLiveData<List<SearchResult>>(emptyList())
     val searchResults: LiveData<List<SearchResult>> get() = _searchResults
@@ -60,5 +60,9 @@ class MapViewModel @Inject constructor() : ViewModel() {
 
     fun hideSearchResults() {
         _isSearchResultsVisible.value = false
+    }
+
+    fun deleteUserPos() {
+        _curPoint.value = null
     }
 }
