@@ -86,6 +86,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         viewModel.startLocationTracker()
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        viewModel.deleteUserPos()
+    }
+
     override fun onStart() {
         super.onStart()
         Log.d("onStart","")
@@ -148,8 +154,9 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private fun subscribe() {
         Log.d("subscribe","")
         viewModel.curPoint.observe(viewLifecycleOwner) {curPoint ->
-            Log.d("subscribe","curPoint: ${curPoint.latitude}, ${curPoint.longitude}")
-            setLocation(curPoint)
+            Log.d("subscribe","curPoint: ${curPoint?.latitude}, ${curPoint?.longitude}")
+            if (curPoint != null)
+                setLocation(curPoint)
         }
 
         viewModel.searchResults.observe(viewLifecycleOwner) { results ->
@@ -193,7 +200,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
-            setPin(point)
         } catch (eNull: NullPointerException) {
             Toast.makeText(requireContext(), "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
         }
