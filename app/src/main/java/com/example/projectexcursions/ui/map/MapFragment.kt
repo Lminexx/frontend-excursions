@@ -10,24 +10,25 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
+import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.FragmentMapBinding
+import com.example.projectexcursions.models.SearchResult
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.layers.GeoObjectTapListener
-import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
-import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
@@ -48,14 +49,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var placemark: PlacemarkMapObject
     private lateinit var mapView: MapView
     private lateinit var binding: FragmentMapBinding
+    private lateinit var searchResultsAdapter: SearchResultsAdapter
     private lateinit var map: Map
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         MapKitFactory.initialize(requireContext())
         checkPermissions()
-
     }
 
     override fun onCreateView(
@@ -68,32 +68,22 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         mapView = binding.mapview
         map = mapView.mapWindow.map
 
-        subscribe()
-        initCallback()
-
         return binding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initData()
+        initCallback()
+        subscribe()
+    }
+
 
     override fun onResume() {
         super.onResume()
 
         Log.d("onResume", "")
         viewModel.startLocationTracker()
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun initCallback() {
-        Log.d("initCallback","")
-        map.addTapListener(geoObjectTapListener())
-        map.mapObjects.addTapListener(mapTapListener())//реализацию этой штуки надо будет поменять, это для тестов
-    }
-
-    private fun subscribe() {
-        Log.d("subscribe","")
-        viewModel.curPoint.observe(viewLifecycleOwner) {curPoint ->
-            Log.d("subscribe","curPoint: ${curPoint.latitude}, ${curPoint.longitude}")
-            setLocation(curPoint)
-        }
     }
 
     override fun onStart() {
@@ -110,20 +100,64 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         MapKitFactory.getInstance().onStop()
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.d("onRequestPermissionsResult", "")
-        if (requestCode == REQUEST_CODE_PERMISSION) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                || grantResults.getOrNull(1) == PackageManager.PERMISSION_GRANTED) {
-                Log.d("Permissions", "Granted")
-                viewModel.startLocationTracker()
-            } else {
-                Toast.makeText(requireContext(), "Разрешение не предоставлено", Toast.LENGTH_SHORT).show()
+
+    private fun initData() {
+
+        searchResultsAdapter = SearchResultsAdapter { item ->
+            setLocation(item.point)
+            viewModel.hideSearchResults()
+        }
+
+        binding.searchResultsRecycler.layoutManager = LinearLayoutManager(context)
+        binding.searchResultsRecycler.adapter = searchResultsAdapter
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initCallback() {
+        Log.d("initCallback","")
+        map.addTapListener(geoObjectTapListener())
+
+        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                search(query)
+                return true
             }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                search(newText)
+                return true
+            }
+
+        })
+
+        binding.searchView.setOnCloseListener {
+            map.mapObjects.clear()
+            Log.d("SetOnCloseListener","")
+            viewModel.deleteSearchResults()
+            viewModel.startLocationTracker()
+            false
+        }
+
+        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                viewModel.toggleSearchResultsVisibility()
+            }
+        }
+    }
+
+    private fun subscribe() {
+        Log.d("subscribe","")
+        viewModel.curPoint.observe(viewLifecycleOwner) {curPoint ->
+            Log.d("subscribe","curPoint: ${curPoint.latitude}, ${curPoint.longitude}")
+            setLocation(curPoint)
+        }
+
+        viewModel.searchResults.observe(viewLifecycleOwner) { results ->
+            searchResultsAdapter.updateData(results)
+        }
+
+        viewModel.isSearchResultsVisible.observe(viewLifecycleOwner) { isVisible ->
+            binding.searchResultsRecycler.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
     }
 
@@ -152,7 +186,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             map.move(
                 CameraPosition(
                     point,
-                    17.0f,
+                    15.0f,
                     150.0f,
                     30.0f
                 ),
@@ -165,7 +199,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun setPin(point: Point, name: String? = null) {
+    private fun setPin(point: Point) {
         Log.d("setPin", "")
 
         val imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.ic_location_pin)
@@ -174,55 +208,38 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             val iconStyle = IconStyle().apply { scale = 0.4f }
             geometry = point
             setIcon(imageProvider, iconStyle)
-            addTapListener { _, tappedPoint ->
-                Toast.makeText(
-                    requireContext(),
-                    "Tapped the point $name: (${tappedPoint.latitude}, ${tappedPoint.longitude})",
-                    Toast.LENGTH_SHORT
-                ).show()
-                true
-            }
         }
     }
 
-    private fun geoObjectTapListener(): GeoObjectTapListener {
-        return geoObjectTapListener
-    }
-
-    private fun mapTapListener(): MapObjectTapListener {
-        return mapTapListener
-    }
-
-    private fun search() {
+    private fun search(query: String?) {
         val searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
         val searchOptions = SearchOptions().apply {
             searchTypes = SearchType.BIZ.value or SearchType.GEO.value
-            resultPageSize = 20
+            resultPageSize = 10
         }
 
         val searchSessionListener = object : Session.SearchListener {
             override fun onSearchResponse(response: Response) {
-                Log.d("Search", "Найдено объектов: ${response.collection.children.size}")
-                map.mapObjects.clear()
-
-                response.collection.children.forEach { searchResult ->
-                    val point = searchResult.obj?.geometry?.firstOrNull()?.point
-                    val name = searchResult.obj?.name ?: "Без имени"
-
-                    if (point != null) {
-                        setPin(point, name)
-                    }
+                val searchResults = response.collection.children.mapNotNull { result ->
+                    val point = result.obj?.geometry?.firstOrNull()?.point
+                    val name = result.obj?.name ?: return@mapNotNull null
+                    SearchResult(name, point!!)
                 }
+                viewModel.updateSearchResults(searchResults)
             }
 
             override fun onSearchError(error: Error) {
-                Toast.makeText(requireContext(), "Ошибка поиска: $error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Ошибка поиска", Toast.LENGTH_SHORT).show()
             }
         }
 
-        val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
-        searchManager.submit("кафе", visibleRegion, searchOptions, searchSessionListener)
+        if (!query.isNullOrEmpty()) {
+            val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
+            searchManager.submit(query, visibleRegion, searchOptions, searchSessionListener)
+        }
     }
+
+
 
     private val geoObjectTapListener = GeoObjectTapListener { event ->
         val geoObject = event.geoObject
@@ -257,9 +274,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         return@GeoObjectTapListener true
     }
 
-    private val mapTapListener = MapObjectTapListener { _, point ->
-        Log.d("MapTap", "Кликнули по карте в точке: ${point.latitude}, ${point.longitude}")
-        Toast.makeText(requireContext(), "Клик в ${point.latitude}, ${point.longitude}", Toast.LENGTH_SHORT).show()
-        true
+    private fun geoObjectTapListener(): GeoObjectTapListener {
+        return geoObjectTapListener
     }
 }
