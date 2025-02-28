@@ -2,6 +2,7 @@ package com.example.projectexcursions.ui.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -21,15 +22,18 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.example.projectexcursions.models.SearchResult
+import com.example.projectexcursions.ui.map.poi_map.PoiBottomFragment
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.geometry.Polyline
 import com.yandex.mapkit.layers.GeoObjectTapListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
@@ -51,6 +55,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var binding: FragmentMapBinding
     private lateinit var searchResultsAdapter: SearchResultsAdapter
     private lateinit var map: Map
+    private var routePolyline: Polyline? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +88,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         super.onResume()
 
         Log.d("onResume", "")
-        viewModel.startLocationTracker()
+        viewModel.getUserLocation()
     }
 
     override fun onPause() {
@@ -140,7 +145,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             map.mapObjects.clear()
             Log.d("SetOnCloseListener","")
             viewModel.deleteSearchResults()
-            viewModel.startLocationTracker()
+            viewModel.getUserLocation()
             false
         }
 
@@ -157,6 +162,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             Log.d("subscribe","curPoint: ${curPoint?.latitude}, ${curPoint?.longitude}")
             if (curPoint != null)
                 setLocation(curPoint)
+            else
+                map.mapObjects.clear()
         }
 
         viewModel.searchResults.observe(viewLifecycleOwner) { results ->
@@ -165,6 +172,17 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
         viewModel.isSearchResultsVisible.observe(viewLifecycleOwner) { isVisible ->
             binding.searchResultsRecycler.visibility = if (isVisible) View.VISIBLE else View.GONE
+        }
+
+        viewModel.routeLiveData.observe(viewLifecycleOwner) { route ->
+            drawRoute(route)
+        }
+
+        viewModel.routeEnded.observe(viewLifecycleOwner) { isRouteFinished ->
+            if (isRouteFinished) {
+                showRouteCompletedDialog()
+                clearRoute()
+            }
         }
     }
 
@@ -177,8 +195,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             == PackageManager.PERMISSION_GRANTED) {
             Log.d("Permissions Granted", "YEES")
             Handler(Looper.getMainLooper()).postDelayed({
-                viewModel.startLocationTracker()
-            }, 1000)
+                viewModel.getUserLocation()
+            }, 2500)
         } else {
             Log.d("Permissions Denied", "no(((")
             ActivityCompat.requestPermissions(requireActivity(),
@@ -187,7 +205,24 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun setLocation(point:Point) {
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d("onRequestPermissionsResult", "")
+        if (requestCode == REQUEST_CODE_PERMISSION) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                || grantResults.getOrNull(1) == PackageManager.PERMISSION_GRANTED) {
+                Log.d("Permissions", "Granted")
+                viewModel.getUserLocation()
+            } else {
+                Toast.makeText(requireContext(), "Разрешение не предоставлено", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun setLocation(point: Point) {
         Log.d("setLocation","")
         try {
             map.move(
@@ -200,6 +235,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
+            setPin(point)
         } catch (eNull: NullPointerException) {
             Toast.makeText(requireContext(), "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
         }
@@ -220,7 +256,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private fun search(query: String?) {
         val searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
         val searchOptions = SearchOptions().apply {
-            searchTypes = SearchType.BIZ.value or SearchType.GEO.value
+            searchTypes = SearchType.BIZ.value
             resultPageSize = 10
         }
 
@@ -245,8 +281,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-
-
     private val geoObjectTapListener = GeoObjectTapListener { event ->
         val geoObject = event.geoObject
         Log.d("GeoObject", "Тап по объекту: ${geoObject.name ?: "Без имени"}")
@@ -260,16 +294,10 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             )
         }
 
+        var address = ""
         val name = geoObject.name ?: "Неизвестное место"
         val description = geoObject.descriptionText ?: "Нет описания"
         val metadata = geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
-
-        Toast.makeText(requireContext(),
-            "Название: $name\nОписание: $description\n" +
-                    "Координаты: ${point?.latitude ?: "null"}, ${point?.longitude ?: "null"}", Toast.LENGTH_SHORT).show()
-        Log.d("GeoObject", "Название: $name, Описание: $description")
-
-        Log.d("GeoObject", "Название: $name, Описание: $description")
 
         if (metadata != null) {
             map.selectGeoObject(metadata)
@@ -277,10 +305,68 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         } else {
             Log.e("GeoObject", "Метаданные умерли(((")
         }
+
+        val searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
+        val searchOptions = SearchOptions().apply {
+            searchTypes = SearchType.BIZ.value
+            resultPageSize = 1
+        }
+
+        val searchSessionListener = object: Session.SearchListener {
+            override fun onSearchResponse(response: Response) {
+                val result = response.collection.children.firstOrNull()
+                address = result?.obj?.name ?: "Тут все взорвали, ниче нет"
+
+                val latitude = point!!.latitude
+                val longitude = point.longitude
+
+                Log.d("point", point.equals(null).toString())
+                Log.d("longitude", longitude.toString())
+                Log.d("latitude", latitude.toString())
+
+                viewModel.setEndPoint(point)
+
+                val bottomSheetFragment = PoiBottomFragment.newInstance(name, address, description)
+                bottomSheetFragment.show(parentFragmentManager, "PoiBottomFragment")
+            }
+
+            override fun onSearchError(p0: Error) {
+                Log.e("GeoObject", "Ошибка поиска адреса")
+                Toast.makeText(requireContext(), "Ошибка получения адреса", Toast.LENGTH_SHORT).show()            }
+        }
+
+        searchManager.submit(point!!, 1, searchOptions, searchSessionListener)
+
+        Log.d("GeoObject", "Название: $name, Описание: $description")
+
         return@GeoObjectTapListener true
+    }
+
+    private fun showRouteCompletedDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Маршрут завершён!")
+            .setMessage("Вы достигли конечной точки маршрута.")
+            .setPositiveButton("ОК") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
+    private fun drawRoute(points: List<Point>) {
+        routePolyline = Polyline(points)
+        map.mapObjects.addPolyline(routePolyline!!)
+        viewModel.startLocationTracker()
+    }
+
+    private fun clearRoute() {
+        routePolyline?.let {
+            map.mapObjects.clear()
+            routePolyline = null
+        }
+        viewModel.getUserLocation()
     }
 
     private fun geoObjectTapListener(): GeoObjectTapListener {
         return geoObjectTapListener
     }
 }
+
+/* TODO надо прописать CameraListener, чтобы обновлялся поиск */

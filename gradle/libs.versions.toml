@@ -3,6 +3,7 @@ activityKtx = "1.9.3"
 agp = "8.4.1"
 coreSplashscreen = "1.0.1"
 glide = "4.15.0"
+graphhopperCore = "8.0"
 hiltAndroid = "2.51.1"
 javaJwt = "3.18.2"
 jwtdecode = "2.0.0"
@@ -45,6 +46,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 facebook-shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmerVersion" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+graphhopper-core = { module = "com.graphhopper:graphhopper-core", version.ref = "graphhopperCore" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 java-jwt = { module = "com.auth0:java-jwt", version.ref = "javaJwt" }

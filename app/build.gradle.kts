@@ -21,6 +21,11 @@ android {
             name = "MAPKIT_API_KEY",
             value = "\"${project.findProperty("yandexMapKitApiKey")}\"",
         )
+        buildConfigField(
+            type = "String",
+            name = "GHOPPER_API_KEY",
+            value = "\"${project.findProperty("graphHopperApiKey")}\"",
+        )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -111,4 +116,5 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.graphhopper.core)
 }
