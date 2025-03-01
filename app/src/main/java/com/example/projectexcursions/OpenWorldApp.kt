@@ -29,6 +29,7 @@ class OpenWorldApp : Application() {
         super.onCreate()
 
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
+        Log.d("YandexMap", "API Key: ${BuildConfig.MAPKIT_API_KEY}")
 
         applicationScope.launch {
             try {

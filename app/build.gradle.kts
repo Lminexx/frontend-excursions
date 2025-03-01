@@ -21,6 +21,11 @@ android {
             name = "MAPKIT_API_KEY",
             value = "\"${project.findProperty("yandexMapKitApiKey")}\"",
         )
+        buildConfigField(
+            type = "String",
+            name = "GHOPPER_API_KEY",
+            value = "\"${project.findProperty("graphHopperApiKey")}\"",
+        )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -86,6 +91,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.navigation.common.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -110,4 +116,5 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.graphhopper.core)
 }
