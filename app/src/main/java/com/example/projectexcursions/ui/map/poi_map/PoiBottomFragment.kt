@@ -13,13 +13,16 @@ import com.example.projectexcursions.databinding.PlacesBottomSheetBinding
 import com.example.projectexcursions.ui.map.MapViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val COLLAPSED_HEIGHT = 228
 
+@AndroidEntryPoint
 class PoiBottomFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: PlacesBottomSheetBinding
-    private val viewModel: MapViewModel by viewModels() //todo надо переделать этот НЕРАБОТАЮЩИЙ костыль, сделать как то по умному
+
+    private val viewModel: MapViewModel by viewModels()
     override fun getTheme() = R.style.AppBottomSheetDialogTheme
     private var poiName: String? = null
     private var poiAddress: String? = null
@@ -42,7 +45,6 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
 
         val density = requireContext().resources.displayMetrics.density
 
-
         dialog?.let {
             val bottomSheet = it.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout
             val behavior = BottomSheetBehavior.from(bottomSheet)
@@ -63,7 +65,6 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
 
             binding.poiName.text = poiName
             binding.poiAddressCollapsed.text = poiAddress
-            binding.poiDescCollapsed.text = poiDesc
             binding.poiAddressExpanded.text = poiAddress
 
             behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {

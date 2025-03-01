@@ -22,6 +22,8 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.example.projectexcursions.models.SearchResult
+import com.example.projectexcursions.repositories.pointrepo.PointRepository
+import com.example.projectexcursions.repositories.pointrepo.PointRepositoryImpl
 import com.example.projectexcursions.ui.map.poi_map.PoiBottomFragment
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -33,7 +35,6 @@ import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
-import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
@@ -44,8 +45,12 @@ import com.yandex.mapkit.search.SearchType
 import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class MapFragment : Fragment(R.layout.fragment_map) {
+@AndroidEntryPoint
+
+class MapFragment: Fragment(R.layout.fragment_map) {
 
     private val REQUEST_CODE_PERMISSION = 1004
 
@@ -56,6 +61,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private lateinit var searchResultsAdapter: SearchResultsAdapter
     private lateinit var map: Map
     private var routePolyline: Polyline? = null
+    private val pointRepository = PointRepositoryImpl()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -174,14 +180,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             binding.searchResultsRecycler.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
 
-        viewModel.routeLiveData.observe(viewLifecycleOwner) { route ->
-            drawRoute(route)
-        }
-
         viewModel.routeEnded.observe(viewLifecycleOwner) { isRouteFinished ->
             if (isRouteFinished) {
                 showRouteCompletedDialog()
                 clearRoute()
+            } else if (pointRepository.hasRoute()) {
+                drawRoute(pointRepository.getRoute())
             }
         }
     }
@@ -282,6 +286,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private val geoObjectTapListener = GeoObjectTapListener { event ->
+        if (pointRepository.getCachedStart()!=null && pointRepository.getCachedEnd()!=null)
+            pointRepository.deleteCachedPoints()
         val geoObject = event.geoObject
         Log.d("GeoObject", "Тап по объекту: ${geoObject.name ?: "Без имени"}")
         val point = geoObject.geometry.firstOrNull()?.point
@@ -350,10 +356,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             .show()
     }
 
-    private fun drawRoute(points: List<Point>) {
-        routePolyline = Polyline(points)
-        map.mapObjects.addPolyline(routePolyline!!)
-        viewModel.startLocationTracker()
+    private fun drawRoute(points: List<Point>?) {
+        if (!points.isNullOrEmpty()) {
+            routePolyline = Polyline(points)
+            map.mapObjects.addPolyline(routePolyline!!)
+            viewModel.startLocationTracker()
+        }
     }
 
     private fun clearRoute() {
@@ -368,5 +376,4 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         return geoObjectTapListener
     }
 }
-
 /* TODO надо прописать CameraListener, чтобы обновлялся поиск */
