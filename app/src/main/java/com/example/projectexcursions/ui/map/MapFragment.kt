@@ -101,6 +101,7 @@ class MapFragment: Fragment(R.layout.fragment_map) {
 
         viewModel.deleteUserPos()
         viewModel.endRoute()
+        pointRepository.setFirst()
     }
 
     override fun onStart() {
@@ -191,7 +192,7 @@ class MapFragment: Fragment(R.layout.fragment_map) {
         }
 
         viewModel.routeEnded.observe(viewLifecycleOwner) { isRouteFinished ->
-            if (isRouteFinished) {
+            if (isRouteFinished && pointRepository.isFirstRoute()) {
                 showRouteCompletedDialog()
                 clearRoute()
                 viewModel.getUserLocation()
@@ -381,6 +382,7 @@ class MapFragment: Fragment(R.layout.fragment_map) {
 
     private fun drawRoute(points: List<Point>) {
         clearRoute()
+        pointRepository.setIsntFirst()
         if (points.isNotEmpty()) {
             viewModel.endPoint.value?.let { setLocation(it) }
             routePolyline = Polyline(points)

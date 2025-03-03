@@ -25,4 +25,10 @@ interface PointRepository {
     fun deleteRoute()
 
     fun hasRoute(): Boolean
+
+    fun isFirstRoute(): Boolean
+
+    fun setFirst()
+
+    fun setIsntFirst()
 }
