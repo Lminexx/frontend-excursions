@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.PlacesBottomSheetBinding
@@ -22,7 +23,7 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: PlacesBottomSheetBinding
 
-    private val viewModel: MapViewModel by viewModels()
+    private val viewModel: MapViewModel by activityViewModels()
     override fun getTheme() = R.style.AppBottomSheetDialogTheme
     private var poiName: String? = null
     private var poiAddress: String? = null
@@ -97,6 +98,7 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
             if (viewModel.routeFinished.value == true) {
                 Log.d("routeFinished", viewModel.routeFinished.value.toString())
                 viewModel.getRoute()
+
             }
             else {
                 val dialog = AlertDialog.Builder(requireContext())

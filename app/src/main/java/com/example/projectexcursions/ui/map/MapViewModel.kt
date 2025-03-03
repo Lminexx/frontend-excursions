@@ -1,5 +1,7 @@
 package com.example.projectexcursions.ui.map
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,9 +14,11 @@ import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.location.FilteringMode
 import com.yandex.mapkit.location.Location
 import com.yandex.mapkit.location.LocationListener
+import com.yandex.mapkit.location.LocationManager
 import com.yandex.mapkit.location.LocationStatus
 import com.yandex.mapkit.location.Purpose
 import dagger.hilt.android.lifecycle.HiltViewModel
+import hilt_aggregated_deps._com_example_projectexcursions_ui_registration_RegViewModel_HiltModules_BindsModule
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -52,17 +56,22 @@ class MapViewModel @Inject constructor(
     private val _routeFinished = MutableLiveData(true)
     val routeFinished: LiveData<Boolean> get() = _routeFinished
 
-    private val _routeEnded = MutableLiveData<Boolean>()
+    private val _routeEnded = MutableLiveData(false)
     val routeEnded: LiveData<Boolean> get() = _routeEnded
 
-    private val locationListener = object : LocationListener {
+    private val _userLocationOnRoute = MutableLiveData<Point?>()
+    val userLocationOnRoute: LiveData<Point?> get() = _userLocationOnRoute
 
+    private var locationManager: LocationManager? = null
+
+
+    private val locationListener = object : LocationListener {
         override fun onLocationUpdated(location: Location) {
             Log.d("startLocationTracker", "onLocationUpdated")
-            if (_curPoint != endPoint) {
-                _curPoint.value = location.position
-                pointRepository.deleteDCachedStart()
-                pointRepository.cacheStart(curPoint.value!!)
+            if (pointRepository.hasRoute()) {
+                _userLocationOnRoute.postValue(location.position)
+                pointRepository.cacheStart(location.position)
+                checkRouteCompletion(location.position, pointRepository.getCachedEnd()!!)
             }
         }
 
@@ -74,22 +83,20 @@ class MapViewModel @Inject constructor(
                 LocationStatus.RESET -> Log.d("Location", "Reset")
             }
         }
-
     }
 
-    private val locationManager = MapKitFactory.getInstance().createLocationManager()
-
     fun getUserLocation() {
-        val locationManager = MapKitFactory.getInstance().createLocationManager()
-        locationManager.requestSingleUpdate(object : LocationListener {
+        _curPoint.value = null
+        locationManager = MapKitFactory.getInstance().createLocationManager()
+        locationManager?.requestSingleUpdate(object : LocationListener {
             override fun onLocationUpdated(location: Location) {
-                Log.d("startLocationTracker", "onLocationUpdated")
-                _curPoint.value = location.position
-                pointRepository.cacheStart(curPoint.value!!)
+                Log.d("getUserLocation", "onLocationUpdated")
+                _curPoint.postValue(location.position)
+                pointRepository.cacheStart(location.position)
             }
 
             override fun onLocationStatusUpdated(locationStatus: LocationStatus) {
-                Log.d("startLocationTracker", "onLocationStatusUpdated")
+                Log.d("getUserLocation", "onLocationStatusUpdated")
                 when (locationStatus) {
                     LocationStatus.NOT_AVAILABLE -> Log.e("Location", "Not available")
                     LocationStatus.AVAILABLE -> Log.d("Location", "Available")
@@ -100,33 +107,35 @@ class MapViewModel @Inject constructor(
     }
 
     fun startLocationTracker() {
-        Log.d("endPoint", "${endPoint.value?.latitude}, ${endPoint.value?.longitude}")
-        Log.d("curPoint", "${curPoint.value?.latitude}, ${curPoint.value?.longitude}")
-
-        locationManager.subscribeForLocationUpdates(
+        locationManager = MapKitFactory.getInstance().createLocationManager()
+        locationManager?.subscribeForLocationUpdates(
             5.0,
             6000,
             0.0,
             true,
             FilteringMode.OFF,
             Purpose.PEDESTRIAN_NAVIGATION,
-            locationListener)
-        checkRouteCompletion(pointRepository.getCachedStart()!!, pointRepository.getCachedEnd()!!)
+            locationListener
+        )
     }
 
     fun getRoute() {
-        Log.d("endPoint", "${endPoint.value?.latitude}, ${endPoint.value?.longitude}")
-        Log.d("curPoint", "${curPoint.value?.latitude}, ${curPoint.value?.longitude}")
         try {
-            _routeFinished.value = false
             val end = pointRepository.getCachedEnd()
             val start = pointRepository.getCachedStart()
-            Log.d("end", "${end?.latitude}, ${end?.longitude}")
-            Log.d("start", "${start?.latitude}, ${start?.longitude}")
+            _curPoint.postValue(start)
+            if (end == null || start == null) {
+                Log.d("Point", "Start or end point is null")
+                return
+            }
+
+            _routeFinished.postValue(false)
+            _routeEnded.postValue(false)
+
             val apiKey = BuildConfig.GHOPPER_API_KEY
             val url =
-                "https://graphhopper.com/api/1/route?point=${start?.latitude},${start?.longitude}" +
-                        "&point=${end?.latitude},${end?.longitude}&vehicle=car&locale=ru&key=$apiKey"
+                "https://graphhopper.com/api/1/route?point=${start.latitude},${start.longitude}" +
+                        "&point=${end.latitude},${end.longitude}&vehicle=car&locale=ru&key=$apiKey"
 
             val request = Request.Builder().url(url).build()
             val client = OkHttpClient()
@@ -134,20 +143,24 @@ class MapViewModel @Inject constructor(
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Log.e("GraphHopper", "Ошибка загрузки маршрута", e)
+                    _routeFinished.postValue(true)
                 }
 
                 override fun onResponse(call: Call, response: Response) {
                     response.body?.string()?.let { json ->
                         val points = parseRoute(json)
-                        Log.d("pointsOnResponse", "${points.isNotEmpty()}")
-                        pointRepository.setRoute(points)
-                        _routeLiveData.postValue(points)
-                        Log.d("routeData", "${pointRepository.getRoute()?.get(1)?.longitude}, ${pointRepository.getRoute()?.get(1)?.latitude}")
+                        if (points.isNotEmpty()) {
+                            pointRepository.setRoute(points)
+                            _routeLiveData.postValue(points)
+                        } else {
+                            _routeFinished.postValue(true)
+                        }
                     }
                 }
             })
-        } catch (nullException: NullPointerException) {
-            Log.d("Point", "Null")
+        } catch (e: Exception) {
+            Log.e("Route", "Error getting route", e)
+            _routeFinished.postValue(true)
         }
     }
 
@@ -179,12 +192,11 @@ class MapViewModel @Inject constructor(
     }
 
     private fun checkRouteCompletion(userLocation: Point, end: Point) {
-        Log.d("routeData in checkRoute", "${pointRepository.getRoute()?.get(1)?.longitude}, ${pointRepository.getRoute()?.get(1)?.latitude}")
         if (pointRepository.hasRoute()) {
-            Log.d("checkRoute", "")
             val distance = calculateDistance(userLocation, end)
-            if (distance < 10 && !routeFinished.value!!)
+            if (distance < 10) {
                 endRoute()
+            }
         }
     }
 
@@ -239,7 +251,6 @@ class MapViewModel @Inject constructor(
         return poly
     }
 
-
     fun updateSearchResults(results: List<SearchResult>) {
         _searchResults.value = results
         _isSearchResultsVisible.value = results.isNotEmpty()
@@ -262,10 +273,15 @@ class MapViewModel @Inject constructor(
         _curPoint.value = null
     }
 
+    fun getUserPos(): Point? {
+        return curPoint.value
+    }
+
     fun endRoute() {
         _routeFinished.value = true
-        _routeEnded.value = true
+        _routeEnded.postValue(true)
         pointRepository.deleteRoute()
+        getUserLocation()
     }
 
     fun setEndPoint(point: Point) {
