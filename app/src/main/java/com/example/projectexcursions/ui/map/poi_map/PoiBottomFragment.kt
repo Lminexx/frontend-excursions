@@ -98,7 +98,6 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
             if (viewModel.routeFinished.value == true) {
                 Log.d("routeFinished", viewModel.routeFinished.value.toString())
                 viewModel.getRoute()
-
             }
             else {
                 val dialog = AlertDialog.Builder(requireContext())
@@ -109,6 +108,7 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
                     }
                     .create()
                 dialog.show()
+                viewModel.getUserLocation()
             }
         }
     }

@@ -12,6 +12,8 @@ class PointRepositoryImpl @Inject constructor(): PointRepository {
 
     private var cachedRoute: List<Point>? = null
 
+    private var firstRoute: Boolean = false
+
     override fun cacheStart(point: Point) {
         cachedStart = point
         Log.d("cachedStart", "${cachedStart?.longitude}, ${cachedStart?.latitude}")
@@ -65,5 +67,17 @@ class PointRepositoryImpl @Inject constructor(): PointRepository {
 
     override fun hasRoute(): Boolean {
         return cachedRoute != null
+    }
+
+    override fun isFirstRoute(): Boolean {
+        return firstRoute
+    }
+
+    override fun setFirst() {
+        firstRoute = false
+    }
+
+    override fun setIsntFirst() {
+        firstRoute = true
     }
 }
