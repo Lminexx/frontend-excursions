@@ -290,4 +290,3 @@ class MapViewModel @Inject constructor(
         Log.d("endPoint", "${endPoint.value?.latitude}, ${endPoint.value?.longitude}")
     }
 }
-/* TODO сделать PointRepository, с помощью которого ВСЁ станет проще и ОБЯЗАТЕЛЬНО надо сделать там две кешерованные точки для текущей и конечной */
