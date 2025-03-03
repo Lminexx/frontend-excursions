@@ -61,7 +61,6 @@ class MapFragment: Fragment(R.layout.fragment_map) {
     private var routePolyline: Polyline? = null
     private val pointRepository = PointRepositoryImpl()
     private lateinit var userLocationPlacemark: PlacemarkMapObject
-    private lateinit var routeStartPlacemark: PlacemarkMapObject
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
