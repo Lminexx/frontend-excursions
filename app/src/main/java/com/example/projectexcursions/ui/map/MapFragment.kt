@@ -16,12 +16,13 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.example.projectexcursions.models.SearchResult
+import com.example.projectexcursions.repositories.pointrepo.PointRepositoryImpl
 import com.example.projectexcursions.ui.map.poi_map.PoiBottomFragment
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -33,7 +34,6 @@ import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
-import com.yandex.mapkit.map.PolylineMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
@@ -44,18 +44,23 @@ import com.yandex.mapkit.search.SearchType
 import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
+import dagger.hilt.android.AndroidEntryPoint
 
-class MapFragment : Fragment(R.layout.fragment_map) {
+@AndroidEntryPoint
+
+class MapFragment: Fragment(R.layout.fragment_map) {
 
     private val REQUEST_CODE_PERMISSION = 1004
 
-    private val viewModel: MapViewModel by viewModels()
+    private val viewModel: MapViewModel by activityViewModels()
     private lateinit var placemark: PlacemarkMapObject
     private lateinit var mapView: MapView
     private lateinit var binding: FragmentMapBinding
     private lateinit var searchResultsAdapter: SearchResultsAdapter
     private lateinit var map: Map
     private var routePolyline: Polyline? = null
+    private val pointRepository = PointRepositoryImpl()
+    private lateinit var userLocationPlacemark: PlacemarkMapObject
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,6 +100,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         super.onPause()
 
         viewModel.deleteUserPos()
+        viewModel.endRoute()
+        pointRepository.setFirst()
     }
 
     override fun onStart() {
@@ -142,10 +149,19 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         })
 
         binding.searchView.setOnCloseListener {
-            map.mapObjects.clear()
             Log.d("SetOnCloseListener","")
             viewModel.deleteSearchResults()
-            viewModel.getUserLocation()
+            if (pointRepository.hasRoute()) {
+                val route = pointRepository.getRoute()
+                Log.d("route", "${route != null}")
+                if (route != null) {
+                    map.mapObjects.clear()
+                    map.mapObjects.addPolyline(Polyline(route))
+                }
+            } else {
+                val curPoint = viewModel.getUserPos()!!
+                setLocation(curPoint)
+            }
             false
         }
 
@@ -158,12 +174,35 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun subscribe() {
         Log.d("subscribe","")
-        viewModel.curPoint.observe(viewLifecycleOwner) {curPoint ->
-            Log.d("subscribe","curPoint: ${curPoint?.latitude}, ${curPoint?.longitude}")
-            if (curPoint != null)
+        viewModel.curPoint.observe(viewLifecycleOwner) { curPoint ->
+            Log.d("curPoint", "${curPoint!=null}")
+            if (curPoint != null && pointRepository.hasRoute()) {
+                setUserLocationPin(curPoint)
+            } else if (!pointRepository.hasRoute() && curPoint != null) {
                 setLocation(curPoint)
-            else
+            } else {
                 map.mapObjects.clear()
+            }
+        }
+
+        viewModel.userLocationOnRoute.observe(viewLifecycleOwner) { location ->
+            if (location != null && pointRepository.hasRoute()) {
+                updateUserLocationPin(location)
+            }
+        }
+
+        viewModel.routeEnded.observe(viewLifecycleOwner) { isRouteFinished ->
+            if (isRouteFinished && pointRepository.isFirstRoute()) {
+                showRouteCompletedDialog()
+                clearRoute()
+                viewModel.getUserLocation()
+            }
+        }
+
+        viewModel.routeLiveData.observe(viewLifecycleOwner) { points ->
+            if (!points.isNullOrEmpty()) {
+                drawRoute(points)
+            }
         }
 
         viewModel.searchResults.observe(viewLifecycleOwner) { results ->
@@ -172,17 +211,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
         viewModel.isSearchResultsVisible.observe(viewLifecycleOwner) { isVisible ->
             binding.searchResultsRecycler.visibility = if (isVisible) View.VISIBLE else View.GONE
-        }
-
-        viewModel.routeLiveData.observe(viewLifecycleOwner) { route ->
-            drawRoute(route)
-        }
-
-        viewModel.routeEnded.observe(viewLifecycleOwner) { isRouteFinished ->
-            if (isRouteFinished) {
-                showRouteCompletedDialog()
-                clearRoute()
-            }
         }
     }
 
@@ -282,6 +310,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     private val geoObjectTapListener = GeoObjectTapListener { event ->
+        if (pointRepository.getCachedStart()!=null && pointRepository.getCachedEnd()!=null)
+            pointRepository.deleteCachedPoints()
         val geoObject = event.geoObject
         Log.d("GeoObject", "Тап по объекту: ${geoObject.name ?: "Без имени"}")
         val point = geoObject.geometry.firstOrNull()?.point
@@ -345,15 +375,20 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private fun showRouteCompletedDialog() {
         AlertDialog.Builder(requireContext())
             .setTitle("Маршрут завершён!")
-            .setMessage("Вы достигли конечной точки маршрута.")
+            .setMessage("Чиназес бро!")
             .setPositiveButton("ОК") { dialog, _ -> dialog.dismiss() }
             .show()
     }
 
     private fun drawRoute(points: List<Point>) {
-        routePolyline = Polyline(points)
-        map.mapObjects.addPolyline(routePolyline!!)
-        viewModel.startLocationTracker()
+        clearRoute()
+        pointRepository.setIsntFirst()
+        if (points.isNotEmpty()) {
+            viewModel.endPoint.value?.let { setLocation(it) }
+            routePolyline = Polyline(points)
+            map.mapObjects.addPolyline(routePolyline!!)
+            viewModel.startLocationTracker()
+        }
     }
 
     private fun clearRoute() {
@@ -361,12 +396,33 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             map.mapObjects.clear()
             routePolyline = null
         }
-        viewModel.getUserLocation()
+    }
+
+    private fun setUserLocationPin(point: Point) {
+        Log.d("setUserLocationPin","")
+        val imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.ic_location_pin)
+        userLocationPlacemark = map.mapObjects.addPlacemark().apply {
+            val iconStyle = IconStyle().apply { scale = 0.4f }
+            geometry = point
+            setIcon(imageProvider, iconStyle)
+        }
+    }
+
+    private fun updateUserLocationPin(point: Point) {
+        if (::userLocationPlacemark.isInitialized) {
+            userLocationPlacemark.geometry = point
+        } else {
+            val imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.ic_location_pin)
+            userLocationPlacemark = map.mapObjects.addPlacemark().apply {
+                val iconStyle = IconStyle().apply { scale = 0.4f }
+                geometry = point
+                setIcon(imageProvider, iconStyle)
+            }
+        }
     }
 
     private fun geoObjectTapListener(): GeoObjectTapListener {
         return geoObjectTapListener
     }
 }
-
 /* TODO надо прописать CameraListener, чтобы обновлялся поиск */

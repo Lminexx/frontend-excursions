@@ -8,8 +8,11 @@ import com.example.projectexcursions.databases.daos.TokenDao
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
+import com.example.projectexcursions.repositories.pointrepo.PointRepository
+import com.example.projectexcursions.repositories.pointrepo.PointRepositoryImpl
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepositoryImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,5 +63,11 @@ object AppModule {
         tokenDao: TokenDao
     ): TokenRepository {
         return TokenRepositoryImpl(tokenDao)
+    }
+
+    @Provides
+    @Singleton
+    fun providePointRepository(): PointRepository {
+        return PointRepositoryImpl()
     }
 }
