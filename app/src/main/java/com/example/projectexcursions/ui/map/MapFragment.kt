@@ -224,7 +224,7 @@ class MapFragment: Fragment(R.layout.fragment_map) {
             Log.d("Permissions Granted", "YEES")
             Handler(Looper.getMainLooper()).postDelayed({
                 viewModel.getUserLocation()
-            }, 2500)
+            }, 750)
         } else {
             Log.d("Permissions Denied", "no(((")
             ActivityCompat.requestPermissions(requireActivity(),
