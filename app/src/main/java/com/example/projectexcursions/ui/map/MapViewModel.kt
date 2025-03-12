@@ -1,7 +1,5 @@
 package com.example.projectexcursions.ui.map
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,7 +16,6 @@ import com.yandex.mapkit.location.LocationManager
 import com.yandex.mapkit.location.LocationStatus
 import com.yandex.mapkit.location.Purpose
 import dagger.hilt.android.lifecycle.HiltViewModel
-import hilt_aggregated_deps._com_example_projectexcursions_ui_registration_RegViewModel_HiltModules_BindsModule
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -135,7 +132,7 @@ class MapViewModel @Inject constructor(
             val apiKey = BuildConfig.GHOPPER_API_KEY
             val url =
                 "https://graphhopper.com/api/1/route?point=${start.latitude},${start.longitude}" +
-                        "&point=${end.latitude},${end.longitude}&vehicle=car&locale=ru&key=$apiKey"
+                        "&point=${end.latitude},${end.longitude}&vehicle=foot&locale=ru&key=$apiKey"
 
             val request = Request.Builder().url(url).build()
             val client = OkHttpClient()
@@ -281,7 +278,6 @@ class MapViewModel @Inject constructor(
         _routeFinished.value = true
         _routeEnded.postValue(true)
         pointRepository.deleteRoute()
-        getUserLocation()
     }
 
     fun setEndPoint(point: Point) {
