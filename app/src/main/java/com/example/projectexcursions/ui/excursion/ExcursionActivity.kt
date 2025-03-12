@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
@@ -67,8 +68,14 @@ class ExcursionActivity : AppCompatActivity() {
             if (excursion != null) {
                 hideShimmer()
                 binding.excursionTitle.text = excursion.title
-                binding.excursionAuthor.text = excursion.username
+                binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
+                val url = excursion.user.url
+                Glide.with(this)
+                    .load(url)
+                    .placeholder(R.drawable.ic_app_v3)
+                    .error(R.drawable.ic_app_v3)
+                    .into(binding.userAvatar)
                 if (viewModel.excursion.value!!.favorite)
                     viewModel.fav()
                 else
@@ -111,7 +118,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.shimmerLayout.visibility = View.VISIBLE
         binding.shimmerLayout.startShimmer()
         binding.excursionTitle.visibility = View.GONE
-        binding.excursionAuthor.visibility = View.GONE
+        binding.authorContainer.visibility = View.GONE
         binding.excursionDescription.visibility = View.GONE
         binding.favoriteButton.visibility = View.GONE
         binding.recyclerViewImages.visibility = View.GONE
@@ -121,7 +128,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.shimmerLayout.stopShimmer()
         binding.shimmerLayout.visibility = View.GONE
         binding.excursionTitle.visibility = View.VISIBLE
-        binding.excursionAuthor.visibility = View.VISIBLE
+        binding.authorContainer.visibility = View.VISIBLE
         binding.excursionDescription.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
         binding.recyclerViewImages.visibility = View.VISIBLE

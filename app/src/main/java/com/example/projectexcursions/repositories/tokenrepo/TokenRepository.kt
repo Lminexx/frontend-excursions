@@ -27,7 +27,5 @@ interface TokenRepository {
 
     suspend fun validateToken(apiService: ApiService)
 
-    suspend fun uploadAvatar(uri: Uri, fileName: RequestBody, file: MultipartBody.Part, apiService: ApiService)
-
     fun getAvatar():Uri?
 }

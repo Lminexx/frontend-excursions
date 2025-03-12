@@ -69,20 +69,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-<!--    <ImageView-->
-<!--        android:id="@+id/buttonAddAvatar"-->
-<!--        android:layout_width="170dp"-->
-<!--        android:layout_height="170dp"-->
-<!--        android:alpha="0.4"-->
-<!--        android:contentDescription="@string/avatar"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/input_login"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.496"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintVertical_bias="0.7"-->
-<!--        app:srcCompat="@drawable/ic_add_avatar" />-->
-
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/buttonAddAvatar"
         android:layout_width="170dp"

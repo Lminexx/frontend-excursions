@@ -28,9 +28,6 @@ class TokenRepositoryImpl @Inject constructor(
     override suspend fun getToken(): Token? {
         val token = tokenDao.getLatestToken()
         cachedToken = token
-        if (token != null) {
-            avatar = tokenDao.getAvatar(token.token).toUri()
-        }
         Log.d("GetToken", cachedToken?.token ?: "null")
         return cachedToken
     }
@@ -80,15 +77,6 @@ class TokenRepositoryImpl @Inject constructor(
 
     override suspend fun validateToken(apiService: ApiService) {
         return apiService.validateToken()
-    }
-
-    override suspend fun uploadAvatar(uri: Uri, fileName: RequestBody, file: MultipartBody.Part, apiService: ApiService) {
-        val token = getCachedToken()
-        if (token != null) {
-            tokenDao.updateAvatar(token.token, uri.toString())
-        }
-        avatar = uri
-        apiService.uploadAvatar(fileName, file)
     }
 
     override fun getAvatar(): Uri? {

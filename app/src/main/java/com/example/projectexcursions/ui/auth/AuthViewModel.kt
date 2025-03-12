@@ -13,20 +13,24 @@ import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val apiService: ApiService,
     private val tokenRepository: TokenRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _loginStatus = MutableLiveData<Boolean>()
     val loginStatus: LiveData<Boolean> get() = _loginStatus
@@ -46,6 +50,10 @@ class AuthViewModel @Inject constructor(
     private val _avatar = MutableLiveData<Uri>()
     val avatar: LiveData<Uri> get() = _avatar
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
         val tempFile = File(context.cacheDir, fileName)
@@ -57,18 +65,26 @@ class AuthViewModel @Inject constructor(
                 }
             }
             return tempFile
-        }catch (e: IOException){
+        } catch (e: IOException) {
             Log.e("getFileFromUri", "Error copying file from URI: $uri", e)
-            return tempFile
+            throw e
         }
     }
 
     fun validateAndLogin(context: Context, login: String, password: String) {
         when {
-            login.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_login)
-            password.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_password)
-            !isInputLangValid(login) -> _validationMessage.value = context.getString(R.string.lang_error)
-            !isInputLangValid(password) -> _validationMessage.value = context.getString(R.string.lang_error)
+            login.isBlank() -> _validationMessage.value =
+                context.getString(R.string.error_enter_login)
+
+            password.isBlank() -> _validationMessage.value =
+                context.getString(R.string.error_enter_password)
+
+            !isInputLangValid(login) -> _validationMessage.value =
+                context.getString(R.string.lang_error)
+
+            !isInputLangValid(password) -> _validationMessage.value =
+                context.getString(R.string.lang_error)
+
             else -> {
                 checkLogin(context, login, password)
             }
@@ -83,8 +99,8 @@ class AuthViewModel @Inject constructor(
                 _token.value = response.token
                 tokenRepository.saveToken(Token(token = token.value!!))
                 Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
-                _loginStatus.value = true
                 _avatar.value?.let { uploadAvatar(context, it) }
+                _loginStatus.value = true
             } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false
                 val errorMessage = when (e.code()) {
@@ -100,18 +116,41 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun uploadAvatar(context: Context, uri: Uri){
+    private fun uploadAvatar(context: Context, uri: Uri) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                val file = getFileFromUri(context, uri)
-                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                val multipartBody =
-                    MultipartBody.Part.createFormData("file", file.name, requestFile)
-                val fileName = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
-                tokenRepository.uploadAvatar(uri, fileName, multipartBody, apiService)
-                Log.d("Avatar", "AvatarUpload")
+                withContext(Dispatchers.IO) {
+                    val file = getFileFromUri(context, uri)
+                    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                    val multipartBody =
+                        MultipartBody.Part.createFormData("file", file.name, requestFile)
+                    val fileName = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val response = apiService.uploadAvatar(fileName, multipartBody)
+                    _token.postValue(response.token)
+                    tokenRepository.clearToken()
+                    tokenRepository.saveToken(Token(token = response.token))
+                    Log.d("Avatar", "Avatar uploaded successfully")
+                    Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
+                }
+            } catch (e: IOException) {
+                Log.e("PhotoUploadError", "IO Error uploading photo: ${e.message}", e)
+                _validationMessage.postValue("Ошибка при чтении файла: ${e.message}")
+            } catch (e: HttpException) {
+                Log.e(
+                    "PhotoUploadError",
+                    "HTTP Error uploading photo: ${e.message}, code: ${e.code()}",
+                    e
+                )
+                _validationMessage.postValue("Ошибка при загрузке: ${e.code()}")
+            } catch (e: CancellationException) {
+                Log.e("PhotoUploadError", "Upload cancelled: ${e.message}", e)
+                _validationMessage.postValue("Загрузка была отменена")
             } catch (e: Exception) {
-                Log.e("PhotoUploadError", "Error uploading photo: ${e.message}")
+                Log.e("PhotoUploadError", "General Error uploading photo: ${e.message}", e)
+                _validationMessage.postValue("Неизвестная ошибка: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -121,8 +160,8 @@ class AuthViewModel @Inject constructor(
         return regex.matches(input)
     }
 
-    fun setAvatar(uri: Uri){
-        _avatar.value=uri
+    fun setAvatar(uri: Uri) {
+        _avatar.value = uri
     }
 
     fun clickRegister() {

@@ -6,9 +6,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.projectexcursions.R
 import com.example.projectexcursions.UsernameNotFoundException
 import com.example.projectexcursions.databinding.FragmentProfileBinding
@@ -17,6 +19,7 @@ import com.example.projectexcursions.ui.created_excursions_list.CreatedExListAct
 import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -40,10 +43,15 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         initCallback()
         subscribe()
 
-        val uri = viewModel.getAvatar()
-        if (uri.toString() != null.toString()) {
-            binding.userPhoto.setImageURI(uri)
-        } else{
+        val decodedToken = viewModel.getDecodeToken()
+        val url = decodedToken?.get("url")?.asString()
+        if (url != null) {
+            Glide.with(requireContext())
+                .load(url)
+                .placeholder(R.drawable.ic_app_v3)
+                .error(R.drawable.ic_app_v3)
+                .into(binding.userPhoto)
+        } else {
             binding.userPhoto.setBackgroundResource(R.drawable.ic_app_v3)
         }
     }
