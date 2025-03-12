@@ -60,9 +60,8 @@ interface ApiService {
 
     @Multipart
     @POST("excursion/photo/upload")
-    suspend fun uploadPhoto(
-        @Part("fileName") fileName: RequestBody,
-        @Part file: MultipartBody.Part,
+    suspend fun uploadPhotos(
+        @Part file: List<MultipartBody.Part>,
         @Part("excursionId") excursionId: RequestBody
     ): PhotoResponse
 
@@ -77,5 +76,5 @@ interface ApiService {
     suspend fun uploadAvatar(
         @Part("fileName") fileName: RequestBody,
         @Part file: MultipartBody.Part
-    )
+    ):AuthResponse
 }

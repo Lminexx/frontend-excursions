@@ -10,6 +10,5 @@ import okhttp3.MultipartBody
 @Entity(tableName = "tokens")
 data class Token (
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-    val token: String,
-    val avatarUri: String = null.toString()
+    val token: String
 )

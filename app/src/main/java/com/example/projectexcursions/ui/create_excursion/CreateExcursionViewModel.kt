@@ -20,6 +20,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,13 +48,17 @@ class CreateExcursionViewModel @Inject constructor(
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
         val tempFile = File(context.cacheDir, fileName)
 
-        context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            tempFile.outputStream().use { outputStream ->
-                inputStream.copyTo(outputStream)
+        try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                tempFile.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
             }
+            return tempFile
+        } catch (e: IOException) {
+            Log.e("getFileFromUri", "Error copying file from URI: $uri", e)
+            throw e
         }
-
-        return tempFile
     }
 
     fun createExcursion(context: Context, title: String, description: String) {
@@ -65,9 +70,8 @@ class CreateExcursionViewModel @Inject constructor(
                 val respondedExcursion = Excursion(
                     response.id,
                     response.title,
-                    response.userId,
                     response.description,
-                    response.username,
+                    response.user,
                     response.favorite
                 )
                 excursionRepository.saveExcursionToDB(respondedExcursion)
@@ -99,35 +103,31 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
+
     private fun uploadPhotos(context: Context, excursionId: Long) {
         viewModelScope.launch {
-            val jobs = mutableListOf<Job>()
+            try {
+                val multipartBodyParts = _selectedImages.value?.map { uri ->
+                    val file = getFileFromUri(context, uri)
+                    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                    MultipartBody.Part.createFormData("files", file.name, requestFile)
+                } ?: emptyList()
 
-            _selectedImages.value?.forEach { uri ->
-                val job = launch {
-                    try {
-                        val file = getFileFromUri(context, uri)
+                val excursionIdRequest = excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
-                        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                        val multipartBody =
-                            MultipartBody.Part.createFormData("file", file.name, requestFile)
-                        val fileName = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
-                        val excursionIdRequest =
-                            excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                val response = excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
+                Log.d("PhotoUpload", "Uploaded photos successfully")
 
-                        val response = excursionRepository.uploadPhoto(fileName, multipartBody, excursionIdRequest)
-                        Log.d("PhotoUpload", "Uploaded photo: ${response.url}")
-                    } catch (e: Exception) {
-                        Log.e("PhotoUploadError", "Error uploading photo: ${e.message}")
-                    }
-                }
-                jobs.add(job)
+                _selectedImages.postValue(emptyList())
+                _wantComeBack.value = true
+
+            } catch (e: Exception) {
+                Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
+                _message.value = "Error uploading photos: ${e.message}"
             }
-            jobs.forEach { it.join() }
-            _selectedImages.postValue(emptyList())
-            _wantComeBack.value = true
         }
     }
+
 
     fun clickCreateExcursion() {
         _createExcursion.value = true

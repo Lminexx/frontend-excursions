@@ -70,7 +70,7 @@ class MineExcursionActivity : AppCompatActivity() {
             if (excursion != null) {
                 hideShimmer()
                 binding.excursionTitle.text = excursion.title
-                binding.excursionAuthor.text = excursion.username
+                binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
                 if (viewModel.excursion.value!!.favorite)
                     viewModel.fav()

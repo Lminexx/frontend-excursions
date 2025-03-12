@@ -27,9 +27,4 @@ interface TokenDao {
     @Query("delete from tokens where token = :token")
     suspend fun deleteToken(token: String)
 
-    @Query("update tokens set avatarUri = :uri  where token = :token")
-    suspend fun updateAvatar(token: String, uri: String)
-
-    @Query("select avatarUri from tokens where token = :token")
-    suspend fun getAvatar(token: String): String
 }

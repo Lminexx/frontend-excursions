@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
 
 @Parcelize
 @Serializable
@@ -15,5 +16,4 @@ data class ExcursionsList(
     val userId: Long,
     val description: String,
     val favorite: Boolean = false,
-    val username: String?
 ): Parcelable

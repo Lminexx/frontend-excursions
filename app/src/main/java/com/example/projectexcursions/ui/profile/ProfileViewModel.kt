@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.auth0.android.jwt.Claim
+import com.example.projectexcursions.models.Token
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -61,9 +63,11 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun getAvatar():Uri?{
-        return repository.getAvatar()
+    fun getDecodeToken(): Map<String, Claim>? {
+        val token = repository.getCachedToken()
+        return token?.let { repository.decodeToken(it.token) }
     }
+
 
     fun clickCreateExcursion() {
         _wantCreate.value = true
