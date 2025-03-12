@@ -1,5 +1,6 @@
 package com.example.projectexcursions.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
@@ -35,6 +36,7 @@ class PhotoAdapter(private val context: Context, private var photoList: List<Uri
         return photoList.size
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updatePhotos(newPhotos: List<Uri>) {
         photoList = newPhotos
         notifyDataSetChanged()

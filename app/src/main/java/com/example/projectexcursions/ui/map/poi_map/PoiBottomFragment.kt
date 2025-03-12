@@ -103,8 +103,8 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
                 val dialog = AlertDialog.Builder(requireContext())
                     .setMessage("Завершите текущий маршрут")
                     .setPositiveButton("Завершить") { dialog, _ ->
-                        viewModel.endRoute()
                         dialog.dismiss()
+                        viewModel.endRoute()
                     }
                     .create()
                 dialog.show()
