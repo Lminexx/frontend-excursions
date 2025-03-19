@@ -8,13 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.PlacesBottomSheetBinding
 import com.example.projectexcursions.ui.map.MapViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 private const val COLLAPSED_HEIGHT = 228
 
@@ -95,20 +96,20 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
 
     private fun initCallback() {
         binding.makePath.setOnClickListener {
-            if (viewModel.routeFinished.value == true) {
-                Log.d("routeFinished", viewModel.routeFinished.value.toString())
-                viewModel.getRoute()
-            }
-            else {
-                val dialog = AlertDialog.Builder(requireContext())
-                    .setMessage("Завершите текущий маршрут")
-                    .setPositiveButton("Завершить") { dialog, _ ->
-                        dialog.dismiss()
-                        viewModel.endRoute()
-                    }
-                    .create()
-                dialog.show()
-                viewModel.getUserLocation()
+            lifecycleScope.launch {
+                if (viewModel.routeFinished.value == true) {
+                    Log.d("routeFinished", viewModel.routeFinished.value.toString())
+                    viewModel.getRoute()
+                } else {
+                    val dialog = AlertDialog.Builder(requireContext())
+                        .setMessage("Завершите текущий маршрут")
+                        .setPositiveButton("Завершить") { dialog, _ ->
+                            dialog.dismiss()
+                            viewModel.endRoute()
+                        }
+                        .create()
+                    dialog.show()
+                }
             }
         }
     }

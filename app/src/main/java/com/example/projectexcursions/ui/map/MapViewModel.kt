@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.projectexcursions.BuildConfig
 import com.example.projectexcursions.models.SearchResult
+import com.example.projectexcursions.repositories.georepo.GeoRepository
 import com.example.projectexcursions.repositories.pointrepo.PointRepository
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -32,7 +33,8 @@ import kotlin.math.sqrt
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val pointRepository: PointRepository
+    private val pointRepository: PointRepository,
+    private val geoRepository: GeoRepository
 ) : ViewModel() {
 
     private val _curPoint = MutableLiveData<Point?>()
@@ -60,7 +62,6 @@ class MapViewModel @Inject constructor(
     val userLocationOnRoute: LiveData<Point?> get() = _userLocationOnRoute
 
     private var locationManager: LocationManager? = null
-
 
     private val locationListener = object : LocationListener {
         override fun onLocationUpdated(location: Location) {
@@ -116,7 +117,7 @@ class MapViewModel @Inject constructor(
         )
     }
 
-    fun getRoute() {
+    suspend fun getRoute() {
         try {
             val end = pointRepository.getCachedEnd()
             val start = pointRepository.getCachedStart()
@@ -129,62 +130,16 @@ class MapViewModel @Inject constructor(
             _routeFinished.postValue(false)
             _routeEnded.postValue(false)
 
-            val apiKey = BuildConfig.GHOPPER_API_KEY
-            val url =
-                "https://graphhopper.com/api/1/route?point=${start.latitude},${start.longitude}" +
-                        "&point=${end.latitude},${end.longitude}&vehicle=foot&locale=ru&key=$apiKey"
-
-            val request = Request.Builder().url(url).build()
-            val client = OkHttpClient()
-
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.e("GraphHopper", "Ошибка загрузки маршрута", e)
-                    _routeFinished.postValue(true)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    response.body?.string()?.let { json ->
-                        val points = parseRoute(json)
-                        if (points.isNotEmpty()) {
-                            pointRepository.setRoute(points)
-                            _routeLiveData.postValue(points)
-                        } else {
-                            _routeFinished.postValue(true)
-                        }
-                    }
-                }
-            })
+            val route = geoRepository.getRoute(start, end)
+            if (route.isNotEmpty()) {
+                pointRepository.setRoute(route)
+                _routeLiveData.postValue(route)
+            } else {
+                _routeFinished.postValue(true)
+            }
         } catch (e: Exception) {
             Log.e("Route", "Error getting route", e)
             _routeFinished.postValue(true)
-        }
-    }
-
-    private fun parseRoute(json: String): List<Point> {
-        val route = JSONObject(json).getJSONArray("paths").getJSONObject(0)
-        val pointsField = route.get("points")
-        Log.d("parse", "true)")
-        return if (pointsField is JSONObject) {
-            val encoded = pointsField.getBoolean("encoded")
-            if (!encoded) {
-                val coordsArray = pointsField.getJSONArray("coordinates")
-                Log.d("coordsArray", "${coordsArray.equals(null)}")
-                (0 until coordsArray.length()).map {
-                    val coord = coordsArray.getJSONArray(it)
-                    Point(coord.getDouble(1), coord.getDouble(0))
-                }
-            } else {
-                val polylineStr = pointsField.getString("points")
-                Log.d("polylineStr", polylineStr)
-                decodePoly(polylineStr)
-            }
-        } else if (pointsField is String) {
-            Log.d("decodePoly", "else-if, $pointsField")
-            decodePoly(pointsField)
-        } else {
-            Log.d("decodePoly", "emptyList()")
-            emptyList()
         }
     }
 
@@ -210,42 +165,6 @@ class MapViewModel @Inject constructor(
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
         return 6371000 * c
-    }
-
-    private fun decodePoly(encoded: String): List<Point> {
-        Log.d("encoded", encoded)
-        val poly = mutableListOf<Point>()
-        var index = 0
-        var lat = 0
-        var lng = 0
-        while (index < encoded.length) {
-            var result = 0
-            var shift = 0
-            var b: Int
-            do {
-                b = encoded[index++].code - 63
-                result = result or ((b and 0x1f) shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlat = if ((result and 1) != 0) -(result shr 1) else (result shr 1)
-            lat += dlat
-
-            result = 0
-            shift = 0
-            do {
-                b = encoded[index++].code - 63
-                result = result or ((b and 0x1f) shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlng = if ((result and 1) != 0) -(result shr 1) else (result shr 1)
-            lng += dlng
-
-            val latitude = lat / 1e5
-            val longitude = lng / 1e5
-            poly.add(Point(latitude, longitude))
-        }
-        Log.d("poly", "${poly.isNotEmpty()}, ${poly[1].longitude}, ${poly[1].latitude}")
-        return poly
     }
 
     fun updateSearchResults(results: List<SearchResult>) {
@@ -278,6 +197,7 @@ class MapViewModel @Inject constructor(
         _routeFinished.value = true
         _routeEnded.postValue(true)
         pointRepository.deleteRoute()
+        getUserLocation()
     }
 
     fun setEndPoint(point: Point) {
