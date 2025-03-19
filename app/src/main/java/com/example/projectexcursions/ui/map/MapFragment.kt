@@ -149,20 +149,26 @@ class MapFragment: Fragment(R.layout.fragment_map) {
         })
 
         binding.searchView.setOnCloseListener {
-            Log.d("SetOnCloseListener","")
-            viewModel.deleteSearchResults()
-            if (pointRepository.hasRoute()) {
-                val route = pointRepository.getRoute()
-                Log.d("route", "${route != null}")
-                if (route != null) {
-                    map.mapObjects.clear()
-                    map.mapObjects.addPolyline(Polyline(route))
+            try {
+                Log.d("SetOnCloseListener", "")
+                viewModel.deleteSearchResults()
+                if (pointRepository.hasRoute()) {
+                    val route = pointRepository.getRoute()
+                    Log.d("route", "${route != null}")
+                    if (route != null) {
+                        map.mapObjects.clear()
+                        map.mapObjects.addPolyline(Polyline(route))
+                    }
+                } else {
+                    val curPoint = viewModel.getUserPos()!!
+                    setLocation(curPoint)
                 }
-            } else {
-                val curPoint = viewModel.getUserPos()!!
-                setLocation(curPoint)
+                false
+            } catch (e: Exception) {
+                Log.d("CloseSearchException", e.message.toString())
+                viewModel.getUserLocation()
+                false
             }
-            false
         }
 
         binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
