@@ -61,11 +61,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"/>
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="420dp"
-            android:background="@drawable/map_view_pattern"
             app:layout_constraintTop_toBottomOf="@id/buttonSelectImage"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -73,12 +72,16 @@
             <com.yandex.mapkit.mapview.MapView
                 android:id="@+id/mapview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="@drawable/map_view_pattern" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="420dp"
-                android:id="@+id/constraint">
+                android:id="@+id/constraint"
+                app:layout_constraintStart_toStartOf="@id/fragment_container"
+                app:layout_constraintEnd_toEndOf="@id/fragment_container"
+                app:layout_constraintTop_toTopOf="@id/fragment_container">
 
                 <SearchView
                     android:id="@+id/search_view"
@@ -108,7 +111,7 @@
                     app:layout_constraintEnd_toEndOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/places"
