@@ -145,26 +145,11 @@ class MapViewModel @Inject constructor(
 
     private fun checkRouteCompletion(userLocation: Point, end: Point) {
         if (pointRepository.hasRoute()) {
-            val distance = calculateDistance(userLocation, end)
+            val distance = geoRepository.calculateDistance(userLocation, end)
             if (distance < 10) {
                 endRoute()
             }
         }
-    }
-
-    private fun calculateDistance(p1: Point, p2: Point): Double {
-        val lat1 = Math.toRadians(p1.latitude)
-        val lon1 = Math.toRadians(p1.longitude)
-        val lat2 = Math.toRadians(p2.latitude)
-        val lon2 = Math.toRadians(p2.longitude)
-
-        val dlat = lat2 - lat1
-        val dlon = lon2 - lon1
-
-        val a = sin(dlat / 2).pow(2) + cos(lat1) * cos(lat2) * sin(dlon / 2).pow(2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        return 6371000 * c
     }
 
     fun updateSearchResults(results: List<SearchResult>) {

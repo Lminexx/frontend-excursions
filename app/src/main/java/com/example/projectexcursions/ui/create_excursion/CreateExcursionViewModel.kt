@@ -10,8 +10,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
+import com.example.projectexcursions.repositories.georepo.GeoRepository
+import com.example.projectexcursions.repositories.pointrepo.PointRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -25,7 +29,9 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateExcursionViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
-    private val excursionRepository: ExcursionRepository
+    private val excursionRepository: ExcursionRepository,
+    private val pointRepository: PointRepository,
+    private val geoRepository: GeoRepository
 ): ViewModel() {
 
     private val _wantComeBack = MutableLiveData<Boolean>()
@@ -42,6 +48,23 @@ class CreateExcursionViewModel @Inject constructor(
 
     private val _selectedImages = MutableLiveData<List<Uri>>(emptyList())
     val selectedImages: LiveData<List<Uri>> get() = _selectedImages
+
+    private val _isSearchResultsVisible = MutableLiveData(false)
+    val isSearchResultsVisible: LiveData<Boolean> get() = _isSearchResultsVisible
+
+    private val _searchResults = MutableLiveData<List<SearchResult>>(emptyList())
+    val searchResults: LiveData<List<SearchResult>> get() = _searchResults
+
+    private val _routeLiveData = MutableLiveData<List<Point>>(emptyList())
+    val routeLiveData: LiveData<List<Point>> get() = _routeLiveData
+
+    private val _prevPoint = MutableLiveData<Point>()
+    val prevPoint: LiveData<Point> get() = _prevPoint
+
+    private val _nextPoint = MutableLiveData<Point>()
+    val nextPoint: LiveData<Point> get() = _nextPoint
+
+
 
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
@@ -129,11 +152,52 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
+    suspend fun getRoute() {
+        try {
+            val end = pointRepository.getCachedEnd()
+            val start = pointRepository.getCachedStart()
+            if (end == null || start == null) {
+                Log.d("Point", "Start or end point is null")
+                return
+            }
+            val route = geoRepository.getRoute(start, end)
+            _routeLiveData.value = route
+        } catch (e: Exception) {
+            Log.e("Route", "Error getting route", e)
+        }
+    }
+
+    fun setPrevPoint(point: Point) {
+        _prevPoint.value = point
+    }
+
+    fun setNextPoint(point: Point) {
+        _nextPoint.value = point
+    }
+
+    fun toggleSearchResultsVisibility() {
+        _isSearchResultsVisible.value = _isSearchResultsVisible.value?.not()
+    }
+
+    fun deleteSearchResults() {
+        _searchResults.value = emptyList()
+        _isSearchResultsVisible.value = false
+    }
+
+    fun hideSearchResults() {
+        _isSearchResultsVisible.value = false
+    }
+
     fun clickCreateExcursion() {
         _createExcursion.value = true
     }
 
     fun addSelectedImages(images: List<Uri>) {
         _selectedImages.value = _selectedImages.value?.plus(images)
+    }
+
+    fun updateSearchResults(results: List<SearchResult>) {
+        _searchResults.value = results
+        _isSearchResultsVisible.value = results.isNotEmpty()
     }
 }

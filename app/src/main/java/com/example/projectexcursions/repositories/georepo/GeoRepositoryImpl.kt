@@ -7,6 +7,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import java.io.IOException
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class GeoRepositoryImpl: GeoRepository {
 
@@ -41,6 +46,21 @@ class GeoRepositoryImpl: GeoRepository {
             Log.e("GraphHopper", "Ошибка загрузки маршрута", e)
             emptyList()
         }
+    }
+
+    override fun calculateDistance(p1: Point, p2: Point): Double {
+        val lat1 = Math.toRadians(p1.latitude)
+        val lon1 = Math.toRadians(p1.longitude)
+        val lat2 = Math.toRadians(p2.latitude)
+        val lon2 = Math.toRadians(p2.longitude)
+
+        val dlat = lat2 - lat1
+        val dlon = lon2 - lon1
+
+        val a = sin(dlat / 2).pow(2) + cos(lat1) * cos(lat2) * sin(dlon / 2).pow(2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        Log.d("calculateDistance: ","${63710000 * c}")
+        return 6371000 * c
     }
 
     private fun decodePolyline(encoded: String): List<Point> {
