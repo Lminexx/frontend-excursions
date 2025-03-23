@@ -2,7 +2,6 @@ package com.example.projectexcursions.ui.create_excursion
 
 import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -20,15 +19,17 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
+import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
+import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
-import com.example.projectexcursions.repositories.pointrepo.PointRepositoryImpl
-import com.example.projectexcursions.ui.map.poi_map.PoiBottomFragment
 import com.example.projectexcursions.ui.utilies.ProgressBar
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -51,6 +52,7 @@ import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.observeOn
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -60,11 +62,11 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var binding: ActivityExcursionCreateBinding
     private lateinit var progressBar: ProgressBar
     private lateinit var searchResultsAdapter: SearchResultsAdapter
+    private lateinit var placesAdapter: PlacesAdapter
     private lateinit var mapView: MapView
     private lateinit var map: Map
     private lateinit var placemark: PlacemarkMapObject
     private var routePolyline: Polyline? = null
-    private val pointRepository = PointRepositoryImpl()
     private val viewModel: CreateExcursionViewModel by viewModels()
 
     private val REQUEST_CODE_PERMISSION = 1003
@@ -86,6 +88,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         Log.d("onStart","")
         MapKitFactory.getInstance().onStart()
         mapView.onStart()
+        viewModel.getUserPosition()
     }
 
     override fun onStop() {
@@ -99,13 +102,26 @@ class CreateExcursionActivity : AppCompatActivity() {
         adapter = PhotoAdapter(this, emptyList())
 
         searchResultsAdapter = SearchResultsAdapter { item ->
-            setLocation(item.point)
+            Log.d("searchAdapter", "true")
+            viewModel.setPoint(item.point)
             viewModel.hideSearchResults()
         }
+
+        placesAdapter = PlacesAdapter(
+            context = this,
+            onItemClick = { placeName ->
+                Log.d("PlaceName", "Пока ниче не сделано")
+            },
+            onDeleteClick = { placeName ->
+                viewModel.deletePlace(placeName)
+            },
+            places = emptyList()
+        )
 
         binding.recyclerViewSelectedImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.searchResultsRecycler.layoutManager = LinearLayoutManager(this)
         binding.searchResultsRecycler.adapter = searchResultsAdapter
+        binding.places.adapter = placesAdapter
         binding.recyclerViewSelectedImages.setHasFixedSize(true)
         binding.recyclerViewSelectedImages.adapter = adapter
         progressBar = ProgressBar()
@@ -195,11 +211,24 @@ class CreateExcursionActivity : AppCompatActivity() {
             binding.searchResultsRecycler.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
 
-        viewModel.nextPoint.observe(this) { point ->
+        viewModel.curPoint.observe(this) { point ->
+            Log.d("nextPoint:","observing")
             setLocation(point)
             if (viewModel.prevPoint.value != null) {
                 lifecycleScope.launch {
                     viewModel.getRoute()
+                }
+            }
+        }
+
+        viewModel.userPos.observe(this) { point ->
+            setUserLocation(point)
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.placeItems.collect { places ->
+                    placesAdapter.updatePlaces(places)
                 }
             }
         }
@@ -282,6 +311,24 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun setUserLocation(point: Point) {
+        Log.d("setUserLocation","")
+        try {
+            map.move(
+                CameraPosition(
+                    point,
+                    13.0f,
+                    150.0f,
+                    30.0f
+                ),
+                Animation(Animation.Type.SMOOTH, 1f),
+                null
+            )
+        } catch (eNull: NullPointerException) {
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun setPin(point: Point) {
         Log.d("setPin", "")
 
@@ -323,8 +370,6 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private val geoObjectTapListener = GeoObjectTapListener { event ->
-        if (pointRepository.getCachedStart()!=null && pointRepository.getCachedEnd()!=null)
-            pointRepository.deleteCachedPoints()
         val geoObject = event.geoObject
         Log.d("GeoObject", "Тап по объекту: ${geoObject.name ?: "Без имени"}")
         val point = geoObject.geometry.firstOrNull()?.point
@@ -341,6 +386,11 @@ class CreateExcursionActivity : AppCompatActivity() {
         val name = geoObject.name ?: "Неизвестное место"
         val description = geoObject.descriptionText ?: "Нет описания"
         val metadata = geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
+
+        val placeItem = PlaceItem(
+            name = name,
+            point = point!!,
+            photos = emptyList())
 
         if (metadata != null) {
             map.selectGeoObject(metadata)
@@ -367,7 +417,8 @@ class CreateExcursionActivity : AppCompatActivity() {
                 Log.d("longitude", longitude.toString())
                 Log.d("latitude", latitude.toString())
 
-                viewModel.setNextPoint(point)
+                viewModel.setPoint(point)
+                viewModel.addPlace(placeItem)
             }
 
             override fun onSearchError(p0: Error) {
@@ -375,7 +426,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 Toast.makeText(this@CreateExcursionActivity, "Ошибка получения адреса", Toast.LENGTH_SHORT).show()            }
         }
 
-        searchManager.submit(point!!, 1, searchOptions, searchSessionListener)
+        searchManager.submit(point, 1, searchOptions, searchSessionListener)
 
         Log.d("GeoObject", "Название: $name, Описание: $description")
 
@@ -400,3 +451,4 @@ class CreateExcursionActivity : AppCompatActivity() {
         return geoObjectTapListener
     }
 }
+//TODO сделать получение списка фото места

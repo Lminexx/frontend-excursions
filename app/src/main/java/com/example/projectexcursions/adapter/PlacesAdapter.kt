@@ -1,14 +1,19 @@
 package com.example.projectexcursions.adapter
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.databinding.ItemPlacesBinding
+import com.example.projectexcursions.models.PlaceItem
 
 class PlacesAdapter(
-    private var placesList: List<String>,
-    private val onItemClick: (String) -> Unit
+    private val context: Context,
+    private val onItemClick: (String) -> Unit,
+    private val onDeleteClick: (String) -> Unit,
+    private var places: List<PlaceItem>
 ) : RecyclerView.Adapter<PlacesAdapter.PlacesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlacesViewHolder {
@@ -17,26 +22,36 @@ class PlacesAdapter(
     }
 
     override fun onBindViewHolder(holder: PlacesViewHolder, position: Int) {
-        val placeName = placesList[position]
-        holder.bind(placeName)
+        val placeItem = places[position]
+        holder.bind(placeItem)
 
-        holder.itemView.setOnClickListener {
-            onItemClick(placeName)
-        }
+        holder.itemView.setOnClickListener { onItemClick(placeItem.name) }
+        holder.binding.deletePlace.setOnClickListener { onDeleteClick(placeItem.name) }
     }
 
-    override fun getItemCount(): Int = placesList.size
+    override fun getItemCount(): Int = places.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updatePlaces(newPlaces: List<String>) {
-        placesList = newPlaces
+    fun updatePlaces(newPlaces: List<PlaceItem>) {
+        places = newPlaces
         notifyDataSetChanged()
     }
 
-    inner class PlacesViewHolder(private val binding: ItemPlacesBinding) :
+    inner class PlacesViewHolder(val binding: ItemPlacesBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(placeName: String) {
-            binding.placeName.text = placeName
+
+        private val photoAdapter = PhotoAdapter(context, emptyList())
+
+        init {
+            binding.placePhoto.apply {
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                adapter = photoAdapter
+            }
+        }
+
+        fun bind(placeItem: PlaceItem) {
+            binding.placeName.text = placeItem.name
+            photoAdapter.updatePhotos(placeItem.photos)
         }
     }
 }
