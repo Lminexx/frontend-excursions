@@ -10,15 +10,26 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
 import com.example.projectexcursions.repositories.pointrepo.PointRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.location.Location
+import com.yandex.mapkit.location.LocationListener
+import com.yandex.mapkit.location.LocationManager
+import com.yandex.mapkit.location.LocationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -28,9 +39,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateExcursionViewModel @Inject constructor(
-    private val tokenRepository: TokenRepository,
     private val excursionRepository: ExcursionRepository,
-    private val pointRepository: PointRepository,
     private val geoRepository: GeoRepository
 ): ViewModel() {
 
@@ -58,13 +67,19 @@ class CreateExcursionViewModel @Inject constructor(
     private val _routeLiveData = MutableLiveData<List<Point>>(emptyList())
     val routeLiveData: LiveData<List<Point>> get() = _routeLiveData
 
-    private val _prevPoint = MutableLiveData<Point>()
-    val prevPoint: LiveData<Point> get() = _prevPoint
+    private val _prevPoint = MutableLiveData<Point?>()
+    val prevPoint: LiveData<Point?> get() = _prevPoint
 
-    private val _nextPoint = MutableLiveData<Point>()
-    val nextPoint: LiveData<Point> get() = _nextPoint
+    private val _curPoint = MutableLiveData<Point>()
+    val curPoint: LiveData<Point> get() = _curPoint
 
+    private val _userPos = MutableLiveData<Point>()
+    val userPos: LiveData<Point> get() = _userPos
 
+    private val locationManager = MapKitFactory.getInstance().createLocationManager()
+
+    private val _placeItems = MutableStateFlow<List<PlaceItem>>(emptyList())
+    val placeItems: StateFlow<List<PlaceItem>> = _placeItems.asStateFlow()
 
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
@@ -154,25 +169,51 @@ class CreateExcursionViewModel @Inject constructor(
 
     suspend fun getRoute() {
         try {
-            val end = pointRepository.getCachedEnd()
-            val start = pointRepository.getCachedStart()
+            val end = curPoint.value
+            val start = prevPoint.value
             if (end == null || start == null) {
                 Log.d("Point", "Start or end point is null")
                 return
             }
-            val route = geoRepository.getRoute(start, end)
-            _routeLiveData.value = route
+            withContext(Dispatchers.IO) {
+                val route = geoRepository.getRoute(start, end)
+                _routeLiveData.postValue(route)
+            }
         } catch (e: Exception) {
             Log.e("Route", "Error getting route", e)
         }
     }
 
-    fun setPrevPoint(point: Point) {
-        _prevPoint.value = point
+    fun getUserPosition() {
+        Log.d("GetUserPosition", "da!")
+        locationManager?.requestSingleUpdate(object : LocationListener {
+            override fun onLocationUpdated(location: Location) {
+                Log.d("getUserLocation", "onLocationUpdated")
+                _userPos.value = location.position
+            }
+
+            override fun onLocationStatusUpdated(locationStatus: LocationStatus) {
+                Log.d("getUserLocation", "onLocationStatusUpdated")
+                when (locationStatus) {
+                    LocationStatus.NOT_AVAILABLE -> Log.e("Location", "Not available")
+                    LocationStatus.AVAILABLE -> Log.d("Location", "Available")
+                    LocationStatus.RESET -> Log.d("Location", "Reset")
+                }
+            }
+        })
     }
 
-    fun setNextPoint(point: Point) {
-        _nextPoint.value = point
+    fun setPoint(point: Point) {
+        if (_curPoint.value == null) {
+            _curPoint.value = point
+            Log.d("curPoint", "${point.latitude}, ${point.longitude}")
+        } else {
+            _prevPoint.value = curPoint.value
+            _curPoint.value = point
+            Log.d("Меняем точки", "true")
+            Log.d("curPoint", "${point.latitude}, ${point.longitude}")
+            Log.d("prevPoint", "${_prevPoint.value?.latitude}, ${_prevPoint.value?.longitude}")
+        }
     }
 
     fun toggleSearchResultsVisibility() {
@@ -199,5 +240,13 @@ class CreateExcursionViewModel @Inject constructor(
     fun updateSearchResults(results: List<SearchResult>) {
         _searchResults.value = results
         _isSearchResultsVisible.value = results.isNotEmpty()
+    }
+
+    fun addPlace(placeItem: PlaceItem) {
+        _placeItems.value += placeItem
+    }
+
+    fun deletePlace(placeName: String) {
+        _placeItems.value = _placeItems.value.filterNot { it.name == placeName }
     }
 }

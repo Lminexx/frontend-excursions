@@ -65,4 +65,5 @@
     <string name="make_path">Построить маршрут</string>
     <string name="smechno">Жена отправляет мужа-программиста в магазин: - Купи батон хлеба, если будут яйца - возьми десяток. Муж возвращается из магазина с десятью батонами. - Ты зачем столько хлеба купил? - Так ведь яйца были...</string>
     <string name="add_place">Добавить место</string>
+    <string name="delete_place">delete_place</string>
 </resources>
