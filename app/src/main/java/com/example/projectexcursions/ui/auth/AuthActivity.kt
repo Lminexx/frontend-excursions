@@ -11,7 +11,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityAuthBinding
-import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.registration.RegActivity
 import dagger.hilt.android.AndroidEntryPoint
 
