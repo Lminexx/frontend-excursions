@@ -26,7 +26,7 @@ class PlacesAdapter(
         holder.bind(placeItem)
 
         holder.itemView.setOnClickListener { onItemClick(placeItem.name) }
-        holder.binding.deletePlace.setOnClickListener { onDeleteClick(placeItem.name) }
+        holder.binding.deletePlace.setOnClickListener { onDeleteClick(placeItem.id) }
     }
 
     override fun getItemCount(): Int = places.size

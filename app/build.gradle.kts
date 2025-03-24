@@ -26,6 +26,11 @@ android {
             name = "GHOPPER_API_KEY",
             value = "\"${project.findProperty("graphHopperApiKey")}\"",
         )
+        buildConfigField(
+            type = "String",
+            name = "MAPILARY_API_KEY",
+            value = "\"${project.findProperty("mapilaryApiKey")}\"",
+        )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

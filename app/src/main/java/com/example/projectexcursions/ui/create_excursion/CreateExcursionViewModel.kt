@@ -70,16 +70,19 @@ class CreateExcursionViewModel @Inject constructor(
     private val _prevPoint = MutableLiveData<Point?>()
     val prevPoint: LiveData<Point?> get() = _prevPoint
 
-    private val _curPoint = MutableLiveData<Point>()
-    val curPoint: LiveData<Point> get() = _curPoint
+    private val _curPoint = MutableLiveData<Point?>()
+    val curPoint: LiveData<Point?> get() = _curPoint
 
     private val _userPos = MutableLiveData<Point>()
     val userPos: LiveData<Point> get() = _userPos
 
     private val locationManager = MapKitFactory.getInstance().createLocationManager()
 
-    private val _placeItems = MutableStateFlow<List<PlaceItem>>(emptyList())
-    val placeItems: StateFlow<List<PlaceItem>> = _placeItems.asStateFlow()
+    private val _placeItems = MutableLiveData<List<PlaceItem>>()
+    val placeItems: LiveData<List<PlaceItem>> get() = _placeItems
+
+    private val _deletingPlaceId = MutableLiveData<String>()
+    val deletingPLaceId: LiveData<String> get() = _deletingPlaceId
 
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
@@ -123,7 +126,7 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun isExcursionCorrect(context: Context, title: String, description: String): Boolean {
+    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>): Boolean {
         when {
             title.isBlank() -> {
                 _message.value = context.getString(R.string.empty_title)
@@ -132,6 +135,10 @@ class CreateExcursionViewModel @Inject constructor(
             description.isBlank() -> {
                 _message.value = context.getString(R.string.empty_desc)
                 return false
+            }
+            places.isNullOrEmpty() -> {
+                _message.value = context.getString(R.string.empty_route)
+                return true
             }
             else -> return true
         }
@@ -184,9 +191,18 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
+    suspend fun getPhotos(point: Point): List<String> {
+        try {
+            return geoRepository.getPhotosByLocation(point)
+        } catch (e: Exception) {
+            Log.e("GetPhotoException", "${e.message}")
+            return emptyList()
+        }
+    }
+
     fun getUserPosition() {
         Log.d("GetUserPosition", "da!")
-        locationManager?.requestSingleUpdate(object : LocationListener {
+        locationManager.requestSingleUpdate(object : LocationListener {
             override fun onLocationUpdated(location: Location) {
                 Log.d("getUserLocation", "onLocationUpdated")
                 _userPos.value = location.position
@@ -243,10 +259,24 @@ class CreateExcursionViewModel @Inject constructor(
     }
 
     fun addPlace(placeItem: PlaceItem) {
-        _placeItems.value += placeItem
+        val updatedList = _placeItems.value?.toMutableList() ?: mutableListOf()
+        Log.d("PlaceItem", placeItem.name)
+        updatedList.add(placeItem)
+        _placeItems.value = updatedList
     }
 
-    fun deletePlace(placeName: String) {
-        _placeItems.value = _placeItems.value.filterNot { it.name == placeName }
+    fun deletePlace(placeId: String) {
+        try {
+            _deletingPlaceId.value = placeId
+            _placeItems.value = _placeItems.value?.filterNot { it.id == placeId }
+        } catch (e: Exception) {
+            Log.e("DeleteException", e.message.toString())
+        }
+    }
+
+    fun resetPoints() {
+        _prevPoint.value = null
+        _curPoint.value = null
+        _routeLiveData.value = emptyList()
     }
 }
