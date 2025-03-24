@@ -63,6 +63,32 @@ class GeoRepositoryImpl: GeoRepository {
         return 6371000 * c
     }
 
+    override suspend fun getPhotosByLocation(point: Point): List<String> {
+        val apiKey = BuildConfig.MAPILARY_API_KEY
+        val url = "https://graph.mapillary.com/images?fields=id,thumb_1024_url&" +
+                "closeto=${point.longitude},${point.latitude}&radius=100&access_token=$apiKey"
+
+        val request = Request.Builder().url(url).build()
+
+        return try {
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                response.body?.string()?.let { json ->
+                    val data = JSONObject(json).optJSONArray("data") ?: return emptyList()
+                    List(data.length()) { index ->
+                        data.getJSONObject(index).getString("thumb_1024_url")
+                    }
+                } ?: emptyList()
+            } else {
+                Log.e("Mapillary", "Ошибка загрузки фото: ${response.message}")
+                emptyList()
+            }
+        } catch (e: IOException) {
+            Log.e("Mapillary", "Ошибка загрузки фото", e)
+            emptyList()
+        }
+    }
+
     private fun decodePolyline(encoded: String): List<Point> {
         Log.d("encoded", encoded)
         val poly = mutableListOf<Point>()
