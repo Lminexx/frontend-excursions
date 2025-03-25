@@ -254,8 +254,12 @@ class CreateExcursionViewModel @Inject constructor(
     }
 
     fun updateSearchResults(results: List<SearchResult>) {
-        _searchResults.value = results
-        _isSearchResultsVisible.value = results.isNotEmpty()
+        try {
+            _searchResults.value = results
+            _isSearchResultsVisible.value = results.isNotEmpty()
+        } catch (e: Exception) {
+            Log.d("Exception", "казявка")
+        }
     }
 
     fun addPlace(placeItem: PlaceItem) {
@@ -269,14 +273,23 @@ class CreateExcursionViewModel @Inject constructor(
         try {
             _deletingPlaceId.value = placeId
             _placeItems.value = _placeItems.value?.filterNot { it.id == placeId }
+            Log.d("PLaceItems", "${placeItems.value?.size ?: "null"}")
         } catch (e: Exception) {
             Log.e("DeleteException", e.message.toString())
         }
     }
 
+    fun getId(i: Int): String {
+        return geoRepository.getRandomId(i)
+    }
+
     fun resetPoints() {
         _prevPoint.value = null
         _curPoint.value = null
+        _routeLiveData.value = emptyList()
+    }
+
+    fun clearRouteData() {
         _routeLiveData.value = emptyList()
     }
 }
