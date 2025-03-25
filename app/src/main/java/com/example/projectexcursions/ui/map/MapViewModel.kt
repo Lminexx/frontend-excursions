@@ -190,4 +190,8 @@ class MapViewModel @Inject constructor(
         pointRepository.cacheEnd(point)
         Log.d("endPoint", "${endPoint.value?.latitude}, ${endPoint.value?.longitude}")
     }
+
+    fun getId(i: Int): String {
+        return geoRepository.getRandomId(10)
+    }
 }

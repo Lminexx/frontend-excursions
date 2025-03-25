@@ -12,6 +12,7 @@ import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 class GeoRepositoryImpl: GeoRepository {
 
@@ -123,5 +124,13 @@ class GeoRepositoryImpl: GeoRepository {
         }
         Log.d("poly", "${poly.isNotEmpty()}, ${poly[1].longitude}, ${poly[1].latitude}")
         return poly
+    }
+
+
+    override fun getRandomId(length: Int): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        return (1..length)
+            .map { chars[Random.nextInt(chars.length)] }
+            .joinToString("")
     }
 }

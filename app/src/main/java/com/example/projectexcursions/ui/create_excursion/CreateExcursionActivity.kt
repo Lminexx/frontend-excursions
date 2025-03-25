@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.create_excursion
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
@@ -20,9 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
@@ -53,9 +53,8 @@ import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.observeOn
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class CreateExcursionActivity : AppCompatActivity() {
@@ -105,7 +104,13 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         searchResultsAdapter = SearchResultsAdapter { item ->
             Log.d("searchAdapter", "true")
-            viewModel.setPoint(item.point)
+            val id = item.id
+            val name = item.name
+            val point = item.point
+
+            val placeItem = createPlaceItem(id, name, point)
+            viewModel.setPoint(point)
+            viewModel.addPlace(placeItem)
             viewModel.hideSearchResults()
         }
 
@@ -130,6 +135,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         progressBar = ProgressBar()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initCallback() {
         binding.buttonCreateExcursion.setOnClickListener {
             it.isClickable = false
@@ -199,6 +205,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.routeLiveData.observe(this) { points ->
             if (!points.isNullOrEmpty()) {
+                Log.d("RouteData", points.size.toString())
                 drawRoute(points)
             }
         }
@@ -232,6 +239,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.placeItems.observe(this) { placeItems ->
+
             try {
                 for (placeItem in placeItems) {
                     Log.d("PLaceItem", "${placeItem.name}, ${placeItem.id}")
@@ -241,6 +249,9 @@ class CreateExcursionActivity : AppCompatActivity() {
             } catch (indexOutOfBound: IndexOutOfBoundsException) {
                 clearRoute()
                 Log.d("IndexOutOfBound", "хихи поймали дурачка)")
+            } catch (e: Exception) {
+                clearRoute()
+                Log.d("Exception", e.message.toString())
             }
         }
 
@@ -252,7 +263,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                 for (place in places!!) {
                     if (placeId != place.id) {
                         viewModel.setPoint(place.point)
-                        delay(500)
                     }
                 }
             }
@@ -367,31 +377,43 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun search(query: String?) {
-        val searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
-        val searchOptions = SearchOptions().apply {
-            searchTypes = SearchType.BIZ.value
-            resultPageSize = 10
-        }
+            val searchManager =
+                SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
+            val searchOptions = SearchOptions().apply {
+                searchTypes = SearchType.BIZ.value
+                resultPageSize = 10
+            }
 
-        val searchSessionListener = object : Session.SearchListener {
-            override fun onSearchResponse(response: Response) {
-                val searchResults = response.collection.children.mapNotNull { result ->
-                    val point = result.obj?.geometry?.firstOrNull()?.point
-                    val name = result.obj?.name ?: return@mapNotNull null
-                    SearchResult(name, point!!)
+            val searchSessionListener = object : Session.SearchListener {
+                override fun onSearchResponse(response: Response) {
+                        val searchResults = response.collection.children.mapNotNull { result ->
+                            val point = result.obj?.geometry?.firstOrNull()?.point
+                            Log.d("point", point?.equals(null).toString())
+                            val name = result.obj?.name ?: return@mapNotNull null
+                            Log.d("name", name.equals(null).toString())
+                            val id = viewModel.getId(10)
+                            Log.d("id", id.equals(null).toString())
+                            SearchResult(id, name, point!!)
+                        }
+                    for (searchResult in searchResults) {
+                        Log.d("SearchResult", "${searchResult.id}, ${searchResult.name}, ${searchResult.point}")
+                    }
+                    viewModel.updateSearchResults(searchResults)
                 }
-                viewModel.updateSearchResults(searchResults)
+
+                override fun onSearchError(error: Error) {
+                    Toast.makeText(
+                        this@CreateExcursionActivity,
+                        "Ошибка поиска",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
 
-            override fun onSearchError(error: Error) {
-                Toast.makeText(this@CreateExcursionActivity, "Ошибка поиска", Toast.LENGTH_SHORT).show()
+            if (!query.isNullOrEmpty()) {
+                val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
+                searchManager.submit(query, visibleRegion, searchOptions, searchSessionListener)
             }
-        }
-
-        if (!query.isNullOrEmpty()) {
-            val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
-            searchManager.submit(query, visibleRegion, searchOptions, searchSessionListener)
-        }
     }
 
     private val geoObjectTapListener = GeoObjectTapListener { event ->
@@ -413,24 +435,9 @@ class CreateExcursionActivity : AppCompatActivity() {
             val description = geoObject.descriptionText ?: "Нет описания"
             val metadata =
                 geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
+            val id = metadata.objectId
 
-            var photos: List<String> = emptyList()
-            lifecycleScope.launch {
-                photos = viewModel.getPhotos(point!!)
-            }
-
-            val photoUris: MutableList<Uri> = mutableListOf()
-
-            for (photo in photos) {
-                photoUris.add(photo.toUri())
-            }
-
-            val placeItem = PlaceItem(
-                id = metadata.objectId,
-                name = name,
-                point = point!!,
-                photos = photoUris
-            )
+            val placeItem = createPlaceItem(id, name, point)
 
             if (metadata != null) {
                 map.selectGeoObject(metadata)
@@ -451,14 +458,14 @@ class CreateExcursionActivity : AppCompatActivity() {
                     val result = response.collection.children.firstOrNull()
                     address = result?.obj?.name ?: "Тут все взорвали, ниче нет"
                     Log.e("onSearchResponse: ", result?.equals(null).toString())
-                    val latitude = point.latitude
-                    val longitude = point.longitude
+                    val latitude = point?.latitude
+                    val longitude = point?.longitude
 
-                    Log.d("point", point.equals(null).toString())
+                    Log.d("point", point?.equals(null).toString())
                     Log.d("longitude", longitude.toString())
                     Log.d("latitude", latitude.toString())
 
-                    viewModel.setPoint(point)
+                    viewModel.setPoint(point!!)
                     viewModel.addPlace(placeItem)
                 }
 
@@ -472,7 +479,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 }
             }
 
-            searchManager.submit(point, 1, searchOptions, searchSessionListener)
+            searchManager.submit(point!!, 1, searchOptions, searchSessionListener)
 
             Log.d("GeoObject", "Название: $name, Описание: $description")
 
@@ -491,10 +498,23 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun clearRoute() {
+        Log.d("clearRoute","")
+        Log.d("RoutePolyline", routePolyline?.equals(null).toString())
+        Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
         if (routePolyline != null) {
+            Log.d("RoutePolyline", routePolyline?.equals(null).toString())
+            Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
             map.mapObjects.clear()
             routePolyline = null
+        } else if (viewModel.placeItems.value?.size == 1) {
+            Log.d("RoutePolyline", routePolyline?.equals(null).toString())
+            Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
+            map.mapObjects.clear()
+            routePolyline = null
+            viewModel.clearRouteData()
         } else {
+            Log.d("RoutePolyline", routePolyline?.equals(null).toString())
+            Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
             map.mapObjects.clear()
             viewModel.resetPoints()
         }
@@ -502,6 +522,21 @@ class CreateExcursionActivity : AppCompatActivity() {
 
     private fun geoObjectTapListener(): GeoObjectTapListener {
         return geoObjectTapListener
+    }
+
+    private fun createPlaceItem(id: String, name: String, point: Point?): PlaceItem {
+        var photos: List<String> = emptyList()
+        lifecycleScope.launch {
+            photos = viewModel.getPhotos(point!!)
+        }
+
+        val photoUris: MutableList<Uri> = mutableListOf()
+
+        for (photo in photos) {
+            photoUris.add(photo.toUri())
+        }
+
+        return PlaceItem(id, name, point!!, photoUris)
     }
 }
 //TODO сделать получение списка фото места
