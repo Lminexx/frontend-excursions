@@ -44,6 +44,11 @@ public final class ProgressBar {
         return dialog;
     }
 
+    public Dialog hide(){
+        dialog.hide();
+        return dialog;
+    }
+
     public Dialog getDialog() {
         return dialog;
     }
