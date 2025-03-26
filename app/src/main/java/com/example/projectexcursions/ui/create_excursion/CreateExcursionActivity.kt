@@ -80,7 +80,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 if (viewModel.isExcursionCorrect(this, title, description)) {
-                    progressBar.show(this)
+                    //progressBar.show(this)
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
                     finish()
                 }

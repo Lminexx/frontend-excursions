@@ -59,7 +59,7 @@ object NetworkModule {
 
         val sslContext = SSLContext.getInstance("SSL")
         sslContext.init(null, arrayOf(x509TrustManager), null)
-        var sslSocketFactory = sslContext.socketFactory
+        val sslSocketFactory = sslContext.socketFactory
 
         return OkHttpClient.Builder()
             .sslSocketFactory(sslSocketFactory, x509TrustManager)
@@ -74,6 +74,9 @@ object NetworkModule {
                 }
                 chain.proceed(requestBuilder.build())
             }
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 

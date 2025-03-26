@@ -99,7 +99,13 @@ class AuthViewModel @Inject constructor(
                 _token.value = response.token
                 tokenRepository.saveToken(Token(token = token.value!!))
                 Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
-                _avatar.value?.let { uploadAvatar(context, it) }
+                _avatar.value?.let { avatarUri ->
+                    try {
+                        uploadAvatar(context, avatarUri)
+                    } catch (e: Exception) {
+                        Log.e("AvatarUploadError", "Failed to upload avatar: ${e.message}", e)
+                    }
+                }
                 _loginStatus.value = true
             } catch (e: retrofit2.HttpException) {
                 _loginStatus.value = false

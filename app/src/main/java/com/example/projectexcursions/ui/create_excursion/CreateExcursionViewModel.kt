@@ -13,7 +13,6 @@ import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -27,7 +26,7 @@ import javax.inject.Inject
 class CreateExcursionViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
     private val excursionRepository: ExcursionRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
@@ -66,6 +65,7 @@ class CreateExcursionViewModel @Inject constructor(
         val excursion = CreatingExcursion(title, description)
         viewModelScope.launch {
             try {
+                _createExcursion.value = false
                 val response = excursionRepository.createExcursion(excursion)
                 val respondedExcursion = Excursion(
                     response.id,
@@ -95,36 +95,33 @@ class CreateExcursionViewModel @Inject constructor(
                 _message.value = context.getString(R.string.empty_title)
                 return false
             }
+
             description.isBlank() -> {
                 _message.value = context.getString(R.string.empty_desc)
                 return false
             }
+
             else -> return true
         }
     }
 
 
-    private fun uploadPhotos(context: Context, excursionId: Long) {
-        viewModelScope.launch {
-            try {
-                val multipartBodyParts = _selectedImages.value?.map { uri ->
-                    val file = getFileFromUri(context, uri)
-                    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                    MultipartBody.Part.createFormData("files", file.name, requestFile)
-                } ?: emptyList()
-
-                val excursionIdRequest = excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-
-                val response = excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
-                Log.d("PhotoUpload", "Uploaded photos successfully")
-
-                _selectedImages.postValue(emptyList())
-                _wantComeBack.value = true
-
-            } catch (e: Exception) {
-                Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
-                _message.value = "Error uploading photos: ${e.message}"
-            }
+    private suspend fun uploadPhotos(context: Context, excursionId: Long) {
+        try {
+            val multipartBodyParts = _selectedImages.value?.map { uri ->
+                val file = getFileFromUri(context, uri)
+                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("files", file.name, requestFile)
+            } ?: emptyList()
+            val excursionIdRequest =
+                excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            val response = excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
+            Log.d("PhotoUpload", "Uploaded photos successfully")
+            _selectedImages.postValue(emptyList())
+            _wantComeBack.value = true
+        } catch (e: Exception) {
+            Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
+            _message.value = "Error uploading photos: ${e.message}"
         }
     }
 
