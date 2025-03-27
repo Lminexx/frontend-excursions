@@ -18,6 +18,6 @@
         android:background="@android:color/transparent"
         android:contentDescription="@string/photo"
         android:src="@android:drawable/ic_menu_close_clear_cancel"
-        app:tint="@color/lighter_blue"
+        app:tint="@color/blue"
         android:layout_gravity="top|end"/>
 </FrameLayout>

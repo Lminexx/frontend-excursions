@@ -3,6 +3,7 @@ activityKtx = "1.9.3"
 agp = "8.4.1"
 coreSplashscreen = "1.0.1"
 glide = "4.15.0"
+graphhopperCore = "8.0"
 hiltAndroid = "2.51.1"
 javaJwt = "3.18.2"
 jwtdecode = "2.0.0"
@@ -29,6 +30,7 @@ playServicesMaps = "19.0.0"
 shimmerVersion = "0.5.0"
 swiperefreshlayout = "1.1.0"
 circleimageview = "3.1.0"
+navigationCommonKtx = "2.8.7"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -46,6 +48,7 @@ androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefre
 facebook-shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmerVersion" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
+graphhopper-core = { module = "com.graphhopper:graphhopper-core", version.ref = "graphhopperCore" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 java-jwt = { module = "com.auth0:java-jwt", version.ref = "javaJwt" }
@@ -68,6 +71,7 @@ retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
 glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
+androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "navigationCommonKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
