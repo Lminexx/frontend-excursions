@@ -30,7 +30,6 @@ object AppModule {
         return OpenWorldDB.getDatabase(context)
     }
 
-
     @Provides
     fun provideExcursions(db: OpenWorldDB): ExcursionsDao {
         return db.excursionsDao()
@@ -60,7 +59,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideTokenRepository(
-        tokenDao: TokenDao
+        tokenDao: TokenDao,
     ): TokenRepository {
         return TokenRepositoryImpl(tokenDao)
     }

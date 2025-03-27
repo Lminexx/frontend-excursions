@@ -2,6 +2,7 @@ package com.example.projectexcursions.ui.excursion
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +13,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
@@ -67,8 +74,36 @@ class ExcursionActivity : AppCompatActivity() {
             if (excursion != null) {
                 hideShimmer()
                 binding.excursionTitle.text = excursion.title
-                binding.excursionAuthor.text = excursion.username
+                binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
+                val url = excursion.user.url
+                Glide.with(this)
+                    .load(url)
+                    .placeholder(R.drawable.ic_app_v3)
+                    .error(R.drawable.ic_app_v3)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            e?.printStackTrace()
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
+                    })
+                    .into(binding.userAvatar)
                 if (viewModel.excursion.value!!.favorite)
                     viewModel.fav()
                 else
@@ -111,7 +146,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.shimmerLayout.visibility = View.VISIBLE
         binding.shimmerLayout.startShimmer()
         binding.excursionTitle.visibility = View.GONE
-        binding.excursionAuthor.visibility = View.GONE
+        binding.authorContainer.visibility = View.GONE
         binding.excursionDescription.visibility = View.GONE
         binding.favoriteButton.visibility = View.GONE
         binding.recyclerViewImages.visibility = View.GONE
@@ -121,7 +156,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.shimmerLayout.stopShimmer()
         binding.shimmerLayout.visibility = View.GONE
         binding.excursionTitle.visibility = View.VISIBLE
-        binding.excursionAuthor.visibility = View.VISIBLE
+        binding.authorContainer.visibility = View.VISIBLE
         binding.excursionDescription.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
         binding.recyclerViewImages.visibility = View.VISIBLE
