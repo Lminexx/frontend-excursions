@@ -79,7 +79,4 @@ class TokenRepositoryImpl @Inject constructor(
         return apiService.validateToken()
     }
 
-    override fun getAvatar(): Uri? {
-        return avatar
-    }
 }
