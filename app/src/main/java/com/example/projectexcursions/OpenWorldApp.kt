@@ -1,6 +1,8 @@
 package com.example.projectexcursions
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.example.projectexcursions.net.ApiService
@@ -39,7 +41,9 @@ class OpenWorldApp : Application() {
             } catch (http: HttpException) {
                 when (http.code()) {
                     401 -> {
-                        if (tokenRepository.getToken()!=null) {
+
+                        if (tokenRepository.getToken() != null) {
+
                             tokenRepository.deleteToken(tokenRepository.getCachedToken()!!.token)
                             Toast.makeText(
                                 applicationContext,

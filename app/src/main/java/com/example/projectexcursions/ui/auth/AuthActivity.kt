@@ -3,6 +3,7 @@ package com.example.projectexcursions.ui.auth
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -10,7 +11,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityAuthBinding
-import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.registration.RegActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -88,8 +88,13 @@ class AuthActivity: AppCompatActivity() {
                 Log.d("RegIntent", "GetRegIntent")
                 val username = data?.getStringExtra(RegActivity.EXTRA_REG_USERNAME)
                 val password = data?.getStringExtra(RegActivity.EXTRA_REG_PASSWORD)
+                val avatar = data?.getParcelableExtra<Uri>(RegActivity.EXTRA_REG_AVATAR)
+                if (avatar != null) {
+                    viewModel.setAvatar(avatar)
+                }
                 Log.d("Data", "$username")
                 Log.d("Data", "$password")
+                Log.d("Data", "$avatar")
                 viewModel.validateAndLogin(this, username!!, password!!)
             }
         }

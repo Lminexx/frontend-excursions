@@ -1,19 +1,24 @@
 package com.example.projectexcursions.repositories.tokenrepo
 
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import com.auth0.android.jwt.Claim
 import com.example.projectexcursions.models.Token
 import com.auth0.android.jwt.JWT
 import com.example.projectexcursions.databases.daos.TokenDao
 import com.example.projectexcursions.net.ApiService
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 
 class TokenRepositoryImpl @Inject constructor(
-    private val tokenDao: TokenDao
+    private val tokenDao: TokenDao,
 ): TokenRepository {
 
     private var cachedToken: Token? = null
+    private var avatar: Uri? = null
 
     override suspend fun saveToken(token: Token) {
         tokenDao.insertToken(token)
@@ -73,4 +78,5 @@ class TokenRepositoryImpl @Inject constructor(
     override suspend fun validateToken(apiService: ApiService) {
         return apiService.validateToken()
     }
+
 }

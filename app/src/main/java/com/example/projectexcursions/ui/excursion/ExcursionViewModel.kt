@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.auth0.android.jwt.Claim
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.PhotoResponse
@@ -55,14 +56,13 @@ class ExcursionViewModel @Inject constructor(
                     Log.d("ExcursionInDB", "ExcExists")
                 } else {
                     val response = repository.fetchExcursion(id = excursionId)
-                    Log.d("ExcContent", "${response.id}, \n${response.title}, \n${response.userId}, " +
-                            "\n${response.description}, \n${response.username}, \n${response.favorite}")
+                    Log.d("ExcContent", "${response.id}, \n${response.title}, " +
+                            "\n${response.description}, \n${response.user}, \n${response.favorite}")
                     val excursion = Excursion(
                         response.id,
                         response.title,
-                        response.userId,
                         response.description,
-                        response.username,
+                        response.user,
                         response.favorite
                     )
                     repository.saveExcursionToDB(excursion)

@@ -45,7 +45,8 @@ class CreateExcursionActivity : AppCompatActivity() {
 
     private fun initData() {
         adapter = PhotoAdapter(this, emptyList())
-        binding.recyclerViewSelectedImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewSelectedImages.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.recyclerViewSelectedImages.setHasFixedSize(true)
         binding.recyclerViewSelectedImages.adapter = adapter
         progressBar = ProgressBar()
@@ -79,8 +80,9 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 if (viewModel.isExcursionCorrect(this, title, description)) {
+                    //progressBar.show(this)
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
-                    progressBar.show(this)
+                    finish()
                 }
             }
         }
@@ -90,37 +92,44 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 
-    private val pickImages = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val clipData = result.data?.clipData
-            val imageUris = mutableListOf<Uri>()
-            if (clipData != null) {
-                for (i in 0 until clipData.itemCount) {
-                    imageUris.add(clipData.getItemAt(i).uri)
+    private val pickImages =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val clipData = result.data?.clipData
+                val imageUris = mutableListOf<Uri>()
+                if (clipData != null) {
+                    for (i in 0 until clipData.itemCount) {
+                        imageUris.add(clipData.getItemAt(i).uri)
+                    }
+                } else {
+                    result.data?.data?.let { imageUris.add(it) }
                 }
-            } else {
-                result.data?.data?.let { imageUris.add(it) }
-            }
-            if (imageUris.isNotEmpty()) {
-                viewModel.addSelectedImages(imageUris)
+                if (imageUris.isNotEmpty()) {
+                    viewModel.addSelectedImages(imageUris)
+                }
             }
         }
-    }
 
     private fun checkPermissionsAndProceed() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES), REQUEST_CODE_PERMISSION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES), REQUEST_CODE_PERMISSION
+                )
             } else {
                 openImagePicker()
             }
         } else {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSION
+                )
             } else {
                 openImagePicker()
             }
