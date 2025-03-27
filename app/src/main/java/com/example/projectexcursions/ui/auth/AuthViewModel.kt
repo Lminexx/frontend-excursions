@@ -122,8 +122,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun uploadAvatar(context: Context, uri: Uri) {
-        viewModelScope.launch {
+    private suspend fun uploadAvatar(context: Context, uri: Uri) {
             _isLoading.value = true
             try {
                 withContext(Dispatchers.IO) {
@@ -142,6 +141,7 @@ class AuthViewModel @Inject constructor(
             } catch (e: IOException) {
                 Log.e("PhotoUploadError", "IO Error uploading photo: ${e.message}", e)
                 _validationMessage.postValue("Ошибка при чтении файла: ${e.message}")
+                throw e
             } catch (e: HttpException) {
                 Log.e(
                     "PhotoUploadError",
@@ -149,16 +149,18 @@ class AuthViewModel @Inject constructor(
                     e
                 )
                 _validationMessage.postValue("Ошибка при загрузке: ${e.code()}")
+                throw e
             } catch (e: CancellationException) {
                 Log.e("PhotoUploadError", "Upload cancelled: ${e.message}", e)
                 _validationMessage.postValue("Загрузка была отменена")
+                throw e
             } catch (e: Exception) {
                 Log.e("PhotoUploadError", "General Error uploading photo: ${e.message}", e)
                 _validationMessage.postValue("Неизвестная ошибка: ${e.message}")
+                throw e
             } finally {
                 _isLoading.value = false
             }
-        }
     }
 
     private fun isInputLangValid(input: String): Boolean {
