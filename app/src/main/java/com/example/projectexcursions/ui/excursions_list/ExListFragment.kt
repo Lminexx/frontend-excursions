@@ -60,6 +60,7 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
     }
 
     private fun initCallback() {
+
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener {
             override fun onExcursionClick(excursionsList: ExcursionsList) {
                 viewModel.clickExcursion(excursionsList)
