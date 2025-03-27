@@ -34,7 +34,26 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(tokenRepo: TokenRepository, app:Application): OkHttpClient {
+    fun provideOkHttpClient(
+        tokenRepo: TokenRepository,
+        okHttpClientBuilder: OkHttpClient.Builder
+    ): OkHttpClient {
+        return okHttpClientBuilder
+            .addInterceptor { chain ->
+                val token = runBlocking { tokenRepo.getToken()?.token }
+                val request = chain.request()
+                val requestBuilder = request.newBuilder()
+                if (token != null) {
+                    requestBuilder.addHeader("Authorization", token.toString())
+                }
+                chain.proceed(requestBuilder.build())
+            }
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClientBuilder(app: Application): OkHttpClient.Builder {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -65,19 +84,10 @@ object NetworkModule {
             .sslSocketFactory(sslSocketFactory, x509TrustManager)
             .hostnameVerifier(myHostNameVerifier())
             .addInterceptor(loggingInterceptor)
-            .addInterceptor { chain ->
-                val token = runBlocking { tokenRepo.getToken()?.token }
-                val request = chain.request()
-                val requestBuilder = request.newBuilder()
-                if (token != null) {
-                    requestBuilder.addHeader("Authorization", token.toString())
-                }
-                chain.proceed(requestBuilder.build())
-            }
             .connectTimeout(30, TimeUnit.SECONDS)
             .callTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
-            .build()
+
     }
 
     @Singleton

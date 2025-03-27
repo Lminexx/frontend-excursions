@@ -27,5 +27,4 @@ interface TokenRepository {
 
     suspend fun validateToken(apiService: ApiService)
 
-    fun getAvatar():Uri?
 }
