@@ -54,7 +54,6 @@ class PhotoAdapter(private val context: Context, private var photoList: List<Uri
                 .load(imageUri)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .skipMemoryCache(true)
                 .placeholder(R.color.lighter_blue)
                 .error(R.drawable.ic_app_v3)
                 .listener(object : RequestListener<Drawable> {

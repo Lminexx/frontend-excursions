@@ -112,4 +112,5 @@ dependencies {
     implementation(libs.glide.okhttp3.integration)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
+    kapt(libs.glide.compiler)
 }

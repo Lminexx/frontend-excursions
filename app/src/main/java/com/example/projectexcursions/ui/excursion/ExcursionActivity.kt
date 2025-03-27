@@ -82,7 +82,6 @@ class ExcursionActivity : AppCompatActivity() {
                     .placeholder(R.drawable.ic_app_v3)
                     .error(R.drawable.ic_app_v3)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .skipMemoryCache(true)
                     .listener(object : RequestListener<Drawable> {
                         override fun onLoadFailed(
                             e: GlideException?,

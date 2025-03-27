@@ -79,8 +79,14 @@ class CreateExcursionViewModel @Inject constructor(
                 _message.value = context.getString(R.string.create_success)
 
                 if (_selectedImages.value?.isNotEmpty() == true) {
-                    uploadPhotos(context, response.id)
+                    try {
+                        uploadPhotos(context, response.id)
+                    } catch (e: Exception) {
+                        Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
+                        _message.value = "Error uploading photos: ${e.message}"
+                    }
                 }
+                _wantComeBack.value = true
             } catch (e: Exception) {
                 _message.value = "Error: ${e.message}"
                 Log.e("CreatingExcursionError", e.message!!)
@@ -118,10 +124,8 @@ class CreateExcursionViewModel @Inject constructor(
             val response = excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
             Log.d("PhotoUpload", "Uploaded photos successfully")
             _selectedImages.postValue(emptyList())
-            _wantComeBack.value = true
         } catch (e: Exception) {
-            Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
-            _message.value = "Error uploading photos: ${e.message}"
+           throw e
         }
     }
 
