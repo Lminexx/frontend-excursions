@@ -20,8 +20,7 @@ import javax.inject.Inject
 class ExcursionRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val excursionsDao: ExcursionsDao,
-    private val excursionDao: ExcursionDao,
-    private val tokenRepository: TokenRepository
+    private val excursionDao: ExcursionDao
 ) : ExcursionRepository {
 
     override fun excursionPagingSource(isFavorite:Boolean, isMine: Boolean) = ExcursionPagingSource(apiService, isFavorite, isMine)
