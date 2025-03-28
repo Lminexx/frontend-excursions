@@ -1,5 +1,6 @@
 package com.example.projectexcursions.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ class SearchResultsAdapter(
 
     private val items = mutableListOf<SearchResult>()
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateData(newItems: List<SearchResult>) {
         items.clear()
         items.addAll(newItems)

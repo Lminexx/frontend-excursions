@@ -10,10 +10,26 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
+import com.example.projectexcursions.models.PlaceItem
+import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
+import com.example.projectexcursions.repositories.georepo.GeoRepository
+import com.example.projectexcursions.repositories.pointrepo.PointRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.location.Location
+import com.yandex.mapkit.location.LocationListener
+import com.yandex.mapkit.location.LocationManager
+import com.yandex.mapkit.location.LocationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -24,9 +40,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateExcursionViewModel @Inject constructor(
-    private val tokenRepository: TokenRepository,
-    private val excursionRepository: ExcursionRepository
-) : ViewModel() {
+    private val excursionRepository: ExcursionRepository,
+    private val geoRepository: GeoRepository
+): ViewModel() {
 
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
@@ -42,6 +58,32 @@ class CreateExcursionViewModel @Inject constructor(
 
     private val _selectedImages = MutableLiveData<List<Uri>>(emptyList())
     val selectedImages: LiveData<List<Uri>> get() = _selectedImages
+
+    private val _isSearchResultsVisible = MutableLiveData(false)
+    val isSearchResultsVisible: LiveData<Boolean> get() = _isSearchResultsVisible
+
+    private val _searchResults = MutableLiveData<List<SearchResult>>(emptyList())
+    val searchResults: LiveData<List<SearchResult>> get() = _searchResults
+
+    private val _routeLiveData = MutableLiveData<List<Point>>(emptyList())
+    val routeLiveData: LiveData<List<Point>> get() = _routeLiveData
+
+    private val _prevPoint = MutableLiveData<Point?>()
+    val prevPoint: LiveData<Point?> get() = _prevPoint
+
+    private val _curPoint = MutableLiveData<Point?>()
+    val curPoint: LiveData<Point?> get() = _curPoint
+
+    private val _userPos = MutableLiveData<Point>()
+    val userPos: LiveData<Point> get() = _userPos
+
+    private val locationManager = MapKitFactory.getInstance().createLocationManager()
+
+    private val _placeItems = MutableLiveData<List<PlaceItem>>()
+    val placeItems: LiveData<List<PlaceItem>> get() = _placeItems
+
+    private val _deletingPlaceId = MutableLiveData<String>()
+    val deletingPLaceId: LiveData<String> get() = _deletingPlaceId
 
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
@@ -95,7 +137,7 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun isExcursionCorrect(context: Context, title: String, description: String): Boolean {
+    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>): Boolean {
         when {
             title.isBlank() -> {
                 _message.value = context.getString(R.string.empty_title)
@@ -106,7 +148,11 @@ class CreateExcursionViewModel @Inject constructor(
                 _message.value = context.getString(R.string.empty_desc)
                 return false
             }
-
+            
+            places.isNullOrEmpty() -> {
+                _message.value = context.getString(R.string.empty_route)
+                return true
+            }
             else -> return true
         }
     }
@@ -129,6 +175,76 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
+    suspend fun getRoute() {
+        try {
+            val end = curPoint.value
+            val start = prevPoint.value
+            if (end == null || start == null) {
+                Log.d("Point", "Start or end point is null")
+                return
+            }
+            withContext(Dispatchers.IO) {
+                val route = geoRepository.getRoute(start, end)
+                _routeLiveData.postValue(route)
+            }
+        } catch (e: Exception) {
+            Log.e("Route", "Error getting route", e)
+        }
+    }
+
+    suspend fun getPhotos(point: Point): List<String> {
+        try {
+            return geoRepository.getPhotosByLocation(point)
+        } catch (e: Exception) {
+            Log.e("GetPhotoException", "${e.message}")
+            return emptyList()
+        }
+    }
+
+    fun getUserPosition() {
+        Log.d("GetUserPosition", "da!")
+        locationManager.requestSingleUpdate(object : LocationListener {
+            override fun onLocationUpdated(location: Location) {
+                Log.d("getUserLocation", "onLocationUpdated")
+                _userPos.value = location.position
+            }
+
+            override fun onLocationStatusUpdated(locationStatus: LocationStatus) {
+                Log.d("getUserLocation", "onLocationStatusUpdated")
+                when (locationStatus) {
+                    LocationStatus.NOT_AVAILABLE -> Log.e("Location", "Not available")
+                    LocationStatus.AVAILABLE -> Log.d("Location", "Available")
+                    LocationStatus.RESET -> Log.d("Location", "Reset")
+                }
+            }
+        })
+    }
+
+    fun setPoint(point: Point) {
+        if (_curPoint.value == null) {
+            _curPoint.value = point
+            Log.d("curPoint", "${point.latitude}, ${point.longitude}")
+        } else {
+            _prevPoint.value = curPoint.value
+            _curPoint.value = point
+            Log.d("Меняем точки", "true")
+            Log.d("curPoint", "${point.latitude}, ${point.longitude}")
+            Log.d("prevPoint", "${_prevPoint.value?.latitude}, ${_prevPoint.value?.longitude}")
+        }
+    }
+
+    fun toggleSearchResultsVisibility() {
+        _isSearchResultsVisible.value = _isSearchResultsVisible.value?.not()
+    }
+
+    fun deleteSearchResults() {
+        _searchResults.value = emptyList()
+        _isSearchResultsVisible.value = false
+    }
+
+    fun hideSearchResults() {
+        _isSearchResultsVisible.value = false
+    }
 
     fun clickCreateExcursion() {
         _createExcursion.value = true
@@ -136,5 +252,45 @@ class CreateExcursionViewModel @Inject constructor(
 
     fun addSelectedImages(images: List<Uri>) {
         _selectedImages.value = _selectedImages.value?.plus(images)
+    }
+
+    fun updateSearchResults(results: List<SearchResult>) {
+        try {
+            _searchResults.value = results
+            _isSearchResultsVisible.value = results.isNotEmpty()
+        } catch (e: Exception) {
+            Log.d("Exception", "казявка")
+        }
+    }
+
+    fun addPlace(placeItem: PlaceItem) {
+        val updatedList = _placeItems.value?.toMutableList() ?: mutableListOf()
+        Log.d("PlaceItem", placeItem.name)
+        updatedList.add(placeItem)
+        _placeItems.value = updatedList
+    }
+
+    fun deletePlace(placeId: String) {
+        try {
+            _deletingPlaceId.value = placeId
+            _placeItems.value = _placeItems.value?.filterNot { it.id == placeId }
+            Log.d("PLaceItems", "${placeItems.value?.size ?: "null"}")
+        } catch (e: Exception) {
+            Log.e("DeleteException", e.message.toString())
+        }
+    }
+
+    fun getId(i: Int): String {
+        return geoRepository.getRandomId(i)
+    }
+
+    fun resetPoints() {
+        _prevPoint.value = null
+        _curPoint.value = null
+        _routeLiveData.value = emptyList()
+    }
+
+    fun clearRouteData() {
+        _routeLiveData.value = emptyList()
     }
 }
