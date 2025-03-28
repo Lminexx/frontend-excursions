@@ -14,20 +14,13 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
-import com.example.projectexcursions.repositories.pointrepo.PointRepository
-import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.location.Location
 import com.yandex.mapkit.location.LocationListener
-import com.yandex.mapkit.location.LocationManager
 import com.yandex.mapkit.location.LocationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -117,16 +110,14 @@ class CreateExcursionViewModel @Inject constructor(
                     response.favorite
                 )
                 excursionRepository.saveExcursionToDB(respondedExcursion)
-
                 _message.value = context.getString(R.string.create_success)
 
-                if (_selectedImages.value?.isNotEmpty() == true) {
-                    try {
-                        uploadPhotos(context, response.id)
-                    } catch (e: Exception) {
-                        Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
-                        _message.value = "Error uploading photos: ${e.message}"
-                    }
+                try {
+                    //uploadPhotos(context, response.id)
+                    uploadPlaces(response.id)
+                } catch (e: Exception) {
+                    Log.e("Error", "Error: ${e.message}")
+                    _message.value = "Error: ${e.message}"
                 }
                 _wantComeBack.value = true
             } catch (e: Exception) {
@@ -137,7 +128,7 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>): Boolean {
+    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>, photos: List<Uri>): Boolean {
         when {
             title.isBlank() -> {
                 _message.value = context.getString(R.string.empty_title)
@@ -149,10 +140,16 @@ class CreateExcursionViewModel @Inject constructor(
                 return false
             }
             
-            places.isNullOrEmpty() -> {
+            places.isEmpty() -> {
                 _message.value = context.getString(R.string.empty_route)
-                return true
+                return false
             }
+
+            /*photos.isEmpty() -> {
+                _message.value = context.getString(R.string.empty_photos)
+                return false
+            }*/
+
             else -> return true
         }
     }
@@ -175,6 +172,15 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
+    private suspend fun uploadPlaces(id: Long) {
+        try {
+            val places = placeItems.value!!
+            val response = geoRepository.uploadPlacesItems(places, id)
+        } catch (e: Exception) {
+            Log.d("UploadPlaces", e.message.toString())
+        }
+    }
+
     suspend fun getRoute() {
         try {
             val end = curPoint.value
@@ -189,15 +195,6 @@ class CreateExcursionViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("Route", "Error getting route", e)
-        }
-    }
-
-    suspend fun getPhotos(point: Point): List<String> {
-        try {
-            return geoRepository.getPhotosByLocation(point)
-        } catch (e: Exception) {
-            Log.e("GetPhotoException", "${e.message}")
-            return emptyList()
         }
     }
 

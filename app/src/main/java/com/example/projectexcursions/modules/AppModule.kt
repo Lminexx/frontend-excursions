@@ -52,10 +52,9 @@ object AppModule {
     fun provideExcursionsRepository(
         apiService: ApiService,
         excursionsDao: ExcursionsDao,
-        excursionDao: ExcursionDao,
-        tokenRepo: TokenRepository
+        excursionDao: ExcursionDao
     ): ExcursionRepository {
-        return ExcursionRepositoryImpl(apiService, excursionsDao, excursionDao, tokenRepo)
+        return ExcursionRepositoryImpl(apiService, excursionsDao, excursionDao)
     }
 
     @Provides
@@ -74,7 +73,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGeoRepository(): GeoRepository {
-        return GeoRepositoryImpl()
+    fun provideGeoRepository(
+        apiService: ApiService
+    ): GeoRepository {
+        return GeoRepositoryImpl(apiService)
     }
 }

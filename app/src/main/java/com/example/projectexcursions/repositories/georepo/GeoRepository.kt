@@ -1,8 +1,7 @@
 package com.example.projectexcursions.repositories.georepo
 
-import android.net.Uri
+import com.example.projectexcursions.models.PlaceItem
 import com.yandex.mapkit.geometry.Point
-import kotlin.random.Random
 
 interface GeoRepository {
 
@@ -13,4 +12,6 @@ interface GeoRepository {
     suspend fun getPhotosByLocation(point: Point): List<String>
 
     fun getRandomId(length: Int): String
+
+    suspend fun uploadPlacesItems(places: List<PlaceItem>, id: Long)
 }
