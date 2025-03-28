@@ -50,14 +50,14 @@
             app:layout_constraintTop_toBottomOf="@+id/buttCreateExcursion"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userPhoto"
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="12dp"
-            android:contentDescription="@string/profilelogo"
-            android:src="@drawable/ic_profile"
+            android:contentDescription="@string/avatar"
+            android:src="@drawable/ic_app_v3"
             tools:srcCompat="@tools:sample/avatars"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>

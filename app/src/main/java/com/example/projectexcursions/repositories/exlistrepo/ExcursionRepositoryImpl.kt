@@ -46,8 +46,17 @@ class ExcursionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchExcursion(id: Long): ExcursionResponse {
-        Log.d("FetchingEx", "FetchExcursion")
-        return apiService.getExcursion(id)
+        Log.d("FetchingEx", "Начинаем запрос экскурсии с ID: $id")
+        try {
+            val response = apiService.getExcursion(id)
+            Log.d("FetchingExResponse", "Получен ответ: $response")
+            Log.d("FetchingExDetails", "ID: ${response.id}, Title: ${response.title}, User: ${response.user}")
+            return response
+        } catch (e: Exception) {
+            Log.e("FetchingExError", "Ошибка при запросе экскурсии: ${e.message}")
+            Log.e("FetchingExStackTrace", "Стек вызовов: ${e.stackTraceToString()}")
+            throw e
+        }
     }
 
     override suspend fun deleteExcursion(id: Long){
@@ -104,8 +113,8 @@ class ExcursionRepositoryImpl @Inject constructor(
         return apiService.searchExcursions(query, offset, limit, isFavorite, isMine)
     }
 
-    override suspend fun uploadPhoto(fileName: RequestBody, file: MultipartBody.Part, excursionId: RequestBody): PhotoResponse {
-        return apiService.uploadPhoto(fileName, file, excursionId)
+    override suspend fun uploadPhotos(files: List<MultipartBody.Part>, excursionId: RequestBody): PhotoResponse {
+        return apiService.uploadPhotos(files, excursionId)
     }
 
     override suspend fun loadPhotos(id: Long): List<PhotoResponse> {

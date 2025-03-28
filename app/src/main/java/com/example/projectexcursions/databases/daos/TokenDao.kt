@@ -1,5 +1,6 @@
 package com.example.projectexcursions.databases.daos
 
+import android.net.Uri
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -25,4 +26,5 @@ interface TokenDao {
 
     @Query("delete from tokens where token = :token")
     suspend fun deleteToken(token: String)
+
 }

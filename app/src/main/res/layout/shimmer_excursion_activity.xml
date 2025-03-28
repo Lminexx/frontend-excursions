@@ -15,15 +15,35 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="8dp"/>
 
-    <View
-        android:id="@+id/shimmer_author"
-        android:layout_width="0dp"
-        android:layout_height="18dp"
-        android:layout_marginTop="28dp"
-        android:background="@color/biryuzoviy"
-        app:layout_constraintEnd_toEndOf="parent"
+    <!-- Контейнер для аватарки и имени автора -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/shimmer_author_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/shimmer_title" />
+        app:layout_constraintTop_toBottomOf="@id/shimmer_title">
+
+        <View
+            android:id="@+id/shimmer_avatar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@color/biryuzoviy"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <View
+            android:id="@+id/shimmer_author"
+            android:layout_width="150dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="8dp"
+            android:background="@color/biryuzoviy"
+            app:layout_constraintStart_toEndOf="@id/shimmer_avatar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/shimmer_description"
@@ -33,7 +53,7 @@
         android:background="@color/lighter_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/shimmer_author" />
+        app:layout_constraintTop_toBottomOf="@id/shimmer_author_container" />
 
     <View
         android:id="@+id/photo_shimmer"
