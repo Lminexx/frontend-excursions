@@ -8,6 +8,8 @@ import com.example.projectexcursions.databases.daos.TokenDao
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepositoryImpl
+import com.example.projectexcursions.repositories.georepo.GeoRepository
+import com.example.projectexcursions.repositories.georepo.GeoRepositoryImpl
 import com.example.projectexcursions.repositories.pointrepo.PointRepository
 import com.example.projectexcursions.repositories.pointrepo.PointRepositoryImpl
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
@@ -68,5 +70,11 @@ object AppModule {
     @Singleton
     fun providePointRepository(): PointRepository {
         return PointRepositoryImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGeoRepository(): GeoRepository {
+        return GeoRepositoryImpl()
     }
 }
