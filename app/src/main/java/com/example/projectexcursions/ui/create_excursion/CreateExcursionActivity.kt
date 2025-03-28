@@ -198,7 +198,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val places = viewModel.placeItems.value ?: emptyList()
                 if (viewModel.isExcursionCorrect(this, title, description, places)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
-                    progressBar.show(this)
+                    finish()
                 }
             }
         }
@@ -269,37 +269,44 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 
-    private val pickImages = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val clipData = result.data?.clipData
-            val imageUris = mutableListOf<Uri>()
-            if (clipData != null) {
-                for (i in 0 until clipData.itemCount) {
-                    imageUris.add(clipData.getItemAt(i).uri)
+    private val pickImages =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val clipData = result.data?.clipData
+                val imageUris = mutableListOf<Uri>()
+                if (clipData != null) {
+                    for (i in 0 until clipData.itemCount) {
+                        imageUris.add(clipData.getItemAt(i).uri)
+                    }
+                } else {
+                    result.data?.data?.let { imageUris.add(it) }
                 }
-            } else {
-                result.data?.data?.let { imageUris.add(it) }
-            }
-            if (imageUris.isNotEmpty()) {
-                viewModel.addSelectedImages(imageUris)
+                if (imageUris.isNotEmpty()) {
+                    viewModel.addSelectedImages(imageUris)
+                }
             }
         }
-    }
 
     private fun checkPermissionsAndProceed() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES), REQUEST_CODE_PERMISSION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_MEDIA_IMAGES), REQUEST_CODE_PERMISSION
+                )
             } else {
                 openImagePicker()
             }
         } else {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSION
+                )
             } else {
                 openImagePicker()
             }

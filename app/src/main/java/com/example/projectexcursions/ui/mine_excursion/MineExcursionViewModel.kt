@@ -57,14 +57,13 @@ class MineExcursionViewModel @Inject constructor(
                     Log.d("ExcursionInDB", "ExcExists")
                 } else {
                     val response = repository.fetchExcursion(id = excursionId)
-                    Log.d("ExcContent", "${response.id}, \n${response.title}, \n${response.userId}, " +
-                            "\n${response.description}, \n${response.username}, \n${response.favorite}")
+                    Log.d("ExcContent", "${response.id}, \n${response.title}, " +
+                            "\n${response.description}, \n${response.user}, \n${response.favorite}")
                     val excursion = Excursion(
                         response.id,
                         response.title,
-                        response.userId,
                         response.description,
-                        response.username,
+                        response.user,
                         response.favorite
                     )
                     repository.saveExcursionToDB(excursion)

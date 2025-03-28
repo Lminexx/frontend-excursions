@@ -1,6 +1,7 @@
 package com.example.projectexcursions.ui.registration
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,13 +10,21 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class RegViewModel @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val tokenRepository: TokenRepository
 ): ViewModel() {
 
     private val _validationMessage = MutableLiveData<String?>()
@@ -30,11 +39,16 @@ class RegViewModel @Inject constructor(
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
+
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
 
     private val _password = MutableLiveData<String>()
     val password: LiveData<String> get() = _password
+
+    private val _avatar = MutableLiveData<Uri>()
+    val avatar: LiveData<Uri> get() = _avatar
+
 
 
     fun validateAndRegister(context: Context, login: String, password: String, repeatPassword: String) {
@@ -73,9 +87,15 @@ class RegViewModel @Inject constructor(
         }
     }
 
+
+
     private fun isInputLangValid(input: String): Boolean {
         val regex = "^[a-zA-Z0-9!@#\$%^&*()_+{}\\[\\]:;<>,.?~\\-=\\s]*\$".toRegex()
         return regex.matches(input)
+    }
+
+    fun addProfilePicture(image: Uri){
+        _avatar.value=image
     }
 
     fun cameBack() {
