@@ -17,14 +17,14 @@
             android:id="@+id/shimmer_title"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:background="@color/lighter_blue" />
+            android:background="@drawable/border_pattern_3" />
 
         <View
             android:id="@+id/shimmer_description"
             android:layout_width="match_parent"
             android:layout_height="20dp"
             android:layout_marginTop="8dp"
-            android:background="@color/lighter_blue"/>
+            android:background="@drawable/border_pattern_3"/>
     </LinearLayout>
 
 </com.facebook.shimmer.ShimmerFrameLayout>

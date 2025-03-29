@@ -122,6 +122,7 @@ class CreateExcursionActivity : AppCompatActivity() {
             onDeleteClick = { placeId ->
                 viewModel.deletePlace(placeId)
             },
+            isCreating = true,
             places = emptyList()
         )
 
@@ -257,14 +258,15 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.deletingPLaceId.observe(this) { placeId ->
             Log.d("DeletingPlace", "true")
+            clearRoute()
             lifecycleScope.launch {
-                val places = viewModel.placeItems.value
-                for (place in places!!) {
-                    if (placeId != place.id) {
-                        val point = Point(place.lat, place.lon)
-                        viewModel.setPoint(point)
-                    }
+                val places = viewModel.placeItems.value!!.filter { it.id != placeId }
+                for (place in places) {
+                    val point = Point(place.lat, place.lon)
+                    viewModel.setPoint(point)
                 }
+                if (places.size == 1)
+                    viewModel.deletePrevPoint()
             }
         }
     }
