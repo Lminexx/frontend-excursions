@@ -197,7 +197,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
                 val photos = viewModel.selectedImages.value ?: emptyList()
-                if (viewModel.isExcursionCorrect(this, title, description, places, photos)) {
+                if (viewModel.isExcursionCorrect(this, title, description, places)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
                     finish()
                 }
