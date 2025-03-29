@@ -142,4 +142,8 @@ class GeoRepositoryImpl @Inject constructor(
     override suspend fun uploadPlacesItems(places: List<PlaceItem>, id: Long) {
         apiService.uploadPlaceItems(id, places)
     }
+
+    override suspend fun loadPlaces(id: Long): List<PlaceItem> {
+        return apiService.loadPlaces(id)
+    }
 }

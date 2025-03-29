@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
         android:layout_marginBottom="100dp"
-        android:background="@drawable/button_pattern_1"
+        android:background="@drawable/border_pattern_1"
         android:text="@string/reg_string"
         android:textColor="@color/blue"
         android:textSize="16sp"

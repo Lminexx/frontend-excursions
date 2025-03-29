@@ -85,7 +85,7 @@
             android:layout_height="60dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/button_pattern_1"
+            android:background="@drawable/border_pattern_1"
             android:textColor="@color/blue"
             android:text="@string/make_path"/>
     </LinearLayout>
