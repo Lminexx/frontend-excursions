@@ -183,7 +183,7 @@ class ExcursionActivity : AppCompatActivity() {
                     for (place in places) {
                         val point = Point(place.lat, place.lon)
                         viewModel.setPoint(point)
-                        delay(300)
+                        delay(500)
                     }
                 }
                 placesAdapter.updatePlaces(places)
@@ -270,6 +270,8 @@ class ExcursionActivity : AppCompatActivity() {
         binding.excursionDescription.visibility = View.GONE
         binding.favoriteButton.visibility = View.GONE
         binding.recyclerViewImages.visibility = View.GONE
+        binding.mapview.visibility = View.GONE
+        binding.places.visibility = View.GONE
     }
 
     private fun hideShimmer() {
@@ -280,6 +282,8 @@ class ExcursionActivity : AppCompatActivity() {
         binding.excursionDescription.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
         binding.recyclerViewImages.visibility = View.VISIBLE
+        binding.mapview.visibility = View.VISIBLE
+        binding.places.visibility = View.VISIBLE
     }
 
     private fun drawRoute(points: List<Point>) {
