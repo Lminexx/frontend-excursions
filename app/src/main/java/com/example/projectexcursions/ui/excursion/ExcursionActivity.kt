@@ -24,7 +24,6 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
-import com.example.projectexcursions.ui.main.MainActivity
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -107,6 +106,7 @@ class ExcursionActivity : AppCompatActivity() {
             places = emptyList()
         )
 
+        binding.places.layoutManager = LinearLayoutManager(this)
         binding.places.adapter = placesAdapter
 
         viewModel.loadPlaces(excursionId)
@@ -175,13 +175,23 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.places.observe(this) { places ->
-            placesAdapter.updatePlaces(places)
-            lifecycleScope.launch {
+            try {
                 for (place in places) {
-                    val point = Point(place.lat, place.lon)
-                    viewModel.setPoint(point)
-                    delay(75)
+                    Log.d("PLaceItem", "${place.name}, ${place.id}")
                 }
+                lifecycleScope.launch {
+                    for (place in places) {
+                        val point = Point(place.lat, place.lon)
+                        viewModel.setPoint(point)
+                        delay(300)
+                    }
+                }
+                placesAdapter.updatePlaces(places)
+                Log.d("PlaceItemsObserve", "true " + places[places.size - 1].name)
+            } catch (indexOutOfBound: IndexOutOfBoundsException) {
+                Log.d("IndexOutOfBound", "хихи поймали дурачка)")
+            } catch (e: Exception) {
+                Log.d("Exception", e.message.toString())
             }
         }
 

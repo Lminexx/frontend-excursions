@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ExcursionViewModel @Inject constructor(
     private val geoRepository: GeoRepository,
-    private val repository: ExcursionRepository,
+    private val excRepository: ExcursionRepository,
     private val tokenRepository: TokenRepository
 ) : ViewModel() {
 
@@ -63,12 +63,12 @@ class ExcursionViewModel @Inject constructor(
     fun loadExcursion(excursionId: Long) {
         viewModelScope.launch {
             try {
-                if (repository.getExcursionFromDB(excursionId) != null) {
-                    val excursionFromDB = repository.getExcursionFromDB(excursionId)
+                if (excRepository.getExcursionFromDB(excursionId) != null) {
+                    val excursionFromDB = excRepository.getExcursionFromDB(excursionId)
                     _excursion.value = excursionFromDB
                     Log.d("ExcursionInDB", "ExcExists")
                 } else {
-                    val response = repository.fetchExcursion(id = excursionId)
+                    val response = excRepository.fetchExcursion(id = excursionId)
                     Log.d("ExcContent", "${response.id}, \n${response.title}, " +
                             "\n${response.description}, \n${response.user}, \n${response.favorite}")
                     val excursion = Excursion(
@@ -78,7 +78,7 @@ class ExcursionViewModel @Inject constructor(
                         response.user,
                         response.favorite
                     )
-                    repository.saveExcursionToDB(excursion)
+                    excRepository.saveExcursionToDB(excursion)
                     _excursion.value = excursion
                     Log.d("ExcursionIsnInDB", "FetchExcursion")
                 }
@@ -92,7 +92,7 @@ class ExcursionViewModel @Inject constructor(
     fun loadPhotos(excursionId: Long) {
         viewModelScope.launch {
             try {
-                val response = repository.loadPhotos(excursionId)
+                val response = excRepository.loadPhotos(excursionId)
                 val photoUris = response.map { Uri.parse(it.url) }
                 _photos.value = photoUris
             } catch (e: Exception) {
@@ -171,10 +171,10 @@ class ExcursionViewModel @Inject constructor(
             viewModelScope.launch {
                 if (isCurrentlyFavorite) {
                     Log.d("FavoriteExcursion", "Removing from favorites")
-                    repository.deleteFavorite(currentExcursion.id)
+                    excRepository.deleteFavorite(currentExcursion.id)
                 } else {
                     Log.d("FavoriteExcursion", "Adding to favorites")
-                    repository.addFavorite(currentExcursion.id)
+                    excRepository.addFavorite(currentExcursion.id)
                 }
             }
         }
