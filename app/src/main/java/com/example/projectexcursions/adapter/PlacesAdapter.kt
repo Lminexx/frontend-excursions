@@ -51,7 +51,6 @@ class PlacesAdapter(
 
         fun bind(placeItem: PlaceItem) {
             binding.placeName.text = placeItem.name
-            photoAdapter.updatePhotos(placeItem.photos)
         }
     }
 }
