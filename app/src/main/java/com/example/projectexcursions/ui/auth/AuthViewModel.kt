@@ -123,44 +123,42 @@ class AuthViewModel @Inject constructor(
     }
 
     private suspend fun uploadAvatar(context: Context, uri: Uri) {
-            _isLoading.value = true
-            try {
-                withContext(Dispatchers.IO) {
-                    val file = getFileFromUri(context, uri)
-                    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                    val multipartBody =
-                        MultipartBody.Part.createFormData("file", file.name, requestFile)
-                    val fileName = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
-                    val response = apiService.uploadAvatar(fileName, multipartBody)
-                    _token.postValue(response.token)
-                    tokenRepository.clearToken()
-                    tokenRepository.saveToken(Token(token = response.token))
-                    Log.d("Avatar", "Avatar uploaded successfully")
-                    Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
-                }
-            } catch (e: IOException) {
-                Log.e("PhotoUploadError", "IO Error uploading photo: ${e.message}", e)
-                _validationMessage.postValue("Ошибка при чтении файла: ${e.message}")
-                throw e
-            } catch (e: HttpException) {
-                Log.e(
-                    "PhotoUploadError",
-                    "HTTP Error uploading photo: ${e.message}, code: ${e.code()}",
-                    e
-                )
-                _validationMessage.postValue("Ошибка при загрузке: ${e.code()}")
-                throw e
-            } catch (e: CancellationException) {
-                Log.e("PhotoUploadError", "Upload cancelled: ${e.message}", e)
-                _validationMessage.postValue("Загрузка была отменена")
-                throw e
-            } catch (e: Exception) {
-                Log.e("PhotoUploadError", "General Error uploading photo: ${e.message}", e)
-                _validationMessage.postValue("Неизвестная ошибка: ${e.message}")
-                throw e
-            } finally {
-                _isLoading.value = false
-            }
+        _isLoading.value = true
+        try {
+            val file = getFileFromUri(context, uri)
+            val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+            val multipartBody =
+                MultipartBody.Part.createFormData("file", file.name, requestFile)
+            val fileName = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
+            val response = apiService.uploadAvatar(fileName, multipartBody)
+            _token.postValue(response.token)
+            tokenRepository.clearToken()
+            tokenRepository.saveToken(Token(token = response.token))
+            Log.d("Avatar", "Avatar uploaded successfully")
+            Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
+        } catch (e: IOException) {
+            Log.e("PhotoUploadError", "IO Error uploading photo: ${e.message}", e)
+            _validationMessage.postValue("Ошибка при чтении файла: ${e.message}")
+            throw e
+        } catch (e: HttpException) {
+            Log.e(
+                "PhotoUploadError",
+                "HTTP Error uploading photo: ${e.message}, code: ${e.code()}",
+                e
+            )
+            _validationMessage.postValue("Ошибка при загрузке: ${e.code()}")
+            throw e
+        } catch (e: CancellationException) {
+            Log.e("PhotoUploadError", "Upload cancelled: ${e.message}", e)
+            _validationMessage.postValue("Загрузка была отменена")
+            throw e
+        } catch (e: Exception) {
+            Log.e("PhotoUploadError", "General Error uploading photo: ${e.message}", e)
+            _validationMessage.postValue("Неизвестная ошибка: ${e.message}")
+            throw e
+        } finally {
+            _isLoading.value = false
+        }
     }
 
     private fun isInputLangValid(input: String): Boolean {

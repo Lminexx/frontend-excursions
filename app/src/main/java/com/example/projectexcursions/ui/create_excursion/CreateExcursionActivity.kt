@@ -196,6 +196,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
+                val photos = viewModel.selectedImages.value ?: emptyList()
                 if (viewModel.isExcursionCorrect(this, title, description, places)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
                     finish()
@@ -239,7 +240,6 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.placeItems.observe(this) { placeItems ->
-
             try {
                 for (placeItem in placeItems) {
                     Log.d("PLaceItem", "${placeItem.name}, ${placeItem.id}")
@@ -257,12 +257,12 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.deletingPLaceId.observe(this) { placeId ->
             Log.d("DeletingPlace", "true")
-            clearRoute()
             lifecycleScope.launch {
                 val places = viewModel.placeItems.value
                 for (place in places!!) {
                     if (placeId != place.id) {
-                        viewModel.setPoint(place.point)
+                        val point = Point(place.lat, place.lon)
+                        viewModel.setPoint(point)
                     }
                 }
             }
@@ -398,7 +398,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                             Log.d("point", point?.equals(null).toString())
                             val name = result.obj?.name ?: return@mapNotNull null
                             Log.d("name", name.equals(null).toString())
-                            val id = viewModel.getId(10)
+                            val id = viewModel.getId(7)
                             Log.d("id", id.equals(null).toString())
                             SearchResult(id, name, point!!)
                         }
@@ -507,24 +507,27 @@ class CreateExcursionActivity : AppCompatActivity() {
     private fun clearRoute() {
         Log.d("clearRoute","")
         Log.d("RoutePolyline", routePolyline?.equals(null).toString())
-        Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
+        Log.d("PlaceItemsSize1", "${viewModel.placeItems.value?.size}")
         if (routePolyline != null) {
-            Log.d("RoutePolyline", routePolyline?.equals(null).toString())
-            Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
-            map.mapObjects.clear()
-            routePolyline = null
-        } else if (viewModel.placeItems.value?.size == 1) {
-            Log.d("RoutePolyline", routePolyline?.equals(null).toString())
-            Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
-            map.mapObjects.clear()
-            routePolyline = null
-            viewModel.clearRouteData()
+            Log.d("PlaceItemsSize3", "${viewModel.placeItems.value?.size}")
+            if (viewModel.placeItems.value?.size == 1) {
+                Log.d("RoutePolyline", routePolyline?.equals(null).toString())
+                Log.d("PlaceItemsSize5", "${viewModel.placeItems.value?.size}")
+                viewModel.clearRouteData()
+                map.mapObjects.clear()
+                routePolyline = null}
+            else {
+                Log.d("RoutePolyline", routePolyline?.equals(null).toString())
+                Log.d("PlaceItemsSize2", "${viewModel.placeItems.value?.size}")
+                map.mapObjects.clear()
+                routePolyline = null}
         } else {
             Log.d("RoutePolyline", routePolyline?.equals(null).toString())
-            Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
+            Log.d("PlaceItemsSize4", "${viewModel.placeItems.value?.size}")
             map.mapObjects.clear()
             viewModel.resetPoints()
         }
+        Log.d("ClearRoute", "RouteClearead")
     }
 
     private fun geoObjectTapListener(): GeoObjectTapListener {
@@ -532,18 +535,9 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun createPlaceItem(id: String, name: String, point: Point?): PlaceItem {
-        var photos: List<String> = emptyList()
-        lifecycleScope.launch {
-            photos = viewModel.getPhotos(point!!)
-        }
-
-        val photoUris: MutableList<Uri> = mutableListOf()
-
-        for (photo in photos) {
-            photoUris.add(photo.toUri())
-        }
-
-        return PlaceItem(id, name, point!!, photoUris)
+        val lat = point?.latitude
+        val lon = point?.longitude
+        return PlaceItem(id, name, lat!!, lon!!)
     }
 }
 //TODO сделать получение списка фото места
