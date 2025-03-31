@@ -20,6 +20,7 @@ import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.databinding.MineActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.mine_excursion.MineExcursionActivity.Companion.createMineExcursionActivityIntent
+import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.example.projectexcursions.ui.utilies.ProgressBar
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -45,7 +46,7 @@ class MineExcursionActivity : AppCompatActivity() {
     private lateinit var placesAdapter: PlacesAdapter
     private var routePolyline: Polyline? = null
     private lateinit var map: Map
-    private lateinit var mapView: MapView
+    private lateinit var mapView: CustomMapView
     private lateinit var placemark: PlacemarkMapObject
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +54,7 @@ class MineExcursionActivity : AppCompatActivity() {
         binding = MineActivityExcursionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mapView = binding.mapview
+        mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
 
         initCallback()
