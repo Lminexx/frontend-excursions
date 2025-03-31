@@ -31,6 +31,7 @@ import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
+import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.example.projectexcursions.ui.utilies.ProgressBar
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -64,7 +65,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var searchResultsAdapter: SearchResultsAdapter
     private lateinit var placesAdapter: PlacesAdapter
-    private lateinit var mapView: MapView
+    private lateinit var mapView: CustomMapView
     private lateinit var map: Map
     private lateinit var placemark: PlacemarkMapObject
     private var routePolyline: Polyline? = null
@@ -77,6 +78,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         binding = ActivityExcursionCreateBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mapView = binding.mapview
+        mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
 
         initData()
