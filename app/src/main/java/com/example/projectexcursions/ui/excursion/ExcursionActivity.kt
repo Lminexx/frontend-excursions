@@ -24,6 +24,7 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
+import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -48,7 +49,7 @@ class ExcursionActivity : AppCompatActivity() {
     private lateinit var placesAdapter: PlacesAdapter
     private var routePolyline: Polyline? = null
     private lateinit var map: Map
-    private lateinit var mapView: MapView
+    private lateinit var mapView: CustomMapView
     private lateinit var placemark: PlacemarkMapObject
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +57,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding = ActivityExcursionBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mapView = binding.mapview
+        mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
 
         initCallback()
