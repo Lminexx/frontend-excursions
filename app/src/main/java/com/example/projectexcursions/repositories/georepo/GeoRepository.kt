@@ -14,4 +14,6 @@ interface GeoRepository {
     fun getRandomId(length: Int): String
 
     suspend fun uploadPlacesItems(places: List<PlaceItem>, id: Long)
+
+    suspend fun loadPlaces(id: Long): List<PlaceItem>
 }

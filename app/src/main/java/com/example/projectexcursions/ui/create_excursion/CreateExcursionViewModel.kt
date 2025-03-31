@@ -293,4 +293,8 @@ class CreateExcursionViewModel @Inject constructor(
     fun clearRouteData() {
         _routeLiveData.value = emptyList()
     }
+
+    fun deletePrevPoint() {
+        _prevPoint.value = null
+    }
 }
