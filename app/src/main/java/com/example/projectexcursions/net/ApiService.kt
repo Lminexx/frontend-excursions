@@ -84,4 +84,7 @@ interface ApiService {
         @Path("excursionId") id: Long,
         @Body places: List<PlaceItem>
     )
+
+    @GET("excursion/points/{id}")
+    suspend fun loadPlaces(@Path("id") id: Long): List<PlaceItem>
 }
