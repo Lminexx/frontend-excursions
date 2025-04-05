@@ -37,12 +37,16 @@ class AuthActivity: AppCompatActivity() {
             if (successAuth) {
                 val prevFrag = intent.getStringExtra("prev_frag")
                 Log.d("AuthActivity", "Success auth, prev_frag: $prevFrag")
-
-                val resultIntent = createAuthResultIntent(true)
-                resultIntent.putExtra("prev_frag", prevFrag)
-
-                Log.d("AuthActivity", "Setting result OK")
-                setResult(Activity.RESULT_OK, resultIntent)
+                val role = viewModel.role.value
+                if (role == "USER") {
+                    val resultIntent = createAuthResultIntent(isAuthSuccess = true, isModerator = false)
+                    resultIntent.putExtra("prev_frag", prevFrag)
+                    setResult(Activity.RESULT_OK, resultIntent)
+                } else {
+                    val resultIntent = createAuthResultIntent(isAuthSuccess = true, isModerator = true)
+                    resultIntent.putExtra("prev_frag", prevFrag)
+                    setResult(Activity.RESULT_OK, resultIntent)
+                }
 
                 finish()
             } else {
@@ -102,8 +106,12 @@ class AuthActivity: AppCompatActivity() {
 
     companion object {
         const val EXTRA_AUTH_STATUS = "EXTRA_AUTH_STATUS"
+        const val EXTRA_ROLE = "EXTRA_ROLE"
 
-         private fun createAuthResultIntent(isAuthSuccess: Boolean): Intent =
-            Intent().putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
+         private fun createAuthResultIntent(isAuthSuccess: Boolean, isModerator: Boolean): Intent =
+            Intent().apply {
+                putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
+                putExtra(EXTRA_ROLE, isModerator)
+            }
     }
 }

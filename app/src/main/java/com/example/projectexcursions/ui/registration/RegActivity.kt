@@ -1,32 +1,23 @@
 package com.example.projectexcursions.ui.registration
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toIcon
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityRegBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RegActivity : AppCompatActivity() {
+class RegActivity: AppCompatActivity() {
 
     private lateinit var binding: ActivityRegBinding
     private val viewModel: RegViewModel by viewModels()
-
-    private val REQUEST_CODE_PERMISSION = 1003
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

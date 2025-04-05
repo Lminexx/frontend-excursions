@@ -126,7 +126,7 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
             if (wantGoToEx) {
                 val excursion = viewModel.selectedExcursionsList
                 if (excursion != null) {
-                    val intent = requireContext().createExcursionActivityIntent(excursionId = excursion.id)
+                    val intent = requireContext().createExcursionActivityIntent(excursionId = excursion.id, false)
                     startActivity(intent)
                     viewModel.goneToExcursion()
                 }

@@ -69,4 +69,10 @@
     <string name="delete_place">delete_place</string>
     <string name="empty_route">Маршрут пуст</string>
     <string name="empty_photos">Добавьте фото</string>
+    <string name="moderating_excursions">Модерация экскурсий</string>
+    <string name="pend">Отправить на доработку</string>
+    <string name="approve">Подтвердить экскурсию</string>
+    <string name="write_comment">Напишите комментарий</string>
+    <string name="descript_problem">Опишите проблему</string>
+    <string name="reject">Отклонить</string>
 </resources>

@@ -42,4 +42,12 @@ open class MainViewModel @Inject constructor(
         Log.d("TokenInMainAct", token?.token ?: "null")
         return token != null
     }
+
+    suspend fun isUserModerator(): Boolean {
+        val token = repository.getToken()
+        val decodedToken = token?.let { repository.decodeToken(token.token) }
+        val role = decodedToken?.get("role")?.asString() ?: "null"
+        Log.d("role", role)
+        return role != "USER" && role != "null"
+    }
 }
