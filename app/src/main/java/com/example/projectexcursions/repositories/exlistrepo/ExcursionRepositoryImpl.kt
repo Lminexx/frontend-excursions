@@ -6,11 +6,13 @@ import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
+import com.example.projectexcursions.models.ModeratingExcursionsResponse
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
 import com.example.projectexcursions.net.PhotoResponse
 import com.example.projectexcursions.paging_sources.ExcursionPagingSource
+import com.example.projectexcursions.paging_sources.ModeratingExcursionsPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import okhttp3.MultipartBody
@@ -26,6 +28,8 @@ class ExcursionRepositoryImpl @Inject constructor(
     override fun excursionPagingSource(isFavorite:Boolean, isMine: Boolean) = ExcursionPagingSource(apiService, isFavorite, isMine)
 
     override fun searchExcursionPagingSource(query: String, isMine: Boolean, isFavorite: Boolean) = SearchExcursionPagingSource(apiService, query, isMine, isFavorite)
+
+    override fun moderatingExcursionsPagingSource() = ModeratingExcursionsPagingSource(apiService)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -118,5 +122,17 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override suspend fun loadPhotos(id: Long): List<PhotoResponse> {
         return apiService.loadPhotos(id)
+    }
+
+    override suspend fun changeExcursionStatus(id: Long, status: String) {
+        apiService.changeExcursionStatus(id, status)
+    }
+
+    override suspend fun loadModeratingExcursions(
+        offset: Int,
+        limit: Int,
+        status: String
+    ): ModeratingExcursionsResponse {
+        return apiService.loadModeratingExcursions(offset, limit, status)
     }
 }

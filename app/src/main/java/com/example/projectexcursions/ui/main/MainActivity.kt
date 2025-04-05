@@ -14,12 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityMainBinding
-import com.example.projectexcursions.repositories.pointrepo.PointRepository
 import com.example.projectexcursions.ui.auth.AuthActivity
 import com.example.projectexcursions.ui.not_auth.NotAuthFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -71,8 +69,11 @@ class MainActivity : AppCompatActivity() {
                 "profile" -> {
                     lifecycleScope.launch {
                         val isAuth = viewModel.checkAuthStatus()
-                        if (isAuth)
-                            replaceFragment(ProfileFragment())
+                        val isModerator = viewModel.isUserModerator()
+                        Log.d("UserRole", isModerator.toString())
+                        if (isAuth) {
+                            replaceFragment(ProfileFragment(isModerator))
+                        }
                         else {
                             replaceFragment(NotAuthFragment().apply {
                                 arguments = Bundle().apply {
@@ -125,13 +126,14 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val isAuth = data?.getBooleanExtra(AuthActivity.EXTRA_AUTH_STATUS, false) ?: false
+            val isModerator = data?.getBooleanExtra(AuthActivity.EXTRA_ROLE, false) ?: false
             val prevFrag = data?.getStringExtra("prev_frag")
             Log.d("MainActivity", "Auth success, prev_frag: $prevFrag")
 
             if (isAuth) {
                 when (prevFrag) {
                     "fav" -> replaceFragment(FavFragment())
-                    "profile" -> replaceFragment(ProfileFragment())
+                    "profile" -> replaceFragment(ProfileFragment(isModerator))
                     else -> replaceFragment(ExListFragment())
                 }
             } else {

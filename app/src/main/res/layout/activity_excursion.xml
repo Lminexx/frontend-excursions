@@ -133,5 +133,30 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <ImageButton
+            android:id="@+id/approveButton"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:layout_marginVertical="16dp"
+            android:layout_marginEnd="8dp"
+            android:background="#00FFFFFF"
+            android:contentDescription="@string/approve"
+            app:layout_constraintTop_toBottomOf="@id/places"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/approve" />
+
+        <ImageButton
+            android:id="@+id/commentButton"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:layout_marginVertical="16dp"
+            android:background="#00FFFFFF"
+            android:contentDescription="@string/pend"
+            app:layout_constraintTop_toBottomOf="@id/places"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/comment_exc" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

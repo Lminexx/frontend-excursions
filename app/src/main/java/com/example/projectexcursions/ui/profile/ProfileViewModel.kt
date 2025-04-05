@@ -34,6 +34,9 @@ class ProfileViewModel @Inject constructor(
     private val _goToCreatedExcs = MutableLiveData(false)
     val goToCreatedExcs: LiveData<Boolean> get() = _goToCreatedExcs
 
+    private val _moderateExcursions = MutableLiveData(false)
+    val moderateExcursions: LiveData<Boolean> get() = _moderateExcursions
+
     init {
         loadUser()
     }
@@ -43,6 +46,7 @@ class ProfileViewModel @Inject constructor(
             val token = repository.getCachedToken()
             val decodedToken = token?.let { repository.decodeToken(it.token) }
             val username = decodedToken?.get("username")?.asString()
+            val role = decodedToken?.get("role")?.asString()
             if (!username.isNullOrEmpty()) {
                 _username.value = username
                 Log.d("UsernameCheck1", username)
@@ -50,6 +54,14 @@ class ProfileViewModel @Inject constructor(
             } else {
                 _message.value = "Username not found in token"
             }
+
+            /*if (!username.isNullOrEmpty()) {
+                _role.value = username
+                Log.d("UsernameCheck1", username)
+                Log.d("UsernameCheck2", _username.value!!)
+            } else {
+                _message.value = "Username not found in token"
+            }*/
         }
     }
 
@@ -81,11 +93,11 @@ class ProfileViewModel @Inject constructor(
         _wantComeBack.value = true
     }
 
-    fun cameBack() {
-        _wantComeBack.value = false
-    }
-
     fun createdExcsList() {
         _goToCreatedExcs.value = true
+    }
+
+    fun moderateExcursions() {
+        _moderateExcursions.value = true
     }
 }

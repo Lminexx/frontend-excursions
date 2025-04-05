@@ -75,5 +75,18 @@
             app:layout_constraintStart_toEndOf="@id/userPhoto"
             app:layout_constraintTop_toBottomOf="@id/userNickname"/>
 
+        <ImageButton
+            android:id="@+id/moderatingExcursions"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/border_pattern_1"
+            android:src="@drawable/moderating_excursions"
+            android:contentDescription="@string/moderating_excursions"
+            app:layout_constraintStart_toEndOf="@id/createdExcursionsList"
+            app:layout_constraintTop_toBottomOf="@id/userNickname"
+            app:layout_constraintRight_toLeftOf="@id/buttLogOut"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
