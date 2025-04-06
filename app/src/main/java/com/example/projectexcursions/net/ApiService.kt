@@ -1,6 +1,7 @@
 package com.example.projectexcursions.net
 
 import com.example.projectexcursions.models.CreatingExcursion
+import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.User
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -77,4 +78,13 @@ interface ApiService {
         @Part("fileName") fileName: RequestBody,
         @Part file: MultipartBody.Part
     ):AuthResponse
+
+    @POST("excursion/points/{excursionId}")
+    suspend fun uploadPlaceItems(
+        @Path("excursionId") id: Long,
+        @Body places: List<PlaceItem>
+    )
+
+    @GET("excursion/points/{id}")
+    suspend fun loadPlaces(@Path("id") id: Long): List<PlaceItem>
 }

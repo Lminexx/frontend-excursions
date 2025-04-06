@@ -2,7 +2,9 @@ package com.example.projectexcursions.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +15,7 @@ class PlacesAdapter(
     private val context: Context,
     private val onItemClick: (String) -> Unit,
     private val onDeleteClick: (String) -> Unit,
+    private val isCreating: Boolean,
     private var places: List<PlaceItem>
 ) : RecyclerView.Adapter<PlacesAdapter.PlacesViewHolder>() {
 
@@ -26,7 +29,11 @@ class PlacesAdapter(
         holder.bind(placeItem)
 
         holder.itemView.setOnClickListener { onItemClick(placeItem.name) }
-        holder.binding.deletePlace.setOnClickListener { onDeleteClick(placeItem.id) }
+        if (isCreating) {
+            holder.itemView.setOnClickListener{ onDeleteClick(placeItem.id) }
+        } else {
+            holder.binding.deletePlace.visibility = View.GONE
+        }
     }
 
     override fun getItemCount(): Int = places.size
@@ -51,7 +58,6 @@ class PlacesAdapter(
 
         fun bind(placeItem: PlaceItem) {
             binding.placeName.text = placeItem.name
-            photoAdapter.updatePhotos(placeItem.photos)
         }
     }
 }

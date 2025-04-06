@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -14,12 +15,25 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
+import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.databinding.MineActivityExcursionBinding
 import com.example.projectexcursions.ui.main.MainActivity
 import com.example.projectexcursions.ui.mine_excursion.MineExcursionActivity.Companion.createMineExcursionActivityIntent
+import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.example.projectexcursions.ui.utilies.ProgressBar
+import com.yandex.mapkit.Animation
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.geometry.Polyline
+import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.IconStyle
+import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -29,15 +43,37 @@ class MineExcursionActivity : AppCompatActivity() {
     private val viewModel: MineExcursionViewModel by viewModels()
     private lateinit var binding: MineActivityExcursionBinding
     private lateinit var adapter: PhotoAdapter
+    private lateinit var placesAdapter: PlacesAdapter
+    private var routePolyline: Polyline? = null
+    private lateinit var map: Map
+    private lateinit var mapView: CustomMapView
+    private lateinit var placemark: PlacemarkMapObject
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = MineActivityExcursionBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        mapView = binding.mapview
+        mapView.parentScrollView = binding.root
+        map = mapView.mapWindow.map
 
         initCallback()
         initData()
         subscribe()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("onStart","")
+        MapKitFactory.getInstance().onStart()
+        mapView.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+        Log.d("onStart","")
+        MapKitFactory.getInstance().onStop()
     }
 
     private fun initData() {
@@ -57,6 +93,22 @@ class MineExcursionActivity : AppCompatActivity() {
         viewModel.loadExcursion(excursionId)
         viewModel.loadPhotos(excursionId)
 
+        placesAdapter = PlacesAdapter(
+            context = this,
+            onItemClick = { placeName ->
+                Log.d("PlaceName", "Пока ниче не сделано")
+            },
+            onDeleteClick = { placeId ->
+                Log.d("DeletePlace", "нельзя!")
+            },
+            isCreating = false,
+            places = emptyList()
+        )
+
+        binding.places.layoutManager = LinearLayoutManager(this)
+        binding.places.adapter = placesAdapter
+
+        viewModel.loadPlaces(excursionId)
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 
@@ -92,6 +144,46 @@ class MineExcursionActivity : AppCompatActivity() {
         viewModel.photos.observe(this) { photos ->
             adapter.updatePhotos(photos)
         }
+
+        viewModel.places.observe(this) { places ->
+            try {
+                for (place in places) {
+                    Log.d("PLaceItem", "${place.name}, ${place.id}")
+                }
+                lifecycleScope.launch {
+                    for (place in places) {
+                        val point = Point(place.lat, place.lon)
+                        viewModel.setPoint(point)
+                        delay(500)
+                    }
+                }
+                placesAdapter.updatePlaces(places)
+                Log.d("PlaceItemsObserve", "true " + places[places.size - 1].name)
+            } catch (indexOutOfBound: IndexOutOfBoundsException) {
+                Log.d("IndexOutOfBound", "хихи поймали дурачка)")
+            } catch (e: Exception) {
+                Log.d("Exception", e.message.toString())
+            }
+        }
+
+        viewModel.routeLiveData.observe(this) { points ->
+            if (!points.isNullOrEmpty()) {
+                Log.d("RouteData", points.size.toString())
+                drawRoute(points)
+            }
+        }
+
+        viewModel.curPoint.observe(this) { point ->
+            if (point != null) {
+                Log.d("nextPoint:", "observing")
+                setLocation(point)
+                if (viewModel.prevPoint.value != null) {
+                    lifecycleScope.launch {
+                        viewModel.getRoute()
+                    }
+                }
+            }
+        }
     }
 
     private fun initCallback() {
@@ -122,6 +214,44 @@ class MineExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun setLocation(point: Point) {
+        Log.d("setLocation","")
+        try {
+            map.move(
+                CameraPosition(
+                    point,
+                    15.0f,
+                    150.0f,
+                    30.0f
+                ),
+                Animation(Animation.Type.SMOOTH, 1f),
+                null
+            )
+            setPin(point)
+        } catch (eNull: NullPointerException) {
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setPin(point: Point) {
+        Log.d("setPin", "")
+
+        val imageProvider = ImageProvider.fromResource(this, R.drawable.ic_location_pin)
+
+        placemark = map.mapObjects.addPlacemark().apply {
+            val iconStyle = IconStyle().apply { scale = 0.4f }
+            geometry = point
+            setIcon(imageProvider, iconStyle)
+        }
+    }
+
+    private fun drawRoute(points: List<Point>) {
+        if (points.isNotEmpty()) {
+            routePolyline = Polyline(points)
+            map.mapObjects.addPolyline(routePolyline!!)
+        }
+    }
+
     private fun showShimmer() {
         binding.shimmerLayout.visibility = View.VISIBLE
         binding.shimmerLayout.startShimmer()
@@ -131,6 +261,8 @@ class MineExcursionActivity : AppCompatActivity() {
         binding.deleteExcursion.visibility = View.GONE
         binding.favoriteButton.visibility = View.GONE
         binding.recyclerViewImages.visibility = View.GONE
+        binding.mapview.visibility = View.GONE
+        binding.places.visibility = View.GONE
     }
 
     private fun hideShimmer() {
@@ -142,6 +274,8 @@ class MineExcursionActivity : AppCompatActivity() {
         binding.deleteExcursion.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
         binding.recyclerViewImages.visibility = View.VISIBLE
+        binding.mapview.visibility = View.VISIBLE
+        binding.places.visibility = View.VISIBLE
     }
 
     companion object {

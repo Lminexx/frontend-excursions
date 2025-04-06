@@ -2,11 +2,14 @@ package com.example.projectexcursions.repositories.georepo
 
 import android.util.Log
 import com.example.projectexcursions.BuildConfig
+import com.example.projectexcursions.models.PlaceItem
+import com.example.projectexcursions.net.ApiService
 import com.yandex.mapkit.geometry.Point
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import java.io.IOException
+import javax.inject.Inject
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -14,7 +17,9 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-class GeoRepositoryImpl: GeoRepository {
+class GeoRepositoryImpl @Inject constructor(
+    private val apiService: ApiService
+): GeoRepository {
 
     private val client = OkHttpClient()
 
@@ -128,9 +133,17 @@ class GeoRepositoryImpl: GeoRepository {
 
 
     override fun getRandomId(length: Int): String {
-        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        val chars = "0123456789"
         return (1..length)
             .map { chars[Random.nextInt(chars.length)] }
             .joinToString("")
+    }
+
+    override suspend fun uploadPlacesItems(places: List<PlaceItem>, id: Long) {
+        apiService.uploadPlaceItems(id, places)
+    }
+
+    override suspend fun loadPlaces(id: Long): List<PlaceItem> {
+        return apiService.loadPlaces(id)
     }
 }
