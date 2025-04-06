@@ -137,6 +137,23 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
+    private suspend fun uploadPhotos(context: Context, excursionId: Long) {
+        try {
+            val multipartBodyParts = _selectedImages.value?.map { uri ->
+                val file = getFileFromUri(context, uri)
+                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("files", file.name, requestFile)
+            } ?: emptyList()
+            val excursionIdRequest =
+                excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            val response = excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
+            Log.d("PhotoUpload", "Uploaded photos successfully")
+            _selectedImages.postValue(emptyList())
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
     fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>): Boolean {
         when {
             title.isBlank() -> {
@@ -157,23 +174,6 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-
-    private suspend fun uploadPhotos(context: Context, excursionId: Long) {
-        try {
-            val multipartBodyParts = _selectedImages.value?.map { uri ->
-                val file = getFileFromUri(context, uri)
-                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("files", file.name, requestFile)
-            } ?: emptyList()
-            val excursionIdRequest =
-                excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-            val response = excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
-            Log.d("PhotoUpload", "Uploaded photos successfully")
-            _selectedImages.postValue(emptyList())
-        } catch (e: Exception) {
-           throw e
-        }
-    }
 
     suspend fun getRoute() {
         try {

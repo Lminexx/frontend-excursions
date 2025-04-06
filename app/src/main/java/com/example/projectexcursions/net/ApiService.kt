@@ -61,7 +61,7 @@ interface ApiService {
     @Multipart
     @POST("excursion/photo/upload")
     suspend fun uploadPhotos(
-        @Part file: List<MultipartBody.Part>,
+        @Part files: List<MultipartBody.Part>,
         @Part("excursionId") excursionId: RequestBody
     ): PhotoResponse
 
