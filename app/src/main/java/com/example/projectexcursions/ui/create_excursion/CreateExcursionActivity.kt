@@ -198,7 +198,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val places = viewModel.placeItems.value ?: emptyList()
                 if (viewModel.isExcursionCorrect(this, title, description, places)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
-                    finish()
+                    //finish()
                 }
             }
         }
