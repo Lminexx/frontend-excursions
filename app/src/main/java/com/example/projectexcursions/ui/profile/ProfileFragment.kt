@@ -19,12 +19,17 @@ import com.example.projectexcursions.ui.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ProfileFragment(
-    private val isModerator: Boolean
-): Fragment(R.layout.fragment_profile) {
+class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private lateinit var binding: FragmentProfileBinding
     private val viewModel: ProfileViewModel by viewModels()
+    private var isModerator = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        isModerator = arguments?.getBoolean(IS_MODERATOR) ?: false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,20 +48,13 @@ class ProfileFragment(
         subscribe()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        if (isModerator)
-            binding.moderatingExcursions.visibility = View.VISIBLE
-        else
-            binding.moderatingExcursions.visibility = View.GONE
-    }
-
     private fun initData() {
-        if (isModerator)
+        if (isModerator) {
             binding.moderatingExcursions.visibility = View.VISIBLE
-        else
-            binding.moderatingExcursions.visibility = View.GONE
+            binding.createdExcursionsList.visibility = View.GONE
+            binding.buttCreateExcursion.visibility = View.GONE
+        }
+        else binding.moderatingExcursions.visibility = View.GONE
 
         val decodedToken = viewModel.getDecodeToken()
         val url = decodedToken?.get("url")?.asString()
@@ -109,6 +107,18 @@ class ProfileFragment(
             if (wannaModerate) {
                 startActivity(Intent(requireContext(), ModeratingExListActivity::class.java))
             }
+        }
+    }
+
+    companion object {
+        private const val IS_MODERATOR = "is_moderator"
+
+        fun newInstance(isModerator: Boolean): ProfileFragment {
+            val fragment = ProfileFragment()
+            fragment.arguments = Bundle().apply {
+                putBoolean(IS_MODERATOR, isModerator)
+            }
+            return fragment
         }
     }
 }

@@ -17,11 +17,14 @@ import kotlinx.coroutines.launch
 private const val COLLAPSED_HEIGHT = 200
 
 @AndroidEntryPoint
-class DisapproveExcursionFragment(private val id: Long): BottomSheetDialogFragment() {
+class DisapproveExcursionFragment: BottomSheetDialogFragment() {
 
     private lateinit var binding: DisapproveExcurusionBottomSheetBinding
 
     private val viewModel: ExcursionViewModel by activityViewModels()
+
+    private var id = -1L
+
     override fun getTheme() = R.style.AppBottomSheetDialogTheme
 
     override fun onCreateView(
@@ -79,6 +82,18 @@ class DisapproveExcursionFragment(private val id: Long): BottomSheetDialogFragme
             lifecycleScope.launch {
                 viewModel.excursionRejected(id)
             }
+        }
+    }
+
+    companion object {
+        private const val ID = "ID"
+
+        fun newInstance(id: Long): DisapproveExcursionFragment {
+            val fragment = DisapproveExcursionFragment()
+            fragment.arguments?.apply {
+                putLong(ID, id)
+            }
+            return fragment
         }
     }
 }

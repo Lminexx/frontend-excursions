@@ -48,6 +48,6 @@ open class MainViewModel @Inject constructor(
         val decodedToken = token?.let { repository.decodeToken(token.token) }
         val role = decodedToken?.get("role")?.asString() ?: "null"
         Log.d("role", role)
-        return role != "USER" && role != "null"
+        return role == "MODERATOR"
     }
 }

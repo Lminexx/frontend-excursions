@@ -228,7 +228,7 @@ class ExcursionActivity : AppCompatActivity() {
             if (disapproving) {
                 val id = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
                 if (id != -1L) {
-                    val disapproveExcursionFrag = DisapproveExcursionFragment(id)
+                    val disapproveExcursionFrag = DisapproveExcursionFragment.newInstance(id)
                     disapproveExcursionFrag.show(supportFragmentManager, "DisapproveExcursionFragment")
                 }
             } else finish()

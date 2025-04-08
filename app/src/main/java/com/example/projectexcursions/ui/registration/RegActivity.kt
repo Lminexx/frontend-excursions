@@ -27,6 +27,14 @@ class RegActivity: AppCompatActivity() {
         subscribe()
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        binding.inputLogin.text.clear()
+        binding.inputPass.text.clear()
+        binding.repeatPass.text.clear()
+    }
+
     private fun initCallback() {
         binding.buttReg.setOnClickListener {
             val login = binding.inputLogin.text.toString().trim()

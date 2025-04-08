@@ -113,13 +113,9 @@ class AuthViewModel @Inject constructor(
                     val token = tokenRepository.getCachedToken()
                     val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
                     val userRole = decodedToken?.get("role")?.asString()
-                    if (!userRole.isNullOrEmpty()) {
-                        _role.value = userRole
-                        Log.d("UserRoleCheck1", userRole)
-                        Log.d("UserRoleCheck2", _role.value!!)
-                    } else {
-                        Log.d("Role", "null")
-                    }
+                    _role.value = userRole
+                    Log.d("UserRoleCheck1", userRole ?: "NULL")
+                    Log.d("UserRoleCheck2", _role.value!!)
                 }
                 _loginStatus.value = true
             } catch (e: HttpException) {
