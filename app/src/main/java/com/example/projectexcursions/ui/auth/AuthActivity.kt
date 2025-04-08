@@ -44,7 +44,7 @@ class AuthActivity: AppCompatActivity() {
                 val prevFrag = intent.getStringExtra("prev_frag")
                 Log.d("AuthActivity", "Success auth, prev_frag: $prevFrag")
                 val role = viewModel.role.value
-                val resultIntent = createAuthResultIntent(isAuthSuccess = true, isModerator = role == "MODERATOR")
+                val resultIntent = createAuthResultIntent(isAuthSuccess = true, isModerator = role == "MODERATOR" || role == "ADMIN")
                 resultIntent.putExtra("prev_frag", prevFrag)
                 setResult(Activity.RESULT_OK, resultIntent)
                 finish()

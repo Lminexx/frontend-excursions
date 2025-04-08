@@ -23,7 +23,7 @@ class DisapproveExcursionFragment: BottomSheetDialogFragment() {
 
     private val viewModel: ExcursionViewModel by activityViewModels()
 
-    private var id = -1L
+    private val id: Long get() = arguments?.getLong(ID) ?: -1L
 
     override fun getTheme() = R.style.AppBottomSheetDialogTheme
 

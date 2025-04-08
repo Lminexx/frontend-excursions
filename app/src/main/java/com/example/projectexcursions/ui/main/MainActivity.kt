@@ -132,9 +132,6 @@ class MainActivity : AppCompatActivity() {
             val prevFrag = data?.getStringExtra("prev_frag")
             Log.d("MainActivity", "Auth success, prev_frag: $prevFrag")
 
-            if (isModerator)
-                binding.botNavView.menu.findItem(R.id.fav).isVisible = false
-
             if (isAuth) {
                 when (prevFrag) {
                     "fav" -> replaceFragment(FavFragment())
