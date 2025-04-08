@@ -14,6 +14,7 @@ class ExcursionPagingSource (
     private val isFavorite: Boolean,
     private val isMine: Boolean
 ): PagingSource<Int, ExcursionsList>() {
+
     override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
         return state.anchorPosition?.let {anchorPosition ->
             val page = state.closestPageToPosition(anchorPosition)
@@ -40,6 +41,7 @@ class ExcursionPagingSource (
                 prevKey = prevKey,
                 nextKey = nextKey
             )
+
         } catch (exception: IOException) {
             LoadResult.Error(Exception("Ошибка сети: ${exception.message}", exception))
         } catch (exception: HttpException) {

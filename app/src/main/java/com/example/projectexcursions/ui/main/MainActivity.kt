@@ -44,6 +44,8 @@ class MainActivity : AppCompatActivity() {
         Log.d("OnResume", "$currentFrag")
         if (currentFrag == NotAuthFragment())
             replaceFragment(FavFragment())
+
+
     }
 
     private fun subscribe() {
@@ -72,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                         val isModerator = viewModel.isUserModerator()
                         Log.d("UserRole", isModerator.toString())
                         if (isAuth) {
-                            replaceFragment(ProfileFragment(isModerator))
+                            replaceFragment(ProfileFragment.newInstance(isModerator))
                         }
                         else {
                             replaceFragment(NotAuthFragment().apply {
@@ -126,14 +128,17 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             val isAuth = data?.getBooleanExtra(AuthActivity.EXTRA_AUTH_STATUS, false) ?: false
-            val isModerator = data?.getBooleanExtra(AuthActivity.EXTRA_ROLE, false) ?: false
+            val isModerator = data?.getBooleanExtra(AuthActivity.EXTRA_MODERATOR_ROLE, false) ?: false
             val prevFrag = data?.getStringExtra("prev_frag")
             Log.d("MainActivity", "Auth success, prev_frag: $prevFrag")
+
+            if (isModerator)
+                binding.botNavView.menu.findItem(R.id.fav).isVisible = false
 
             if (isAuth) {
                 when (prevFrag) {
                     "fav" -> replaceFragment(FavFragment())
-                    "profile" -> replaceFragment(ProfileFragment(isModerator))
+                    "profile" -> replaceFragment(ProfileFragment.newInstance(isModerator))
                     else -> replaceFragment(ExListFragment())
                 }
             } else {

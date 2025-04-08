@@ -23,13 +23,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/border_pattern_1"
         android:text="@string/reg_string"
         android:textColor="@color/blue"
         android:textSize="16sp"
         app:layout_constraintTop_toBottomOf="@id/repeat_pass"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
