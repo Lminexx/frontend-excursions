@@ -176,6 +176,8 @@ class MapFragment: Fragment(R.layout.fragment_map) {
                 viewModel.toggleSearchResultsVisibility()
             }
         }
+
+        binding.userPos.setOnClickListener { viewModel.getUserLocation() }
     }
 
     private fun subscribe() {

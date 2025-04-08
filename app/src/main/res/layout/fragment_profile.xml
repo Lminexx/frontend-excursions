@@ -7,24 +7,23 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="0dp">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/userNickname"
-            android:layout_height="36dp"
             android:layout_width="180dp"
-            android:layout_marginHorizontal="4dp"
-            android:layout_marginTop="16dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="24dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:scrollHorizontally="false"
             android:text="@string/user"
             android:textColor="@color/black"
             android:textSize="24sp"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:scrollHorizontally="false"
+            app:layout_constraintEnd_toStartOf="@id/buttCreateExcursion"
             app:layout_constraintStart_toEndOf="@id/userPhoto"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/buttCreateExcursion" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/buttCreateExcursion"
@@ -39,54 +38,53 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/buttLogOut"
+            android:id="@+id/moderatingExcursions"
             android:layout_width="52dp"
             android:layout_height="52dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="48dp"
+            android:background="@drawable/border_pattern_1"
+            android:contentDescription="@string/moderating_excursions"
+            android:src="@drawable/moderating_excursions"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/buttLogOut"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="86dp"
+            android:layout_marginEnd="48dp"
             android:background="#00FFFFFF"
             android:contentDescription="@string/log_out"
             android:src="@drawable/ic_logout"
-            app:layout_constraintTop_toBottomOf="@+id/buttCreateExcursion"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userPhoto"
             android:layout_width="72dp"
             android:layout_height="72dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="36dp"
             android:contentDescription="@string/avatar"
             android:src="@drawable/ic_app_v3"
-            tools:srcCompat="@tools:sample/avatars"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
+            tools:srcCompat="@tools:sample/avatars" />
 
         <Button
             android:id="@+id/createdExcursionsList"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="34dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/border_pattern_1"
             android:text="@string/my_exc_list"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@id/userPhoto"
-            app:layout_constraintTop_toBottomOf="@id/userNickname"/>
-
-        <ImageButton
-            android:id="@+id/moderatingExcursions"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="32dp"
-            android:background="@drawable/border_pattern_1"
-            android:src="@drawable/moderating_excursions"
-            android:contentDescription="@string/moderating_excursions"
-            app:layout_constraintStart_toEndOf="@id/createdExcursionsList"
-            app:layout_constraintTop_toBottomOf="@id/userNickname"
-            app:layout_constraintRight_toLeftOf="@id/buttLogOut"/>
+            app:layout_constraintTop_toBottomOf="@id/userNickname" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
