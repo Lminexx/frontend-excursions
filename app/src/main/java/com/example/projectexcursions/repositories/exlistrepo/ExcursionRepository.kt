@@ -6,10 +6,12 @@ import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
 import com.example.projectexcursions.net.PhotoResponse
+import com.example.projectexcursions.net.RatingResponse
 import com.example.projectexcursions.paging_sources.ExcursionPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.math.BigDecimal
 
 interface ExcursionRepository {
     fun excursionPagingSource(isFavorite: Boolean, isMine: Boolean): ExcursionPagingSource
@@ -47,4 +49,6 @@ interface ExcursionRepository {
     suspend fun uploadPhotos(files: List<MultipartBody.Part>, excursionId: RequestBody): PhotoResponse
 
     suspend fun loadPhotos(id: Long): List<PhotoResponse>
+
+    suspend fun uploadRating(id:Long, rating: BigDecimal):RatingResponse
 }

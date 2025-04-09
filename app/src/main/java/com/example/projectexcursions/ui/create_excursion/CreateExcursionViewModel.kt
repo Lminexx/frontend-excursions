@@ -14,20 +14,13 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
-import com.example.projectexcursions.repositories.pointrepo.PointRepository
-import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.location.Location
 import com.yandex.mapkit.location.LocationListener
-import com.yandex.mapkit.location.LocationManager
 import com.yandex.mapkit.location.LocationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -114,7 +107,9 @@ class CreateExcursionViewModel @Inject constructor(
                     response.title,
                     response.description,
                     response.user,
-                    response.favorite
+                    response.favorite,
+                    response.rating,
+                    response.personalRating
                 )
                 excursionRepository.saveExcursionToDB(respondedExcursion)
 

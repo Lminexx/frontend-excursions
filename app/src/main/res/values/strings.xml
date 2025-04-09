@@ -69,4 +69,6 @@
     <string name="delete_place">delete_place</string>
     <string name="empty_route">Маршрут пуст</string>
     <string name="empty_photos">Добавьте фото</string>
+    <string name="rating_description">Рейтинг экскурсии</string>
+    <string name="my_rating_description">Моя оценка</string>
 </resources>

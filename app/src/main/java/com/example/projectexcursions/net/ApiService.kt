@@ -14,6 +14,7 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.math.BigDecimal
 
 interface ApiService {
 
@@ -33,7 +34,6 @@ interface ApiService {
 
     @GET("excursion/{id}")
     suspend fun getExcursion(@Path("id") id: Long): ExcursionResponse
-
 
     @DELETE("excursion/{id}")
     suspend fun deleteExcursion(@Path("id") id: Long): Response<Unit>
@@ -87,4 +87,10 @@ interface ApiService {
 
     @GET("excursion/points/{id}")
     suspend fun loadPlaces(@Path("id") id: Long): List<PlaceItem>
+
+    @POST("excursion/rating")
+    suspend fun uploadRating(
+        @Query("excursionId") excursionId: Long,
+        @Query("ratingValue") ratingValue: BigDecimal
+    ) : RatingResponse
 }
