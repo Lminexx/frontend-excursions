@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.excursion
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -63,11 +64,12 @@ class ExcursionActivity : AppCompatActivity() {
         initCallback()
         initData()
         subscribe()
+
     }
 
     override fun onStart() {
         super.onStart()
-        Log.d("onStart","")
+        Log.d("onStart", "")
         MapKitFactory.getInstance().onStart()
         mapView.onStart()
     }
@@ -75,20 +77,23 @@ class ExcursionActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         mapView.onStop()
-        Log.d("onStart","")
+        Log.d("onStart", "")
         MapKitFactory.getInstance().onStop()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initData() {
         val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
         if (excursionId == -1L) {
-            Toast.makeText(this, this.getString(R.string.invalid_excursion), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, this.getString(R.string.invalid_excursion), Toast.LENGTH_SHORT)
+                .show()
             finish()
             return
         }
 
         adapter = PhotoAdapter(this, listOf())
-        binding.recyclerViewImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewImages.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.recyclerViewImages.adapter = adapter
 
         showShimmer()
@@ -115,6 +120,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun subscribe() {
         viewModel.wantComeBack.observe(this) { wannaComeback ->
             if (wannaComeback)
@@ -127,6 +133,14 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionTitle.text = excursion.title
                 binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
+                binding.ratingBar.rating = excursion.rating.toFloat()
+                binding.excursionRating.text = excursion.rating.toString()
+                if (excursion.personalRating == null) {
+                    binding.myRatingText.alpha = 0F
+                } else {
+                    binding.myRatingText.alpha = 1F
+                    binding.myExcursionRating.text = excursion.personalRating.toString()
+                }
                 val url = excursion.user.url
                 Glide.with(this)
                     .load(url)
@@ -160,7 +174,8 @@ class ExcursionActivity : AppCompatActivity() {
                 else
                     viewModel.notFav()
             } else {
-                Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT)
+                    .show()
             }
         }
 
@@ -217,6 +232,7 @@ class ExcursionActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initCallback() {
         binding.favoriteButton.setOnClickListener {
             it.isClickable = false
@@ -227,14 +243,25 @@ class ExcursionActivity : AppCompatActivity() {
                 if (viewModel.checkAuthStatus()) {
                     viewModel.clickFavorite()
                 } else {
-                    Toast.makeText(this@ExcursionActivity, this@ExcursionActivity.getString(R.string.error_favorite), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@ExcursionActivity,
+                        this@ExcursionActivity.getString(R.string.error_favorite),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
+        }
+
+        binding.ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
+            val ratingValue = viewModel.updateRating(rating.toBigDecimal())
+            binding.excursionRating.text=ratingValue.toString()
+            binding.myRatingText.alpha = 1F
+            binding.myExcursionRating.text= rating.toString()
         }
     }
 
     private fun setLocation(point: Point) {
-        Log.d("setLocation","")
+        Log.d("setLocation", "")
         try {
             map.move(
                 CameraPosition(
@@ -248,7 +275,8 @@ class ExcursionActivity : AppCompatActivity() {
             )
             setPin(point)
         } catch (eNull: NullPointerException) {
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 

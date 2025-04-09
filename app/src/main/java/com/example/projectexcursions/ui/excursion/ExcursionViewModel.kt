@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
@@ -76,7 +77,9 @@ class ExcursionViewModel @Inject constructor(
                         response.title,
                         response.description,
                         response.user,
-                        response.favorite
+                        response.favorite,
+                        response.rating,
+                        response.personalRating
                     )
                     excRepository.saveExcursionToDB(excursion)
                     _excursion.value = excursion
@@ -178,6 +181,16 @@ class ExcursionViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun updateRating(rating: BigDecimal):BigDecimal{
+        var ratingValue = BigDecimal("0.0")
+        _excursion.value?.let { currentExcursion ->
+            viewModelScope.launch {
+                ratingValue = excRepository.uploadRating(currentExcursion.id, rating).ratingValue
+            }
+        }
+        return ratingValue
     }
 
     suspend fun checkAuthStatus(): Boolean {
