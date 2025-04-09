@@ -53,6 +53,9 @@ class AuthViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _role = MutableLiveData<String?>()
+    val role: LiveData<String?> get() = _role
+
 
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
@@ -106,8 +109,16 @@ class AuthViewModel @Inject constructor(
                         Log.e("AvatarUploadError", "Failed to upload avatar: ${e.message}", e)
                     }
                 }
+                viewModelScope.launch {
+                    val token = tokenRepository.getCachedToken()
+                    val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
+                    val userRole = decodedToken?.get("role")?.asString()
+                    _role.value = userRole
+                    Log.d("UserRoleCheck1", userRole ?: "NULL")
+                    Log.d("UserRoleCheck2", _role.value!!)
+                }
                 _loginStatus.value = true
-            } catch (e: retrofit2.HttpException) {
+            } catch (e: HttpException) {
                 _loginStatus.value = false
                 val errorMessage = when (e.code()) {
                     401, 403 -> context.getString(R.string.error_auth)

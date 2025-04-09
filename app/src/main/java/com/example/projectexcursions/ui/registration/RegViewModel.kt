@@ -23,8 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegViewModel @Inject constructor(
-    private val apiService: ApiService,
-    private val tokenRepository: TokenRepository
+    private val apiService: ApiService
 ): ViewModel() {
 
     private val _validationMessage = MutableLiveData<String?>()
@@ -39,7 +38,6 @@ class RegViewModel @Inject constructor(
     private val _wantComeBack = MutableLiveData<Boolean>()
     val wantComeBack: LiveData<Boolean> get() = _wantComeBack
 
-
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
 
@@ -48,8 +46,6 @@ class RegViewModel @Inject constructor(
 
     private val _avatar = MutableLiveData<Uri>()
     val avatar: LiveData<Uri> get() = _avatar
-
-
 
     fun validateAndRegister(context: Context, login: String, password: String, repeatPassword: String) {
         when {

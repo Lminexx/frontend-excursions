@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.projectexcursions.ApproveExcursionException
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
@@ -54,6 +55,15 @@ class ExcursionViewModel @Inject constructor(
 
     private val _curPoint = MutableLiveData<Point?>()
     val curPoint: LiveData<Point?> get() = _curPoint
+
+    private val _disapproving = MutableLiveData<Boolean>()
+    val disapproving: LiveData<Boolean> get() = _disapproving
+
+    private val _approve = MutableLiveData<Boolean>()
+    val approve: LiveData<Boolean> get() = _approve
+
+    private val _id = MutableLiveData<Long>()
+    val id: LiveData<Long> get() = _id
 
     init {
         if (tokenRepository.getCachedToken() != null)
@@ -143,10 +153,14 @@ class ExcursionViewModel @Inject constructor(
     }
 
     private fun getUsername() {
-            val token = tokenRepository.getCachedToken()
-            val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
-            val name = decodedToken?.get("username")!!.asString()
-            _username.value = name!!
+        val token = tokenRepository.getCachedToken()
+        val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
+        val name = decodedToken?.get("username")!!.asString()
+        _username.value = name!!
+    }
+
+    fun disapprove() {
+        _disapproving.value = true
     }
 
     fun fav() {
@@ -178,6 +192,22 @@ class ExcursionViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    suspend fun excursionPended(id: Long) {
+        excRepository.changeExcursionStatus(id, "PENDING")
+        _disapproving.postValue(false)
+    }
+
+    suspend fun excursionRejected(id: Long) {
+        excRepository.changeExcursionStatus(id, "REJECTED")
+        _disapproving.postValue(false)
+    }
+
+    suspend fun excursionApproved() {
+        val id = excursion.value?.id ?: throw ApproveExcursionException()
+        excRepository.changeExcursionStatus(id, "APPROVED")
+        _approve.postValue(false)
     }
 
     suspend fun checkAuthStatus(): Boolean {
