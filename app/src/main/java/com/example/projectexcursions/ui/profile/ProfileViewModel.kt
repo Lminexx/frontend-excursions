@@ -34,6 +34,9 @@ class ProfileViewModel @Inject constructor(
     private val _goToCreatedExcs = MutableLiveData(false)
     val goToCreatedExcs: LiveData<Boolean> get() = _goToCreatedExcs
 
+    private val _moderateExcursions = MutableLiveData(false)
+    val moderateExcursions: LiveData<Boolean> get() = _moderateExcursions
+
     init {
         loadUser()
     }
@@ -81,11 +84,11 @@ class ProfileViewModel @Inject constructor(
         _wantComeBack.value = true
     }
 
-    fun cameBack() {
-        _wantComeBack.value = false
-    }
-
     fun createdExcsList() {
         _goToCreatedExcs.value = true
+    }
+
+    fun moderateExcursions() {
+        _moderateExcursions.value = true
     }
 }
