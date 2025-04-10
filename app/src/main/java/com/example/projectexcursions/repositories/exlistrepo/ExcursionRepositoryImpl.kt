@@ -11,12 +11,14 @@ import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
 import com.example.projectexcursions.net.PhotoResponse
+import com.example.projectexcursions.net.RatingResponse
 import com.example.projectexcursions.paging_sources.ExcursionPagingSource
 import com.example.projectexcursions.paging_sources.ModeratingExcursionsPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.math.BigDecimal
 import javax.inject.Inject
 
 class ExcursionRepositoryImpl @Inject constructor(
@@ -123,6 +125,9 @@ class ExcursionRepositoryImpl @Inject constructor(
     override suspend fun loadPhotos(id: Long): List<PhotoResponse> {
         return apiService.loadPhotos(id)
     }
+
+    override suspend fun uploadRating(id:Long,rating:Float) : RatingResponse{
+        return apiService.uploadRating(id, rating)
 
     override suspend fun changeExcursionStatus(id: Long, status: String) {
         apiService.changeExcursionStatus(id, status)

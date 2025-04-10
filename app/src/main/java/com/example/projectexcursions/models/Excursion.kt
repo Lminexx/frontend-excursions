@@ -16,5 +16,7 @@ data class Excursion(
     val description: String,
     @Embedded
     val user: UserInformation,
-    val favorite: Boolean = false
+    val favorite: Boolean = false,
+    val rating: Float,
+    val personalRating: Float? = null
 ) : Parcelable
