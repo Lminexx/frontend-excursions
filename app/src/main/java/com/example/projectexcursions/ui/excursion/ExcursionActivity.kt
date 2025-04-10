@@ -133,13 +133,13 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionTitle.text = excursion.title
                 binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
-                binding.ratingBar.rating = excursion.rating.toFloat()
                 binding.excursionRating.text = excursion.rating.toString()
                 if (excursion.personalRating == null) {
                     binding.myRatingText.alpha = 0F
                 } else {
                     binding.myRatingText.alpha = 1F
                     binding.myExcursionRating.text = excursion.personalRating.toString()
+                    binding.ratingBar.rating = excursion.personalRating
                 }
                 val url = excursion.user.url
                 Glide.with(this)
@@ -253,10 +253,15 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         binding.ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
-            val ratingValue = viewModel.updateRating(rating.toBigDecimal())
-            binding.excursionRating.text=ratingValue.toString()
-            binding.myRatingText.alpha = 1F
-            binding.myExcursionRating.text= rating.toString()
+            if (fromUser) {
+                lifecycleScope.launch {
+                    val newAverageRating = viewModel.updateRating(rating)
+                    Log.d("ratingValue", newAverageRating.toString())
+                    binding.excursionRating.text = newAverageRating.toString()
+                    binding.myRatingText.alpha = 1F
+                    binding.myExcursionRating.text = rating.toString()
+                }
+            }
         }
     }
 

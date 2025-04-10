@@ -91,6 +91,6 @@ interface ApiService {
     @POST("excursion/rating")
     suspend fun uploadRating(
         @Query("excursionId") excursionId: Long,
-        @Query("ratingValue") ratingValue: BigDecimal
+        @Query("ratingValue") ratingValue: Float
     ) : RatingResponse
 }

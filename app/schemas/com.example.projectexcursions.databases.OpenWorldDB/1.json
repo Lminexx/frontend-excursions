@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a7db0acde76613a1d5253985ae679698",
+    "identityHash": "14a86d337d7c07efd90db581b5e32492",
     "entities": [
       {
         "tableName": "excursions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `rating` TEXT NOT NULL, `personalRating` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -41,13 +41,13 @@
           {
             "fieldPath": "rating",
             "columnName": "rating",
-            "affinity": "TEXT",
+            "affinity": "REAL",
             "notNull": true
           },
           {
             "fieldPath": "personalRating",
             "columnName": "personalRating",
-            "affinity": "TEXT",
+            "affinity": "REAL",
             "notNull": false
           }
         ],
@@ -62,7 +62,7 @@
       },
       {
         "tableName": "excursion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `rating` TEXT NOT NULL, `personalRating` TEXT, `userId` INTEGER NOT NULL, `url` TEXT NOT NULL, `username` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL, `userId` INTEGER NOT NULL, `url` TEXT NOT NULL, `username` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -91,13 +91,13 @@
           {
             "fieldPath": "rating",
             "columnName": "rating",
-            "affinity": "TEXT",
+            "affinity": "REAL",
             "notNull": true
           },
           {
             "fieldPath": "personalRating",
             "columnName": "personalRating",
-            "affinity": "TEXT",
+            "affinity": "REAL",
             "notNull": false
           },
           {
@@ -158,7 +158,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a7db0acde76613a1d5253985ae679698')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '14a86d337d7c07efd90db581b5e32492')"
     ]
   }
 }
