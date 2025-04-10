@@ -36,7 +36,7 @@ class ExcursionViewModel @Inject constructor(
     val favorite: LiveData<Boolean> get() = _favorite
 
     private val _deleteExcursion = MutableLiveData<Boolean>()
-    val deleteExcursion:LiveData<Boolean> get() = _deleteExcursion
+    val deleteExcursion: LiveData<Boolean> get() = _deleteExcursion
 
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
@@ -64,27 +64,23 @@ class ExcursionViewModel @Inject constructor(
     fun loadExcursion(excursionId: Long) {
         viewModelScope.launch {
             try {
-                if (excRepository.getExcursionFromDB(excursionId) != null) {
-                    val excursionFromDB = excRepository.getExcursionFromDB(excursionId)
-                    _excursion.value = excursionFromDB
-                    Log.d("ExcursionInDB", "ExcExists")
-                } else {
-                    val response = excRepository.fetchExcursion(id = excursionId)
-                    Log.d("ExcContent", "${response.id}, \n${response.title}, " +
-                            "\n${response.description}, \n${response.user}, \n${response.favorite}")
-                    val excursion = Excursion(
-                        response.id,
-                        response.title,
-                        response.description,
-                        response.user,
-                        response.favorite,
-                        response.rating,
-                        response.personalRating
-                    )
-                    excRepository.saveExcursionToDB(excursion)
-                    _excursion.value = excursion
-                    Log.d("ExcursionIsnInDB", "FetchExcursion")
-                }
+                val response = excRepository.fetchExcursion(id = excursionId)
+                Log.d(
+                    "ExcContent", "${response.id}, \n${response.title}, " +
+                            "\n${response.description}, \n${response.user}, \n${response.favorite}"
+                )
+                val excursion = Excursion(
+                    response.id,
+                    response.title,
+                    response.description,
+                    response.user,
+                    response.favorite,
+                    response.rating,
+                    response.personalRating
+                )
+                excRepository.saveExcursionToDB(excursion)
+                _excursion.value = excursion
+                Log.d("ExcursionIsnInDB", "FetchExcursion")
             } catch (e: Exception) {
                 Log.e("LoadExcursion", e.message!!)
                 _excursion.value = null
@@ -114,6 +110,7 @@ class ExcursionViewModel @Inject constructor(
             }
         }
     }
+
     suspend fun getRoute() {
         try {
             val end = curPoint.value
@@ -146,10 +143,10 @@ class ExcursionViewModel @Inject constructor(
     }
 
     private fun getUsername() {
-            val token = tokenRepository.getCachedToken()
-            val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
-            val name = decodedToken?.get("username")!!.asString()
-            _username.value = name!!
+        val token = tokenRepository.getCachedToken()
+        val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
+        val name = decodedToken?.get("username")!!.asString()
+        _username.value = name!!
     }
 
     fun fav() {
@@ -183,14 +180,21 @@ class ExcursionViewModel @Inject constructor(
         }
     }
 
-    fun updateRating(rating: BigDecimal):BigDecimal{
-        var ratingValue = BigDecimal("0.0")
-        _excursion.value?.let { currentExcursion ->
-            viewModelScope.launch {
-                ratingValue = excRepository.uploadRating(currentExcursion.id, rating).ratingValue
-            }
+    suspend fun updateRating(rating: Float): Float {
+        val excursionId = _excursion.value?.id ?: return 0.0f
+        return try {
+            val response = excRepository.uploadRating(excursionId, rating)
+            _excursion.postValue(
+                _excursion.value?.copy(
+                    rating = response.ratingAVG,
+                    personalRating = rating
+                )
+            )
+            response.ratingAVG
+        } catch (e: Exception) {
+            Log.e("UpdateRating", "Error updating rating for excursion $excursionId", e)
+            _excursion.value?.rating ?: 0.0f
         }
-        return ratingValue
     }
 
     suspend fun checkAuthStatus(): Boolean {

@@ -122,7 +122,7 @@ class ExcursionRepositoryImpl @Inject constructor(
         return apiService.loadPhotos(id)
     }
 
-    override suspend fun uploadRating(id:Long,rating:BigDecimal) : RatingResponse{
+    override suspend fun uploadRating(id:Long,rating:Float) : RatingResponse{
         return apiService.uploadRating(id, rating)
     }
 }

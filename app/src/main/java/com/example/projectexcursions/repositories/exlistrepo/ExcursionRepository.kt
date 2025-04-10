@@ -50,5 +50,5 @@ interface ExcursionRepository {
 
     suspend fun loadPhotos(id: Long): List<PhotoResponse>
 
-    suspend fun uploadRating(id:Long, rating: BigDecimal):RatingResponse
+    suspend fun uploadRating(id:Long, rating: Float):RatingResponse
 }

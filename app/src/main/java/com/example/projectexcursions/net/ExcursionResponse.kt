@@ -1,8 +1,6 @@
 package com.example.projectexcursions.net
 
 import com.example.projectexcursions.models.UserInformation
-import com.example.projectexcursions.serializers.BigDecimalSerializer
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 
@@ -14,8 +12,6 @@ data class ExcursionResponse(
     val userId: Long,
     val user: UserInformation,
     val favorite: Boolean = false,
-    @Serializable(with = BigDecimalSerializer::class)
-    val rating: BigDecimal,
-    @Serializable(with = BigDecimalSerializer::class)
-    val personalRating: BigDecimal? = null
+    val rating: Float,
+    val personalRating: Float? = null
 )
