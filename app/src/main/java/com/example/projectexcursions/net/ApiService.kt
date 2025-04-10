@@ -1,6 +1,7 @@
 package com.example.projectexcursions.net
 
 import com.example.projectexcursions.models.CreatingExcursion
+import com.example.projectexcursions.models.ModeratingExcursionsResponse
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.User
 import okhttp3.MultipartBody
@@ -11,6 +12,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -49,7 +51,6 @@ interface ApiService {
     @POST("excursion/{id}/unFavorite")
     suspend fun deleteFavorite(@Path("id") id: Long)
 
-    //todo миграция с http на https
     @GET("excursion/search")
     suspend fun searchExcursions(
         @Query("query") query: String,
@@ -88,9 +89,22 @@ interface ApiService {
     @GET("excursion/points/{id}")
     suspend fun loadPlaces(@Path("id") id: Long): List<PlaceItem>
 
+
     @POST("excursion/rating")
     suspend fun uploadRating(
         @Query("excursionId") excursionId: Long,
         @Query("ratingValue") ratingValue: Float
     ) : RatingResponse
+
+    @PUT("excursion/moderation/{id}/status")
+    suspend fun changeExcursionStatus(
+        @Path("id") id: Long,
+        @Query("status") status: String)
+
+    @GET("excursion/moderation")
+    suspend fun loadModeratingExcursions(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int,
+        @Query("status") status: String
+    ): ModeratingExcursionsResponse
 }

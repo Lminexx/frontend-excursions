@@ -6,9 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.projectexcursions.R
@@ -16,17 +14,22 @@ import com.example.projectexcursions.UsernameNotFoundException
 import com.example.projectexcursions.databinding.FragmentProfileBinding
 import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.created_excursions_list.CreatedExListActivity
+import com.example.projectexcursions.ui.moderating_excursions_list.ModeratingExListActivity
 import com.example.projectexcursions.ui.main.MainActivity
-import com.example.projectexcursions.ui.main.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private lateinit var binding: FragmentProfileBinding
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val viewModel: ProfileViewModel by viewModels()
+    private var isModerator = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        isModerator = arguments?.getBoolean(IS_MODERATOR) ?: false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,8 +43,18 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initData()
         initCallback()
         subscribe()
+    }
+
+    private fun initData() {
+        if (isModerator) {
+            binding.moderatingExcursions.visibility = View.VISIBLE
+            binding.createdExcursionsList.visibility = View.GONE
+            binding.buttCreateExcursion.visibility = View.GONE
+        }
+        else binding.moderatingExcursions.visibility = View.GONE
 
         val decodedToken = viewModel.getDecodeToken()
         val url = decodedToken?.get("url")?.asString()
@@ -60,6 +73,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         binding.buttCreateExcursion.setOnClickListener { viewModel.clickCreateExcursion() }
         binding.buttLogOut.setOnClickListener { viewModel.clickComeBack() }
         binding.createdExcursionsList.setOnClickListener { viewModel.createdExcsList() }
+        binding.moderatingExcursions.setOnClickListener { viewModel.moderateExcursions() }
     }
 
     private fun subscribe() {
@@ -87,6 +101,24 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             if (wannaCreated) {
                 startActivity(Intent(requireContext(), CreatedExListActivity::class.java))
             }
+        }
+
+        viewModel.moderateExcursions.observe(viewLifecycleOwner) { wannaModerate ->
+            if (wannaModerate) {
+                startActivity(Intent(requireContext(), ModeratingExListActivity::class.java))
+            }
+        }
+    }
+
+    companion object {
+        private const val IS_MODERATOR = "is_moderator"
+
+        fun newInstance(isModerator: Boolean): ProfileFragment {
+            val fragment = ProfileFragment()
+            fragment.arguments = Bundle().apply {
+                putBoolean(IS_MODERATOR, isModerator)
+            }
+            return fragment
         }
     }
 }

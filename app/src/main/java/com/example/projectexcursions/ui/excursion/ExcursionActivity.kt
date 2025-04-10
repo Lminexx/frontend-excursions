@@ -21,6 +21,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.example.projectexcursions.ApproveExcursionException
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
@@ -34,7 +35,6 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
-import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -89,6 +89,14 @@ class ExcursionActivity : AppCompatActivity() {
                 .show()
             finish()
             return
+        }
+
+        val isModerating = intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
+        if (isModerating)
+            binding.favoriteButton.visibility = View.GONE
+        else {
+            binding.commentButton.visibility = View.GONE
+            binding.approveButton.visibility = View.GONE
         }
 
         adapter = PhotoAdapter(this, listOf())
@@ -230,6 +238,20 @@ class ExcursionActivity : AppCompatActivity() {
                 }
             }
         }
+
+        viewModel.disapproving.observe(this) { disapproving ->
+            if (disapproving) {
+                val id = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
+                if (id != -1L) {
+                    val disapproveExcursionFrag = DisapproveExcursionFragment.newInstance(id)
+                    disapproveExcursionFrag.show(supportFragmentManager, "DisapproveExcursionFragment")
+                }
+            } else finish()
+        }
+
+        viewModel.approve.observe(this) { approved ->
+            if (approved) finish()
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -260,6 +282,24 @@ class ExcursionActivity : AppCompatActivity() {
                     binding.excursionRating.text = newAverageRating.toString()
                     binding.myRatingText.alpha = 1F
                     binding.myExcursionRating.text = rating.toString()
+                }
+            }
+        }
+
+        binding.commentButton.setOnClickListener { viewModel.disapprove() }
+
+        binding.approveButton.setOnClickListener {
+            it.isClickable = false
+            Handler(Looper.getMainLooper()).postDelayed({
+                it.isClickable = true
+            }, 1000)
+            lifecycleScope.launch {
+                try {
+                    viewModel.excursionApproved()
+                } catch (e: ApproveExcursionException) {
+                    Toast.makeText(this@ExcursionActivity, e.message, Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Log.e("ApprovedError", e.message.toString())
                 }
             }
         }
@@ -330,9 +370,11 @@ class ExcursionActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_EXCURSION_ID = "EXTRA_EXCURSION_ID"
-
-        internal fun Context.createExcursionActivityIntent(excursionId: Long): Intent =
-            Intent(this, ExcursionActivity::class.java)
-                .putExtra(EXTRA_EXCURSION_ID, excursionId)
+        private const val EXTRA_IS_MODERATING = "EXTRA_IS_MODERATING"
+        internal fun Context.createExcursionActivityIntent(excursionId: Long, isModerating: Boolean): Intent =
+            Intent(this, ExcursionActivity::class.java).apply {
+                putExtra(EXTRA_EXCURSION_ID, excursionId)
+                putExtra(EXTRA_IS_MODERATING, isModerating)
+            }
     }
 }
