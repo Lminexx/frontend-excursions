@@ -3,11 +3,13 @@ package com.example.projectexcursions.repositories.exlistrepo
 import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
+import com.example.projectexcursions.models.ModeratingExcursionsResponse
 import com.example.projectexcursions.net.ExcursionResponse
 import com.example.projectexcursions.net.ExcursionsResponse
 import com.example.projectexcursions.net.PhotoResponse
 import com.example.projectexcursions.net.RatingResponse
 import com.example.projectexcursions.paging_sources.ExcursionPagingSource
+import com.example.projectexcursions.paging_sources.ModeratingExcursionsPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -17,6 +19,8 @@ interface ExcursionRepository {
     fun excursionPagingSource(isFavorite: Boolean, isMine: Boolean): ExcursionPagingSource
 
     fun searchExcursionPagingSource(query: String, isMine: Boolean, isFavorite: Boolean): SearchExcursionPagingSource
+
+    fun moderatingExcursionsPagingSource(): ModeratingExcursionsPagingSource
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 
@@ -50,5 +54,11 @@ interface ExcursionRepository {
 
     suspend fun loadPhotos(id: Long): List<PhotoResponse>
 
+
     suspend fun uploadRating(id:Long, rating: Float):RatingResponse
+
+    suspend fun changeExcursionStatus(id: Long, status: String)
+
+    suspend fun loadModeratingExcursions(offset: Int, limit: Int, status: String): ModeratingExcursionsResponse
+
 }

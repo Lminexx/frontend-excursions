@@ -7,14 +7,10 @@ import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.net.ApiService
 import retrofit2.HttpException
 import java.io.IOException
-import javax.inject.Inject
 
-class ExcursionPagingSource (
-    private val apiService: ApiService,
-    private val isFavorite: Boolean,
-    private val isMine: Boolean
+class ModeratingExcursionsPagingSource (
+    private val apiService: ApiService
 ): PagingSource<Int, ExcursionsList>() {
-
     override fun getRefreshKey(state: PagingState<Int, ExcursionsList>): Int? {
         return state.anchorPosition?.let {anchorPosition ->
             val page = state.closestPageToPosition(anchorPosition)
@@ -28,7 +24,7 @@ class ExcursionPagingSource (
         Log.d("Paging", "Offset: $position")
         Log.d("Paging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.getExcursions(offset = position, limit = params.loadSize, isFavorite = isFavorite, isMine = isMine)
+            val response = apiService.loadModeratingExcursions(offset = position, limit = params.loadSize, status = "REJECTED")
             val excursions = response.content
             Log.d("PagingSource2", "$excursions")
             val pageInfo = response.page
@@ -41,7 +37,6 @@ class ExcursionPagingSource (
                 prevKey = prevKey,
                 nextKey = nextKey
             )
-
         } catch (exception: IOException) {
             LoadResult.Error(Exception("Ошибка сети: ${exception.message}", exception))
         } catch (exception: HttpException) {

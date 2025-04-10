@@ -1,7 +1,6 @@
 package com.example.projectexcursions.ui.auth
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -32,18 +31,22 @@ class AuthActivity: AppCompatActivity() {
         subscribe()
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        binding.inputLogin.text.clear()
+        binding.inputPass.text.clear()
+    }
+
     private fun subscribe() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
                 val prevFrag = intent.getStringExtra("prev_frag")
                 Log.d("AuthActivity", "Success auth, prev_frag: $prevFrag")
-
-                val resultIntent = createAuthResultIntent(true)
+                val role = viewModel.role.value
+                val resultIntent = createAuthResultIntent(isAuthSuccess = true, isModerator = role == "MODERATOR" || role == "ADMIN")
                 resultIntent.putExtra("prev_frag", prevFrag)
-
-                Log.d("AuthActivity", "Setting result OK")
                 setResult(Activity.RESULT_OK, resultIntent)
-
                 finish()
             } else {
                 Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()
@@ -102,8 +105,12 @@ class AuthActivity: AppCompatActivity() {
 
     companion object {
         const val EXTRA_AUTH_STATUS = "EXTRA_AUTH_STATUS"
+        const val EXTRA_MODERATOR_ROLE = "EXTRA_MODERATOR_ROLE"
 
-         private fun createAuthResultIntent(isAuthSuccess: Boolean): Intent =
-            Intent().putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
+         private fun createAuthResultIntent(isAuthSuccess: Boolean, isModerator: Boolean): Intent =
+            Intent().apply {
+                putExtra(EXTRA_AUTH_STATUS, isAuthSuccess)
+                putExtra(EXTRA_MODERATOR_ROLE, isModerator)
+            }
     }
 }

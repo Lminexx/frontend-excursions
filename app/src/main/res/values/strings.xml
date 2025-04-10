@@ -71,4 +71,11 @@
     <string name="empty_photos">Добавьте фото</string>
     <string name="rating_description">Рейтинг экскурсии</string>
     <string name="my_rating_description">Моя оценка</string>
+    <string name="moderating_excursions">Модерация экскурсий</string>
+    <string name="pend">Отправить на доработку</string>
+    <string name="approve">Подтвердить экскурсию</string>
+    <string name="write_comment">Напишите комментарий</string>
+    <string name="descript_problem">Опишите проблему</string>
+    <string name="reject">Отклонить</string>
+    <string name="focus_on_user">Фокус на юзера</string>
 </resources>
