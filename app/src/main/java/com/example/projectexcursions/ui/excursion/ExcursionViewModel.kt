@@ -210,6 +210,7 @@ class ExcursionViewModel @Inject constructor(
             Log.e("UpdateRating", "Error updating rating for excursion $excursionId", e)
             _excursion.value?.rating ?: 0.0f
         }
+    }
 
     suspend fun excursionPended(id: Long) {
         excRepository.changeExcursionStatus(id, "PENDING")
