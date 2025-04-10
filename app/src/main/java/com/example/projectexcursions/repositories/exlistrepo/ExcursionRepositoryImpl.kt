@@ -126,9 +126,9 @@ class ExcursionRepositoryImpl @Inject constructor(
         return apiService.loadPhotos(id)
     }
 
-    override suspend fun uploadRating(id:Long,rating:Float) : RatingResponse{
+    override suspend fun uploadRating(id:Long,rating:Float) : RatingResponse {
         return apiService.uploadRating(id, rating)
-
+    }
     override suspend fun changeExcursionStatus(id: Long, status: String) {
         apiService.changeExcursionStatus(id, status)
     }
