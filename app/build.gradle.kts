@@ -5,6 +5,8 @@ plugins {
     kotlin("plugin.serialization")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -121,8 +123,11 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.circleimageview)
     implementation(libs.glide.okhttp3.integration)
+    implementation(libs.graphhopper.core)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics.ktx)
+    implementation(libs.firebase.analytics.ktx)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
     kapt(libs.glide.compiler)
-    implementation(libs.graphhopper.core)
 }

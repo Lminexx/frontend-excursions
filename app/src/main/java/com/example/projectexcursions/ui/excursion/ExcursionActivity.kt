@@ -27,6 +27,7 @@ import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.utilies.CustomMapView
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -214,8 +215,10 @@ class ExcursionActivity : AppCompatActivity() {
                 placesAdapter.updatePlaces(places)
                 Log.d("PlaceItemsObserve", "true " + places[places.size - 1].name)
             } catch (indexOutOfBound: IndexOutOfBoundsException) {
+                FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
                 Log.d("IndexOutOfBound", "хихи поймали дурачка)")
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.d("Exception", e.message.toString())
             }
         }
@@ -297,8 +300,10 @@ class ExcursionActivity : AppCompatActivity() {
                 try {
                     viewModel.excursionApproved()
                 } catch (e: ApproveExcursionException) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(this@ExcursionActivity, e.message, Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Log.e("ApprovedError", e.message.toString())
                 }
             }
@@ -320,8 +325,7 @@ class ExcursionActivity : AppCompatActivity() {
             )
             setPin(point)
         } catch (eNull: NullPointerException) {
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
-                .show()
+            FirebaseCrashlytics.getInstance().recordException(eNull)
         }
     }
 

@@ -12,6 +12,7 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -92,6 +93,7 @@ class ExcursionViewModel @Inject constructor(
                 _excursion.value = excursion
                 Log.d("ExcursionIsnInDB", "FetchExcursion")
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoadExcursion", e.message!!)
                 _excursion.value = null
             }
@@ -105,6 +107,7 @@ class ExcursionViewModel @Inject constructor(
                 val photoUris = response.map { Uri.parse(it.url) }
                 _photos.value = photoUris
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoadPhotos", e.message ?: "Unknown error")
             }
         }
@@ -116,6 +119,7 @@ class ExcursionViewModel @Inject constructor(
                 val response = geoRepository.loadPlaces(excursionId)
                 _places.value = response
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("PLacesError", e.message.toString())
             }
         }
@@ -134,6 +138,7 @@ class ExcursionViewModel @Inject constructor(
                 _routeLiveData.postValue(route)
             }
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("Route", "Error getting route", e)
         }
     }
@@ -207,6 +212,7 @@ class ExcursionViewModel @Inject constructor(
             )
             response.ratingAVG
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("UpdateRating", "Error updating rating for excursion $excursionId", e)
             _excursion.value?.rating ?: 0.0f
         }
