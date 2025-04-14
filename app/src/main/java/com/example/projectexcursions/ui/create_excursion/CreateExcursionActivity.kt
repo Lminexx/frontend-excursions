@@ -33,6 +33,7 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.example.projectexcursions.ui.utilies.ProgressBar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -44,7 +45,6 @@ import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
-import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchFactory
 import com.yandex.mapkit.search.SearchManagerType
@@ -176,6 +176,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 false
             } catch (e: Exception) {
                 Log.d("CloseSearchException", e.message.toString())
+                FirebaseCrashlytics.getInstance().recordException(e)
                 false
             }
         }
@@ -250,9 +251,11 @@ class CreateExcursionActivity : AppCompatActivity() {
                 Log.d("PlaceItemsObserve", "true " + placeItems[placeItems.size - 1].name)
             } catch (indexOutOfBound: IndexOutOfBoundsException) {
                 clearRoute()
+                FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
                 Log.d("IndexOutOfBound", "хихи поймали дурачка)")
             } catch (e: Exception) {
                 clearRoute()
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.d("Exception", e.message.toString())
             }
         }
@@ -352,6 +355,7 @@ class CreateExcursionActivity : AppCompatActivity() {
             )
             setPin(point)
         } catch (eNull: NullPointerException) {
+            FirebaseCrashlytics.getInstance().recordException(eNull)
             Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
         }
     }
@@ -370,6 +374,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 null
             )
         } catch (eNull: NullPointerException) {
+            FirebaseCrashlytics.getInstance().recordException(eNull)
             Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
         }
     }
@@ -496,6 +501,7 @@ class CreateExcursionActivity : AppCompatActivity() {
             return@GeoObjectTapListener true
         } catch (e: Exception) {
             Log.e("GeoObjectException", "${e.message}")
+            FirebaseCrashlytics.getInstance().recordException(e)
             return@GeoObjectTapListener false
         }
     }
