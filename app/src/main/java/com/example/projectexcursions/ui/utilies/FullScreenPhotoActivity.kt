@@ -1,4 +1,4 @@
-package com.example.projectexcursions.ui.fullscreen
+package com.example.projectexcursions.ui.utilies
 
 import FullScreenPhotoAdapter
 import android.content.Context

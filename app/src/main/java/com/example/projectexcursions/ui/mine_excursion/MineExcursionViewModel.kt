@@ -11,6 +11,7 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -92,6 +93,7 @@ class MineExcursionViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e("LoadExcursion", e.message!!)
+                FirebaseCrashlytics.getInstance().recordException(e)
                 _excursion.value = null
             }
         }
@@ -106,6 +108,7 @@ class MineExcursionViewModel @Inject constructor(
                     _photos.value = photoUris
                 }
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoadPhotos", e.message ?: "Unknown error")
             }
         }
@@ -124,6 +127,7 @@ class MineExcursionViewModel @Inject constructor(
                 val response = geoRepository.loadPlaces(excursionId)
                 _places.value = response
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("PLacesError", e.message.toString())
             }
         }
@@ -141,6 +145,7 @@ class MineExcursionViewModel @Inject constructor(
                 _routeLiveData.postValue(route)
             }
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("Route", "Error getting route", e)
         }
     }
@@ -167,16 +172,15 @@ class MineExcursionViewModel @Inject constructor(
                 _wantComeBack.value = true
             }
         } catch (http: HttpException) {
+            FirebaseCrashlytics.getInstance().recordException(http)
             _message.value = http.message
         } catch (io: IOException) {
+            FirebaseCrashlytics.getInstance().recordException(io)
             _message.value = io.message
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             _message.value = e.message
         }
-    }
-
-    fun cameBack() {
-        _wantComeBack.value = false
     }
 
     fun fav() {

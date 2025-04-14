@@ -12,6 +12,7 @@ import com.example.projectexcursions.models.Token
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,6 +71,7 @@ class AuthViewModel @Inject constructor(
             return tempFile
         } catch (e: IOException) {
             Log.e("getFileFromUri", "Error copying file from URI: $uri", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         }
     }
@@ -107,6 +109,7 @@ class AuthViewModel @Inject constructor(
                         uploadAvatar(context, avatarUri)
                     } catch (e: Exception) {
                         Log.e("AvatarUploadError", "Failed to upload avatar: ${e.message}", e)
+                        FirebaseCrashlytics.getInstance().recordException(e)
                     }
                 }
                 viewModelScope.launch {
@@ -124,10 +127,12 @@ class AuthViewModel @Inject constructor(
                     401, 403 -> context.getString(R.string.error_auth)
                     else -> context.getString(R.string.error_auth)
                 }
+                FirebaseCrashlytics.getInstance().recordException(e)
                 _validationMessage.value = errorMessage
             } catch (e: Exception) {
                 _loginStatus.value = false
                 _validationMessage.value = e.localizedMessage
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoginError", "Login error: ", e)
             }
         }
@@ -150,6 +155,7 @@ class AuthViewModel @Inject constructor(
         } catch (e: IOException) {
             Log.e("PhotoUploadError", "IO Error uploading photo: ${e.message}", e)
             _validationMessage.postValue("Ошибка при чтении файла: ${e.message}")
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         } catch (e: HttpException) {
             Log.e(
@@ -157,15 +163,18 @@ class AuthViewModel @Inject constructor(
                 "HTTP Error uploading photo: ${e.message}, code: ${e.code()}",
                 e
             )
+            FirebaseCrashlytics.getInstance().recordException(e)
             _validationMessage.postValue("Ошибка при загрузке: ${e.code()}")
             throw e
         } catch (e: CancellationException) {
             Log.e("PhotoUploadError", "Upload cancelled: ${e.message}", e)
             _validationMessage.postValue("Загрузка была отменена")
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         } catch (e: Exception) {
             Log.e("PhotoUploadError", "General Error uploading photo: ${e.message}", e)
             _validationMessage.postValue("Неизвестная ошибка: ${e.message}")
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         } finally {
             _isLoading.value = false

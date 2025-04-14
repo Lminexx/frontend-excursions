@@ -44,8 +44,6 @@ class MainActivity : AppCompatActivity() {
         Log.d("OnResume", "$currentFrag")
         if (currentFrag == NotAuthFragment())
             replaceFragment(FavFragment())
-
-
     }
 
     private fun subscribe() {

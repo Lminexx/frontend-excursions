@@ -14,6 +14,7 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.location.Location
@@ -91,6 +92,7 @@ class CreateExcursionViewModel @Inject constructor(
             return tempFile
         } catch (e: IOException) {
             Log.e("getFileFromUri", "Error copying file from URI: $uri", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         }
     }
@@ -124,6 +126,7 @@ class CreateExcursionViewModel @Inject constructor(
                         uploadPhotos(context, response.id)
                     } catch (e: Exception) {
                         Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
+                        FirebaseCrashlytics.getInstance().recordException(e)
                         _message.value = "Error uploading photos: ${e.message}"
                     }
                 }
@@ -131,6 +134,7 @@ class CreateExcursionViewModel @Inject constructor(
             } catch (e: Exception) {
                 _message.value = "Error: ${e.message}"
                 Log.e("CreatingExcursionError", e.message!!)
+                FirebaseCrashlytics.getInstance().recordException(e)
                 _createExcursion.value = false
             }
         }
@@ -149,6 +153,7 @@ class CreateExcursionViewModel @Inject constructor(
             Log.d("PhotoUpload", "Uploaded photos successfully")
             _selectedImages.postValue(emptyList())
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         }
     }
@@ -187,16 +192,8 @@ class CreateExcursionViewModel @Inject constructor(
                 _routeLiveData.postValue(route)
             }
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("Route", "Error getting route", e)
-        }
-    }
-
-    suspend fun getPhotos(point: Point): List<String> {
-        try {
-            return geoRepository.getPhotosByLocation(point)
-        } catch (e: Exception) {
-            Log.e("GetPhotoException", "${e.message}")
-            return emptyList()
         }
     }
 
@@ -258,6 +255,7 @@ class CreateExcursionViewModel @Inject constructor(
             _searchResults.value = results
             _isSearchResultsVisible.value = results.isNotEmpty()
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.d("Exception", "казявка")
         }
     }
@@ -275,6 +273,7 @@ class CreateExcursionViewModel @Inject constructor(
             _placeItems.value = _placeItems.value?.filterNot { it.id == placeId }
             Log.d("PLaceItems", "${placeItems.value?.size ?: "null"}")
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("DeleteException", e.message.toString())
         }
     }

@@ -2,6 +2,7 @@
 activityKtx = "1.9.3"
 agp = "8.4.1"
 coreSplashscreen = "1.0.1"
+firebaseBom = "32.7.2"
 glide = "4.15.0"
 graphhopperCore = "8.0"
 gson = "2.10.1"
@@ -47,6 +48,9 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 facebook-shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmerVersion" }
+firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 graphhopper-core = { module = "com.graphhopper:graphhopper-core", version.ref = "graphhopperCore" }

@@ -11,6 +11,7 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -79,6 +80,8 @@ class RegViewModel @Inject constructor(
                 Log.e("RegistrationError", "Ошибка при регистрации: ${e.message}")
                 if (e.message!!.contains("409"))
                     _regRespMes.value = context.getString(R.string.user_exists)
+                else
+                    FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
     }
