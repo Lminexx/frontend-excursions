@@ -7,6 +7,9 @@ import android.util.Log
 import android.widget.Toast
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.google.firebase.FirebaseApp
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +33,7 @@ class OpenWorldApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        FirebaseApp.initializeApp(this)
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
         Log.d("YandexMap", "API Key: ${BuildConfig.MAPKIT_API_KEY}")
 
@@ -43,7 +47,6 @@ class OpenWorldApp : Application() {
                     401 -> {
 
                         if (tokenRepository.getToken() != null) {
-
                             tokenRepository.deleteToken(tokenRepository.getCachedToken()!!.token)
                             Toast.makeText(
                                 applicationContext,

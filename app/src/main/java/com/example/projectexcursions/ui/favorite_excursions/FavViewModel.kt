@@ -4,16 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.projectexcursions.databases.daos.ExcursionsDao
 import com.example.projectexcursions.models.ExcursionsList
-import com.example.projectexcursions.net.ExcursionRemoteMediator
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
-import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -26,12 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavViewModel @Inject constructor(
-    repository: ExcursionRepository,
-    excursionsDao: ExcursionsDao,
-    private val tokenRepository: TokenRepository
+    repository: ExcursionRepository
 ) : ViewModel() {
-
-    private val remoteMediator = ExcursionRemoteMediator(repository)
 
     private val _goToExcursion = MutableLiveData(false)
     val goToExcursion: LiveData<Boolean> get() = _goToExcursion
@@ -42,7 +34,7 @@ class FavViewModel @Inject constructor(
 
     private val isSearching = MutableStateFlow(false)
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalPagingApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     var favExcursions: Flow<PagingData<ExcursionsList>> = isSearching
         .flatMapLatest { searching ->
             if (searching) {

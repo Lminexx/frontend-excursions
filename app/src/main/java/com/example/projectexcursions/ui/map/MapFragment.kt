@@ -24,6 +24,7 @@ import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.pointrepo.PointRepositoryImpl
 import com.example.projectexcursions.ui.map.poi_map.PoiBottomFragment
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -167,6 +168,7 @@ class MapFragment: Fragment(R.layout.fragment_map) {
             } catch (e: Exception) {
                 Log.d("CloseSearchException", e.message.toString())
                 viewModel.getUserLocation()
+                FirebaseCrashlytics.getInstance().recordException(e)
                 false
             }
         }
@@ -273,7 +275,7 @@ class MapFragment: Fragment(R.layout.fragment_map) {
             )
             setPin(point)
         } catch (eNull: NullPointerException) {
-            Toast.makeText(requireContext(), "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
+            FirebaseCrashlytics.getInstance().recordException(eNull)
         }
     }
 
