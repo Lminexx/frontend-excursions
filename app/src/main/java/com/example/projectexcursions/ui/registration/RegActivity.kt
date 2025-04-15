@@ -65,19 +65,8 @@ class RegActivity: AppCompatActivity() {
             }
         }
 
-        viewModel.regRespMes.observe(this) { response ->
-            response?.let {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-            } ?: run {
-                Toast.makeText(this, this.getString(R.string.shit_happens), Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-
-        viewModel.validationMessage.observe(this) { message ->
-            val finalMessage =
-                message.takeIf { !it.isNullOrEmpty() } ?: this.getString(R.string.unknown_error)
-            Toast.makeText(this, finalMessage, Toast.LENGTH_SHORT).show()
+        viewModel.message.observe(this) { message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
 
         viewModel.avatar.observe(this) { picture ->
