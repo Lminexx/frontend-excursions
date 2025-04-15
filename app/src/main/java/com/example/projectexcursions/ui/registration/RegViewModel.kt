@@ -10,16 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
-import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,11 +20,8 @@ class RegViewModel @Inject constructor(
     private val apiService: ApiService
 ): ViewModel() {
 
-    private val _validationMessage = MutableLiveData<String?>()
-    val validationMessage: LiveData<String?> get() = _validationMessage
-
-    private val _regRespMes = MutableLiveData<String?>()
-    val regRespMes: LiveData<String?> get() = _regRespMes
+    private val _message = MutableLiveData<String?>()
+    val message: LiveData<String?> get() = _message
 
     private val _regStatus = MutableLiveData<Boolean>()
     val regStatus: LiveData<Boolean> get() = _regStatus
@@ -50,10 +40,10 @@ class RegViewModel @Inject constructor(
 
     fun validateAndRegister(context: Context, login: String, password: String, repeatPassword: String) {
         when {
-            login.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_login)
-            password.isBlank() -> _validationMessage.value = context.getString(R.string.error_enter_password)
-            repeatPassword.isBlank() -> _validationMessage.value = context.getString(R.string.repeat_password)
-            password != repeatPassword -> _validationMessage.value = context.getString(R.string.pass_not_same)
+            login.isBlank() -> _message.value = context.getString(R.string.error_enter_login)
+            password.isBlank() -> _message.value = context.getString(R.string.error_enter_password)
+            repeatPassword.isBlank() -> _message.value = context.getString(R.string.repeat_password)
+            password != repeatPassword -> _message.value = context.getString(R.string.pass_not_same)
             else -> {
                 _username.value = login
                 _password.value = password
@@ -71,22 +61,22 @@ class RegViewModel @Inject constructor(
                     val user = User(username, password)
                     val response = apiService.registerUser(user)
                     Log.d("RegistrationResponse", "Response: $response")
-                    _regRespMes.value = context.getString(R.string.user_registered)
+                    _message.value = context.getString(R.string.user_registered)
                     _regStatus.value = true
                 } else {
-                    _regRespMes.value = context.getString(R.string.lang_error)
+                    _message.value = context.getString(R.string.lang_error)
                 }
             } catch (e: Exception) {
                 Log.e("RegistrationError", "Ошибка при регистрации: ${e.message}")
                 if (e.message!!.contains("409"))
-                    _regRespMes.value = context.getString(R.string.user_exists)
-                else
+                    _message.value = context.getString(R.string.user_exists)
+                else {
+                    _message.value = e.message
                     FirebaseCrashlytics.getInstance().recordException(e)
+                }
             }
         }
     }
-
-
 
     private fun isInputLangValid(input: String): Boolean {
         val regex = "^[a-zA-Z0-9!@#\$%^&*()_+{}\\[\\]:;<>,.?~\\-=\\s]*\$".toRegex()
@@ -95,9 +85,5 @@ class RegViewModel @Inject constructor(
 
     fun addProfilePicture(image: Uri){
         _avatar.value=image
-    }
-
-    fun cameBack() {
-        _wantComeBack.value = false
     }
 }
