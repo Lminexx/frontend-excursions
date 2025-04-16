@@ -202,7 +202,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val photos = viewModel.selectedImages.value ?: emptyList()
                 if (viewModel.isExcursionCorrect(this, title, description, places)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description)
-                    //finish()
                 }
             }
         }
