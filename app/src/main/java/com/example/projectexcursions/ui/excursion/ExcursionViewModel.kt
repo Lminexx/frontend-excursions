@@ -86,7 +86,11 @@ class ExcursionViewModel @Inject constructor(
                     response.user,
                     response.favorite,
                     response.rating,
-                    response.personalRating
+                    response.personalRating,
+                    response.tags,
+                    response.topic,
+                    response.approvedAt,
+                    response.cityName
                 )
                 excRepository.saveExcursionToDB(excursion)
                 _excursion.value = excursion

@@ -4,6 +4,7 @@ agp = "8.4.1"
 coreSplashscreen = "1.0.1"
 glide = "4.15.0"
 graphhopperCore = "8.0"
+gson = "2.10.1"
 hiltAndroid = "2.51.1"
 javaJwt = "3.18.2"
 jwtdecode = "2.0.0"
@@ -72,6 +73,7 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
 glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
 androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "navigationCommonKtx" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

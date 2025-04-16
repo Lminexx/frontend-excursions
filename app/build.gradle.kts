@@ -85,7 +85,6 @@ buildTypes {
 }
 
 dependencies {
-
     implementation(libs.glide)
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.facebook.shimmer)
@@ -97,6 +96,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.play.services.maps)
     implementation(libs.androidx.navigation.common.ktx)
+    implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
