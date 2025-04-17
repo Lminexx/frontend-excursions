@@ -52,32 +52,6 @@ class ModeratingExListActivity: AppCompatActivity() {
             }
         }
 
-        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                if (!query.isNullOrEmpty()) {
-                    viewModel.searchExcursionsQuery(query)
-                }
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null) {
-                    viewModel.searchExcursionsQuery(newText)
-                }
-                return true
-            }
-        })
-
-        binding.searchView.setOnCloseListener {
-            viewModel.resetSearch()
-            false
-        }
-
-        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            if (hasFocus)
-                lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
-        }
-
         binding.swipeRefresh.setOnRefreshListener {
             adapter.refresh()
         }
