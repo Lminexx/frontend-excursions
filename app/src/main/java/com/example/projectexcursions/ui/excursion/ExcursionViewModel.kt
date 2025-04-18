@@ -76,10 +76,6 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = excRepository.fetchExcursion(id = excursionId)
-                Log.d(
-                    "ExcContent", "${response.id}, \n${response.title}, " +
-                            "\n${response.description}, \n${response.user}, \n${response.favorite}"
-                )
                 val excursion = Excursion(
                     response.id,
                     response.title,

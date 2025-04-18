@@ -2,7 +2,6 @@ package com.example.projectexcursions.net
 
 import com.example.projectexcursions.models.UserInformation
 import kotlinx.serialization.Serializable
-import java.math.BigDecimal
 
 @Serializable
 data class ExcursionResponse(
