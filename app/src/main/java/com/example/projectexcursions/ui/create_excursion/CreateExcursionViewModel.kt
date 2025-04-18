@@ -76,8 +76,8 @@ class CreateExcursionViewModel @Inject constructor(
     private val _placeItems = MutableLiveData<List<PlaceItem>>()
     val placeItems: LiveData<List<PlaceItem>> get() = _placeItems
 
-    private val _deletingPlaceId = MutableLiveData<String>()
-    val deletingPLaceId: LiveData<String> get() = _deletingPlaceId
+    private val _deletingPlace = MutableLiveData<Boolean>()
+    val deletingPLace: LiveData<Boolean> get() = _deletingPlace
 
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
@@ -100,6 +100,7 @@ class CreateExcursionViewModel @Inject constructor(
     fun createExcursion(context: Context, title: String, description: String) {
         Log.d("CreatingExcursion", "CreatingExcursion")
         val excursion = CreatingExcursion(title, description)
+        val places = placeItems.value ?: emptyList()
         viewModelScope.launch {
             try {
                 _createExcursion.value = false
@@ -113,7 +114,9 @@ class CreateExcursionViewModel @Inject constructor(
                     response.rating,
                     response.personalRating
                 )
+                val id = response.id
                 excursionRepository.saveExcursionToDB(respondedExcursion)
+                geoRepository.uploadPlacesItems(places, id)
 
                 _message.value = context.getString(R.string.create_success)
 
@@ -145,12 +148,12 @@ class CreateExcursionViewModel @Inject constructor(
             } ?: emptyList()
             val excursionIdRequest =
                 excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-            val response = excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
+            excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
             Log.d("PhotoUpload", "Uploaded photos successfully")
             _selectedImages.postValue(emptyList())
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
-            throw e
+            Log.e("photo_exc", e.message.toString())
         }
     }
 
@@ -166,7 +169,7 @@ class CreateExcursionViewModel @Inject constructor(
                 return false
             }
             
-            places.isNullOrEmpty() -> {
+            places.isEmpty() -> {
                 _message.value = context.getString(R.string.empty_route)
                 return true
             }
@@ -213,7 +216,7 @@ class CreateExcursionViewModel @Inject constructor(
     }
 
     fun setPoint(point: Point) {
-        if (_curPoint.value == null) {
+        if (_curPoint.value == null && _prevPoint.value == null) {
             _curPoint.value = point
             Log.d("curPoint", "${point.latitude}, ${point.longitude}")
         } else {
@@ -265,13 +268,17 @@ class CreateExcursionViewModel @Inject constructor(
 
     fun deletePlace(placeId: String) {
         try {
-            _deletingPlaceId.value = placeId
+            _deletingPlace.value = true
             _placeItems.value = _placeItems.value?.filterNot { it.id == placeId }
             Log.d("PLaceItems", "${placeItems.value?.size ?: "null"}")
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("DeleteException", e.message.toString())
         }
+    }
+
+    fun itemDeleted() {
+        _deletingPlace.value = false
     }
 
     fun getId(i: Int): String {
