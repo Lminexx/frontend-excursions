@@ -43,6 +43,7 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.search.Response
@@ -70,6 +71,8 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var placemark: PlacemarkMapObject
     private var routePolyline: Polyline? = null
     private val viewModel: CreateExcursionViewModel by viewModels()
+    private lateinit var pinsLayer: MapObjectCollection
+    private lateinit var routeLayer: MapObjectCollection
 
     private val REQUEST_CODE_PERMISSION = 1003
 
@@ -80,6 +83,9 @@ class CreateExcursionActivity : AppCompatActivity() {
         mapView = binding.mapview
         mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
+        val root = map.mapObjects
+        pinsLayer = root.addCollection()
+        routeLayer = root.addCollection()
 
         initData()
         initCallback()
@@ -123,6 +129,7 @@ class CreateExcursionActivity : AppCompatActivity() {
             },
             onDeleteClick = { placeId ->
                 viewModel.deletePlace(placeId)
+                Log.d("onDeleteClick", placeId)
             },
             isCreating = true,
             places = emptyList()
@@ -245,15 +252,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.placeItems.observe(this) { placeItems ->
             try {
-                for (placeItem in placeItems) {
-                    Log.d("PLaceItem", "${placeItem.name}, ${placeItem.id}")
-                }
                 placesAdapter.updatePlaces(placeItems)
-                Log.d("PlaceItemsObserve", "true " + placeItems[placeItems.size - 1].name)
-            } catch (indexOutOfBound: IndexOutOfBoundsException) {
-                clearRoute()
-                FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
-                Log.d("IndexOutOfBound", "хихи поймали дурачка)")
             } catch (e: Exception) {
                 clearRoute()
                 FirebaseCrashlytics.getInstance().recordException(e)
@@ -261,17 +260,20 @@ class CreateExcursionActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.deletingPLaceId.observe(this) { placeId ->
-            Log.d("DeletingPlace", "true")
-            clearRoute()
-            lifecycleScope.launch {
-                val places = viewModel.placeItems.value!!.filter { it.id != placeId }
-                for (place in places) {
-                    val point = Point(place.lat, place.lon)
-                    viewModel.setPoint(point)
+        viewModel.deletingPLace.observe(this) { wannaDelete ->
+            Log.d("DeletingPlace", wannaDelete.toString())
+            if (wannaDelete) {
+                clearRoute()
+                lifecycleScope.launch {
+                    val places = viewModel.placeItems.value!!
+                    for (place in places) {
+                        val point = Point(place.lat, place.lon)
+                        viewModel.setPoint(point)
+                    }
+                    if (places.size == 1)
+                        viewModel.deletePrevPoint()
                 }
-                if (places.size == 1)
-                    viewModel.deletePrevPoint()
+                viewModel.itemDeleted()
             }
         }
     }
