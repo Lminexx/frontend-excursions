@@ -303,7 +303,7 @@ class MapFragment: Fragment(R.layout.fragment_map) {
                 val searchResults = response.collection.children.mapNotNull { result ->
                     val point = result.obj?.geometry?.firstOrNull()?.point
                     val name = result.obj?.name ?: return@mapNotNull null
-                    val id = viewModel.getId(10)
+                    val id = viewModel.getId()
                     SearchResult(id, name, point!!)
                 }
                 viewModel.updateSearchResults(searchResults)

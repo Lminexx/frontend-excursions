@@ -86,8 +86,8 @@ interface ApiService {
         @Body places: List<PlaceItem>
     )
 
-    @GET("excursion/points/{id}")
-    suspend fun loadPlaces(@Path("id") id: Long): List<PlaceItem>
+    @GET("excursion/points/{excursionId}")
+    suspend fun loadPlaces(@Path("excursionId") id: Long): List<PlaceItem>
 
 
     @POST("excursion/rating")

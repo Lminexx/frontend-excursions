@@ -129,10 +129,8 @@ class ExcursionViewModel @Inject constructor(
                 Log.d("Point", "Start or end point is null")
                 return
             }
-            withContext(Dispatchers.IO) {
-                val route = geoRepository.getRoute(start, end)
-                _routeLiveData.postValue(route)
-            }
+            val route = geoRepository.getRoute(start, end)
+            _routeLiveData.postValue(route)
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("Route", "Error getting route", e)
@@ -228,7 +226,6 @@ class ExcursionViewModel @Inject constructor(
         val id = excursion.value?.id ?: throw ApproveExcursionException()
         excRepository.changeExcursionStatus(id, "APPROVED")
         _approve.postValue(false)
-
     }
 
     suspend fun checkAuthStatus(): Boolean {

@@ -293,6 +293,7 @@ class ExcursionActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     viewModel.excursionApproved()
+                    finish()
                 } catch (e: ApproveExcursionException) {
                     FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(this@ExcursionActivity, e.message, Toast.LENGTH_SHORT).show()
@@ -369,9 +370,15 @@ class ExcursionActivity : AppCompatActivity() {
             binding.mainRatingConteiner.visibility = View.GONE
             binding.myRatingContainer.visibility = View.GONE
             binding.ratingDescription.visibility = View.GONE
+            binding.commentButton.visibility = View.VISIBLE
+            binding.approveButton.visibility = View.VISIBLE
         } else {
             binding.commentButton.visibility = View.GONE
             binding.approveButton.visibility = View.GONE
+            binding.favoriteButton.visibility = View.VISIBLE
+            binding.mainRatingConteiner.visibility = View.VISIBLE
+            binding.myRatingContainer.visibility = View.VISIBLE
+            binding.ratingDescription.visibility = View.VISIBLE
         }
     }
 

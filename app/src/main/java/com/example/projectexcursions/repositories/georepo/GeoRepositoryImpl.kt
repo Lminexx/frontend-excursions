@@ -5,6 +5,8 @@ import com.example.projectexcursions.BuildConfig
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.net.ApiService
 import com.yandex.mapkit.geometry.Point
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -23,14 +25,14 @@ class GeoRepositoryImpl @Inject constructor(
 
     private val client = OkHttpClient()
 
-    override suspend fun getRoute(start: Point, end: Point): List<Point> {
+    override suspend fun getRoute(start: Point, end: Point): List<Point> = withContext(Dispatchers.IO) {
         val apiKey = BuildConfig.GHOPPER_API_KEY
         val url = "https://graphhopper.com/api/1/route?point=${start.latitude},${start.longitude}" +
                 "&point=${end.latitude},${end.longitude}&vehicle=foot&locale=ru&key=$apiKey"
 
         val request = Request.Builder().url(url).build()
 
-        return try {
+        return@withContext try {
             val response = client.newCall(request).execute()
             if (response.isSuccessful) {
                 response.body?.string()?.let { json ->
