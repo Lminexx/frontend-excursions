@@ -21,7 +21,7 @@ import java.math.BigDecimal
 interface ApiService {
 
     @POST("user")
-    suspend fun registerUser(@Body user: User): RegistrationResponse
+    suspend fun registerUser(@Body user: User): Response<RegistrationResponse>
 
     @GET("excursion")
     suspend fun getExcursions(
@@ -29,13 +29,13 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("isFavorite") isFavorite: Boolean,
         @Query("myList") isMine: Boolean
-    ): ExcursionsResponse
+    ): Response<ExcursionsResponse>
 
     @POST("user/login")
-    suspend fun authUser(@Body user: User): AuthResponse
+    suspend fun authUser(@Body user: User): Response<AuthResponse>
 
     @GET("excursion/{id}")
-    suspend fun getExcursion(@Path("id") id: Long): ExcursionResponse
+    suspend fun getExcursion(@Path("id") id: Long): Response<ExcursionResponse>
 
     @DELETE("excursion/{id}")
     suspend fun deleteExcursion(@Path("id") id: Long): Response<Unit>
@@ -43,7 +43,7 @@ interface ApiService {
     @POST("excursion/create")
     suspend fun createExcursion(
         @Body creatingExcursion: CreatingExcursion
-    ): ExcursionResponse
+    ): Response<ExcursionResponse>
 
     @POST("excursion/{id}/favorite")
     suspend fun addFavorite(@Path("id") id: Long)
@@ -58,17 +58,17 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("isFavorite") isFavorite: Boolean,
         @Query("myList") isMine: Boolean
-    ): ExcursionsResponse
+    ): Response<ExcursionsResponse>
 
     @Multipart
     @POST("excursion/photo/upload")
     suspend fun uploadPhotos(
         @Part files: List<MultipartBody.Part>,
         @Part("excursionId") excursionId: RequestBody
-    ): PhotoResponse
+    ): Response<PhotoResponse>
 
     @GET("excursion/photo/{id}")
-    suspend fun loadPhotos(@Path("id") id: Long): List<PhotoResponse>
+    suspend fun loadPhotos(@Path("id") id: Long): Response<List<PhotoResponse>>
 
     @POST("user/validToken")
     suspend fun validateToken()
@@ -78,7 +78,7 @@ interface ApiService {
     suspend fun uploadAvatar(
         @Part("fileName") fileName: RequestBody,
         @Part file: MultipartBody.Part
-    ):AuthResponse
+    ): Response<AuthResponse>
 
     @POST("excursion/points/{excursionId}")
     suspend fun uploadPlaceItems(
@@ -87,14 +87,14 @@ interface ApiService {
     )
 
     @GET("excursion/points/{excursionId}")
-    suspend fun loadPlaces(@Path("excursionId") id: Long): List<PlaceItem>
+    suspend fun loadPlaces(@Path("excursionId") id: Long): Response<List<PlaceItem>>
 
 
     @POST("excursion/rating")
     suspend fun uploadRating(
         @Query("excursionId") excursionId: Long,
         @Query("ratingValue") ratingValue: Float
-    ) : RatingResponse
+    ): Response<RatingResponse>
 
     @PUT("excursion/moderation/{id}/status")
     suspend fun changeExcursionStatus(
@@ -106,5 +106,5 @@ interface ApiService {
         @Query("offset") offset: Int,
         @Query("limit") limit: Int,
         @Query("status") status: String
-    ): ModeratingExcursionsResponse
+    ): Response<ModeratingExcursionsResponse>
 }

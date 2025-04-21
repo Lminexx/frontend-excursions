@@ -244,6 +244,7 @@ class ExcursionActivity : AppCompatActivity() {
                     disapproveExcursionFrag.show(supportFragmentManager, "DisapproveExcursionFragment")
                 }
             } else finish()
+            Log.d("disapproving", disapproving.toString())
         }
 
         viewModel.approve.observe(this) { approved ->

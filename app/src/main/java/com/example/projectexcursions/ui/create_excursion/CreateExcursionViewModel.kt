@@ -99,7 +99,7 @@ class CreateExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _createExcursion.value = false
-                val response = excursionRepository.createExcursion(excursion)
+                val response = excursionRepository.createExcursion(excursion).body()!!
                 val respondedExcursion = Excursion(
                     response.id,
                     response.title,

@@ -2,6 +2,7 @@ package com.example.projectexcursions.repositories.georepo
 
 import com.example.projectexcursions.models.PlaceItem
 import com.yandex.mapkit.geometry.Point
+import retrofit2.Response
 
 interface GeoRepository {
 
@@ -15,5 +16,5 @@ interface GeoRepository {
 
     suspend fun uploadPlacesItems(places: List<PlaceItem>, id: Long)
 
-    suspend fun loadPlaces(id: Long): List<PlaceItem>
+    suspend fun loadPlaces(id: Long): Response<List<PlaceItem>>
 }
