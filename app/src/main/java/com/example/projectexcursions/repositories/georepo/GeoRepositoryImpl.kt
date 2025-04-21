@@ -4,12 +4,14 @@ import android.util.Log
 import com.example.projectexcursions.BuildConfig
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.net.ApiService
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
+import retrofit2.Response
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.atan2
@@ -48,10 +50,12 @@ class GeoRepositoryImpl @Inject constructor(
                 } ?: emptyList()
             } else {
                 Log.e("GraphHopper", "Ошибка загрузки маршрута: ${response.message}")
+                FirebaseCrashlytics.getInstance().recordException(Exception(response.message))
                 emptyList()
             }
-        } catch (e: IOException) {
-            Log.e("GraphHopper", "Ошибка загрузки маршрута", e)
+        } catch (io: IOException) {
+            Log.e("GraphHopper", "Ошибка загрузки маршрута", io)
+            FirebaseCrashlytics.getInstance().recordException(io)
             emptyList()
         }
     }
@@ -145,7 +149,7 @@ class GeoRepositoryImpl @Inject constructor(
         apiService.uploadPlaceItems(id, places)
     }
 
-    override suspend fun loadPlaces(id: Long): List<PlaceItem> {
+    override suspend fun loadPlaces(id: Long): Response<List<PlaceItem>> {
         return apiService.loadPlaces(id)
     }
 }

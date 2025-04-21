@@ -71,7 +71,7 @@ class MineExcursionViewModel @Inject constructor(
                     _excursion.value = excursionFromDB
                     Log.d("ExcursionInDB", "ExcExists")
                 } else {
-                    val response = excRepository.fetchExcursion(id = excursionId)
+                    val response = excRepository.fetchExcursion(id = excursionId).body()!!
                     Log.d("ExcContent", "${response.id}, \n${response.title}, " +
                             "\n${response.description}, \n${response.user}, \n${response.favorite}")
                     val excursion = Excursion(
@@ -98,7 +98,7 @@ class MineExcursionViewModel @Inject constructor(
     fun loadPhotos(excursionId: Long) {
         viewModelScope.launch {
             try {
-                val response = excRepository.loadPhotos(excursionId)
+                val response = excRepository.loadPhotos(excursionId).body()!!
                 if (response.isNotEmpty()) {
                     val photoUris = response.map { Uri.parse(it.url) }
                     _photos.value = photoUris
@@ -120,7 +120,7 @@ class MineExcursionViewModel @Inject constructor(
     fun loadPlaces(excursionId: Long) {
         viewModelScope.launch {
             try {
-                val response = geoRepository.loadPlaces(excursionId)
+                val response = geoRepository.loadPlaces(excursionId).body()!!
                 _places.value = response
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)

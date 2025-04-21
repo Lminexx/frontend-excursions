@@ -18,7 +18,6 @@ class TokenRepositoryImpl @Inject constructor(
 ): TokenRepository {
 
     private var cachedToken: Token? = null
-    private var avatar: Uri? = null
 
     override suspend fun saveToken(token: Token) {
         tokenDao.insertToken(token)

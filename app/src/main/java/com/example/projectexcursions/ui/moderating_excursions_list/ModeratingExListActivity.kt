@@ -45,6 +45,18 @@ class ModeratingExListActivity: AppCompatActivity() {
         hideShimmer()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        lifecycleScope.launch {
+            viewModel.moderatingExcursions.collectLatest { pagingData ->
+                Log.d("excursions", "$pagingData")
+                adapter.submitData(pagingData)
+                Log.d("GetAllExcursions", "${viewModel.moderatingExcursions}")
+            }
+        }
+    }
+
     private fun initCallback() {
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
             override fun onExcursionClick(excursionsList: ExcursionsList) {
