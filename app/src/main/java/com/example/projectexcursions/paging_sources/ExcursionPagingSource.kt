@@ -29,9 +29,9 @@ class ExcursionPagingSource (
         Log.d("Paging", "limit: ${params.loadSize}")
         return try {
             val response = apiService.getExcursions(offset = position, limit = params.loadSize, isFavorite = isFavorite, isMine = isMine)
-            val excursions = response.content
+            val excursions = response.body()!!.content
             Log.d("PagingSource2", "$excursions")
-            val pageInfo = response.page
+            val pageInfo = response.body()!!.page
             val prevKey = if (position == 0) null else position - 1
             val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
             Log.d("PagingSource3", "NextKey: $nextKey, PrevKey: $prevKey")

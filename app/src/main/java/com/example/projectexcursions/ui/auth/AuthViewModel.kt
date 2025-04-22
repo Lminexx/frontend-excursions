@@ -12,6 +12,7 @@ import com.example.projectexcursions.models.Token
 import com.example.projectexcursions.models.User
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,6 +71,7 @@ class AuthViewModel @Inject constructor(
             return tempFile
         } catch (e: IOException) {
             Log.e("getFileFromUri", "Error copying file from URI: $uri", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         }
     }
@@ -99,7 +101,7 @@ class AuthViewModel @Inject constructor(
             try {
                 val user = User(login, password)
                 val response = apiService.authUser(user)
-                _token.value = response.token
+                _token.value = response.body()!!.token
                 tokenRepository.saveToken(Token(token = token.value!!))
                 Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
                 _avatar.value?.let { avatarUri ->
@@ -107,6 +109,7 @@ class AuthViewModel @Inject constructor(
                         uploadAvatar(context, avatarUri)
                     } catch (e: Exception) {
                         Log.e("AvatarUploadError", "Failed to upload avatar: ${e.message}", e)
+                        FirebaseCrashlytics.getInstance().recordException(e)
                     }
                 }
                 viewModelScope.launch {
@@ -124,10 +127,12 @@ class AuthViewModel @Inject constructor(
                     401, 403 -> context.getString(R.string.error_auth)
                     else -> context.getString(R.string.error_auth)
                 }
+                FirebaseCrashlytics.getInstance().recordException(e)
                 _validationMessage.value = errorMessage
             } catch (e: Exception) {
                 _loginStatus.value = false
                 _validationMessage.value = e.localizedMessage
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoginError", "Login error: ", e)
             }
         }
@@ -142,14 +147,15 @@ class AuthViewModel @Inject constructor(
                 MultipartBody.Part.createFormData("file", file.name, requestFile)
             val fileName = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
             val response = apiService.uploadAvatar(fileName, multipartBody)
-            _token.postValue(response.token)
+            _token.postValue(response.body()!!.token)
             tokenRepository.clearToken()
-            tokenRepository.saveToken(Token(token = response.token))
+            tokenRepository.saveToken(Token(token = response.body()!!.token))
             Log.d("Avatar", "Avatar uploaded successfully")
             Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
         } catch (e: IOException) {
             Log.e("PhotoUploadError", "IO Error uploading photo: ${e.message}", e)
             _validationMessage.postValue("Ошибка при чтении файла: ${e.message}")
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         } catch (e: HttpException) {
             Log.e(
@@ -157,15 +163,18 @@ class AuthViewModel @Inject constructor(
                 "HTTP Error uploading photo: ${e.message}, code: ${e.code()}",
                 e
             )
+            FirebaseCrashlytics.getInstance().recordException(e)
             _validationMessage.postValue("Ошибка при загрузке: ${e.code()}")
             throw e
         } catch (e: CancellationException) {
             Log.e("PhotoUploadError", "Upload cancelled: ${e.message}", e)
             _validationMessage.postValue("Загрузка была отменена")
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         } catch (e: Exception) {
             Log.e("PhotoUploadError", "General Error uploading photo: ${e.message}", e)
             _validationMessage.postValue("Неизвестная ошибка: ${e.message}")
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         } finally {
             _isLoading.value = false
@@ -191,9 +200,5 @@ class AuthViewModel @Inject constructor(
 
     fun clickComeBack() {
         _wantComeBack.value = true
-    }
-
-    fun cameBack() {
-        _wantComeBack.value = false
     }
 }

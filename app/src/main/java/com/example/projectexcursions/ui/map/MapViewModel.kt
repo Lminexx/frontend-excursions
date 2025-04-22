@@ -8,6 +8,7 @@ import com.example.projectexcursions.BuildConfig
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.georepo.GeoRepository
 import com.example.projectexcursions.repositories.pointrepo.PointRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.location.FilteringMode
@@ -139,6 +140,7 @@ class MapViewModel @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("Route", "Error getting route", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             _routeFinished.postValue(true)
         }
     }
@@ -191,7 +193,7 @@ class MapViewModel @Inject constructor(
         Log.d("endPoint", "${endPoint.value?.latitude}, ${endPoint.value?.longitude}")
     }
 
-    fun getId(i: Int): String {
+    fun getId(): String {
         return geoRepository.getRandomId(10)
     }
 }

@@ -34,26 +34,11 @@ class ModeratingExListViewModel @Inject constructor(
 
     var selectedExcursionsList: ExcursionsList? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    var moderatingExcursions: Flow<PagingData<ExcursionsList>> = isSearching
-        .flatMapLatest { searching ->
-            if (searching) {
-                searchExcursion
-                    .debounce(1000)
-                    .distinctUntilChanged()
-                    .flatMapLatest { query ->
-                        Pager(
-                            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                            pagingSourceFactory = { repository.moderatingExcursionsPagingSource() }
-                        ).flow
-                    }
-            } else {
-                Pager(
-                    config = PagingConfig(pageSize = 10, enablePlaceholders = false),
-                    pagingSourceFactory = { repository.moderatingExcursionsPagingSource() }
-                ).flow
-            }
-        }.cachedIn(viewModelScope)
+    var moderatingExcursions: Flow<PagingData<ExcursionsList>> =
+        Pager(
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+            pagingSourceFactory = { repository.moderatingExcursionsPagingSource() }
+        ).flow
 
     fun goneToExcursion() {
         _goToExcursion.value = false

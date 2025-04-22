@@ -27,6 +27,7 @@ import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.utilies.CustomMapView
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -84,12 +85,6 @@ class ExcursionActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun initData() {
         val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
-        if (excursionId == -1L) {
-            Toast.makeText(this, this.getString(R.string.invalid_excursion), Toast.LENGTH_SHORT)
-                .show()
-            finish()
-            return
-        }
 
         val isModerating = intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
         if (isModerating)
@@ -143,7 +138,7 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionDescription.text = excursion.description
                 binding.excursionRating.text = excursion.rating.toString()
                 if (excursion.personalRating == null) {
-                    binding.myRatingText.alpha = 0F
+                    binding.myRatingText.alpha = 0.0F
                 } else {
                     binding.myRatingText.alpha = 1F
                     binding.myExcursionRating.text = excursion.personalRating.toString()
@@ -214,8 +209,10 @@ class ExcursionActivity : AppCompatActivity() {
                 placesAdapter.updatePlaces(places)
                 Log.d("PlaceItemsObserve", "true " + places[places.size - 1].name)
             } catch (indexOutOfBound: IndexOutOfBoundsException) {
+                FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
                 Log.d("IndexOutOfBound", "хихи поймали дурачка)")
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.d("Exception", e.message.toString())
             }
         }
@@ -247,6 +244,7 @@ class ExcursionActivity : AppCompatActivity() {
                     disapproveExcursionFrag.show(supportFragmentManager, "DisapproveExcursionFragment")
                 }
             } else finish()
+            Log.d("disapproving", disapproving.toString())
         }
 
         viewModel.approve.observe(this) { approved ->
@@ -296,9 +294,12 @@ class ExcursionActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     viewModel.excursionApproved()
+                    finish()
                 } catch (e: ApproveExcursionException) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(this@ExcursionActivity, e.message, Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Log.e("ApprovedError", e.message.toString())
                 }
             }
@@ -320,8 +321,7 @@ class ExcursionActivity : AppCompatActivity() {
             )
             setPin(point)
         } catch (eNull: NullPointerException) {
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
-                .show()
+            FirebaseCrashlytics.getInstance().recordException(eNull)
         }
     }
 
@@ -347,6 +347,11 @@ class ExcursionActivity : AppCompatActivity() {
         binding.recyclerViewImages.visibility = View.GONE
         binding.mapview.visibility = View.GONE
         binding.places.visibility = View.GONE
+        binding.approveButton.visibility = View.GONE
+        binding.commentButton.visibility = View.GONE
+        binding.mainRatingConteiner.visibility = View.GONE
+        binding.myRatingContainer.visibility = View.GONE
+        binding.ratingDescription.visibility = View.GONE
     }
 
     private fun hideShimmer() {
@@ -359,6 +364,23 @@ class ExcursionActivity : AppCompatActivity() {
         binding.recyclerViewImages.visibility = View.VISIBLE
         binding.mapview.visibility = View.VISIBLE
         binding.places.visibility = View.VISIBLE
+        binding.ratingDescription.visibility = View.VISIBLE
+        val isModerating = intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
+        if (isModerating) {
+            binding.favoriteButton.visibility = View.GONE
+            binding.mainRatingConteiner.visibility = View.GONE
+            binding.myRatingContainer.visibility = View.GONE
+            binding.ratingDescription.visibility = View.GONE
+            binding.commentButton.visibility = View.VISIBLE
+            binding.approveButton.visibility = View.VISIBLE
+        } else {
+            binding.commentButton.visibility = View.GONE
+            binding.approveButton.visibility = View.GONE
+            binding.favoriteButton.visibility = View.VISIBLE
+            binding.mainRatingConteiner.visibility = View.VISIBLE
+            binding.myRatingContainer.visibility = View.VISIBLE
+            binding.ratingDescription.visibility = View.VISIBLE
+        }
     }
 
     private fun drawRoute(points: List<Point>) {

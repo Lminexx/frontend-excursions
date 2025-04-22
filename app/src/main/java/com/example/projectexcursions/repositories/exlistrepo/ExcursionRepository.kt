@@ -13,6 +13,7 @@ import com.example.projectexcursions.paging_sources.ModeratingExcursionsPagingSo
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Response
 import java.math.BigDecimal
 
 interface ExcursionRepository {
@@ -28,9 +29,9 @@ interface ExcursionRepository {
 
     suspend fun saveExcursionToDB(excursion: Excursion)
 
-    suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse
+    suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): Response<ExcursionsResponse>
 
-    suspend fun fetchExcursion(id: Long): ExcursionResponse
+    suspend fun fetchExcursion(id: Long): Response<ExcursionResponse>
 
     suspend fun deleteExcursion(id: Long)
 
@@ -40,7 +41,7 @@ interface ExcursionRepository {
 
     suspend fun deleteAllExcursionsFromExcursion()
 
-    suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse
+    suspend fun createExcursion(creatingExcursion: CreatingExcursion): Response<ExcursionResponse>
 
     suspend fun addFavorite(id:Long)
 
@@ -48,17 +49,17 @@ interface ExcursionRepository {
 
     suspend fun checkFav(excursionId: Long): Boolean
 
-    suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse
+    suspend fun searchExcursions(query: String, offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): Response<ExcursionsResponse>
 
-    suspend fun uploadPhotos(files: List<MultipartBody.Part>, excursionId: RequestBody): PhotoResponse
+    suspend fun uploadPhotos(files: List<MultipartBody.Part>, excursionId: RequestBody): Response<PhotoResponse>
 
-    suspend fun loadPhotos(id: Long): List<PhotoResponse>
+    suspend fun loadPhotos(id: Long): Response<List<PhotoResponse>>
 
 
-    suspend fun uploadRating(id:Long, rating: Float):RatingResponse
+    suspend fun uploadRating(id:Long, rating: Float): Response<RatingResponse>
 
     suspend fun changeExcursionStatus(id: Long, status: String)
 
-    suspend fun loadModeratingExcursions(offset: Int, limit: Int, status: String): ModeratingExcursionsResponse
+    suspend fun loadModeratingExcursions(offset: Int, limit: Int, status: String): Response<ModeratingExcursionsResponse>
 
 }
