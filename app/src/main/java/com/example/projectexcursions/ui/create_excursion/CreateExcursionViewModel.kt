@@ -95,9 +95,9 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun createExcursion(context: Context, title: String, description: String) {
+    fun createExcursion(context: Context, title: String, description: String, tags:List<String>, topic:String, city: String) {
         Log.d("CreatingExcursion", "CreatingExcursion")
-        val excursion = CreatingExcursion(title, description)
+        val excursion = CreatingExcursion(title, description, topic, tags, city)
         viewModelScope.launch {
             try {
                 _createExcursion.value = false
@@ -153,7 +153,7 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>): Boolean {
+    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>, city: String): Boolean {
         when {
             title.isBlank() -> {
                 _message.value = context.getString(R.string.empty_title)
@@ -168,6 +168,11 @@ class CreateExcursionViewModel @Inject constructor(
             places.isNullOrEmpty() -> {
                 _message.value = context.getString(R.string.empty_route)
                 return true
+            }
+
+            city.isEmpty()->{
+                _message.value=context.getString(R.string.empty_city_name)
+                return false
             }
             else -> return true
         }
