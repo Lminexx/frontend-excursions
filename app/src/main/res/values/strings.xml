@@ -84,10 +84,10 @@
     <string name="empty_city_name">Название города не заполненно</string>
     <string name="topic_string">Выберите тематику экскурсии</string>
     <string-array name="topics">
-        <item>Семейная</item>
-        <item>Развлекательная</item>
-        <item>Позновательная</item>
-        <item>Активная</item>
+        <item>UNDEFINED</item>
+        <item>WALKING</item>
+        <item>TRIP</item>
+        <item>ACADEMIC</item>
     </string-array>
     <string name="or_login_by">или войти через:</string>
     <string name="login_by_google">Войти через Google</string>
