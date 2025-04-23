@@ -12,7 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
-import android.view.MotionEvent
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
@@ -21,7 +21,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
@@ -33,6 +32,7 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.example.projectexcursions.ui.utilies.ProgressBar
+import com.google.android.material.chip.Chip
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -44,7 +44,6 @@ import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
-import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchFactory
 import com.yandex.mapkit.search.SearchManagerType
@@ -55,7 +54,7 @@ import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlin.random.Random
+
 
 @AndroidEntryPoint
 class CreateExcursionActivity : AppCompatActivity() {
@@ -88,7 +87,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d("onStart","")
+        Log.d("onStart", "")
         MapKitFactory.getInstance().onStart()
         mapView.onStart()
         viewModel.getUserPosition()
@@ -97,7 +96,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         mapView.onStop()
-        Log.d("onStart","")
+        Log.d("onStart", "")
         MapKitFactory.getInstance().onStop()
     }
 
@@ -128,7 +127,8 @@ class CreateExcursionActivity : AppCompatActivity() {
             places = emptyList()
         )
 
-        binding.recyclerViewSelectedImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewSelectedImages.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.searchResultsRecycler.layoutManager = LinearLayoutManager(this)
         binding.places.layoutManager = LinearLayoutManager(this)
         binding.searchResultsRecycler.adapter = searchResultsAdapter
@@ -156,7 +156,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         map.addTapListener(geoObjectTapListener())
 
-        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 search(query)
                 return true
@@ -185,6 +185,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                 viewModel.toggleSearchResultsVisibility()
             }
         }
+
+        binding.addTagsButton.setOnClickListener {
+            addNewChip()
+        }
     }
 
     private fun subscribe() {
@@ -200,8 +204,18 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
                 val photos = viewModel.selectedImages.value ?: emptyList()
-                if (viewModel.isExcursionCorrect(this, title, description, places)) {
-                    viewModel.createExcursion(this@CreateExcursionActivity, title, description)
+                val tags = binding.tagsChips
+                val chipTexts = mutableListOf<String>()
+                for (i in 0 until tags.childCount) {
+                    val chip = tags.getChildAt(i) as? Chip
+                    chip?.let {
+                        chipTexts.add(it.text.toString())
+                    }
+                }
+                val city = binding.cityName.text.toString()
+                val topic= binding.topic.selectedItem.toString()
+                if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
+                    viewModel.createExcursion(this@CreateExcursionActivity, title, description, chipTexts, topic, city)
                 }
             }
         }
@@ -270,6 +284,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                     viewModel.deletePrevPoint()
             }
         }
+
+        viewModel.message.observe(this){ massage ->
+            Toast.makeText(this, massage, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private val pickImages =
@@ -316,6 +334,32 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun addNewChip() {
+        val keyword: String = binding.addTagsString.text.toString()
+        println(keyword)
+        if (keyword.isEmpty()) {
+            Toast.makeText(this, "Пожалуйста, введите тэг", Toast.LENGTH_SHORT).show()
+            return
+        }
+        try {
+            val inflater = LayoutInflater.from(this)
+            val newChip =
+                inflater.inflate(R.layout.layout_chip_entry, binding.tagsChips, false) as Chip
+            newChip.text = keyword
+            newChip.setCloseIconVisible(true)
+            newChip.setChipBackgroundColorResource(R.color.lighter_blue)
+            newChip.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.tagsChips.addView(newChip)
+            newChip.setOnCloseIconClickListener {
+                binding.tagsChips.removeView(newChip)
+            }
+            binding.addTagsString.setText("")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error: " + e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "image/*"
@@ -338,7 +382,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun setLocation(point: Point) {
-        Log.d("setLocation","")
+        Log.d("setLocation", "")
         try {
             map.move(
                 CameraPosition(
@@ -352,12 +396,13 @@ class CreateExcursionActivity : AppCompatActivity() {
             )
             setPin(point)
         } catch (eNull: NullPointerException) {
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
     private fun setUserLocation(point: Point) {
-        Log.d("setUserLocation","")
+        Log.d("setUserLocation", "")
         try {
             map.move(
                 CameraPosition(
@@ -370,7 +415,8 @@ class CreateExcursionActivity : AppCompatActivity() {
                 null
             )
         } catch (eNull: NullPointerException) {
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -387,43 +433,46 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun search(query: String?) {
-            val searchManager =
-                SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
-            val searchOptions = SearchOptions().apply {
-                searchTypes = SearchType.BIZ.value
-                resultPageSize = 10
-            }
+        val searchManager =
+            SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
+        val searchOptions = SearchOptions().apply {
+            searchTypes = SearchType.BIZ.value
+            resultPageSize = 10
+        }
 
-            val searchSessionListener = object : Session.SearchListener {
-                override fun onSearchResponse(response: Response) {
-                        val searchResults = response.collection.children.mapNotNull { result ->
-                            val point = result.obj?.geometry?.firstOrNull()?.point
-                            Log.d("point", point?.equals(null).toString())
-                            val name = result.obj?.name ?: return@mapNotNull null
-                            Log.d("name", name.equals(null).toString())
-                            val id = viewModel.getId(7)
-                            Log.d("id", id.equals(null).toString())
-                            SearchResult(id, name, point!!)
-                        }
-                    for (searchResult in searchResults) {
-                        Log.d("SearchResult", "${searchResult.id}, ${searchResult.name}, ${searchResult.point}")
-                    }
-                    viewModel.updateSearchResults(searchResults)
+        val searchSessionListener = object : Session.SearchListener {
+            override fun onSearchResponse(response: Response) {
+                val searchResults = response.collection.children.mapNotNull { result ->
+                    val point = result.obj?.geometry?.firstOrNull()?.point
+                    Log.d("point", point?.equals(null).toString())
+                    val name = result.obj?.name ?: return@mapNotNull null
+                    Log.d("name", name.equals(null).toString())
+                    val id = viewModel.getId(7)
+                    Log.d("id", id.equals(null).toString())
+                    SearchResult(id, name, point!!)
                 }
-
-                override fun onSearchError(error: Error) {
-                    Toast.makeText(
-                        this@CreateExcursionActivity,
-                        "Ошибка поиска",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                for (searchResult in searchResults) {
+                    Log.d(
+                        "SearchResult",
+                        "${searchResult.id}, ${searchResult.name}, ${searchResult.point}"
+                    )
                 }
+                viewModel.updateSearchResults(searchResults)
             }
 
-            if (!query.isNullOrEmpty()) {
-                val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
-                searchManager.submit(query, visibleRegion, searchOptions, searchSessionListener)
+            override fun onSearchError(error: Error) {
+                Toast.makeText(
+                    this@CreateExcursionActivity,
+                    "Ошибка поиска",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
+        }
+
+        if (!query.isNullOrEmpty()) {
+            val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
+            searchManager.submit(query, visibleRegion, searchOptions, searchSessionListener)
+        }
     }
 
     private val geoObjectTapListener = GeoObjectTapListener { event ->
@@ -508,7 +557,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun clearRoute() {
-        Log.d("clearRoute","")
+        Log.d("clearRoute", "")
         Log.d("RoutePolyline", routePolyline?.equals(null).toString())
         Log.d("PlaceItemsSize1", "${viewModel.placeItems.value?.size}")
         if (routePolyline != null) {
@@ -518,12 +567,13 @@ class CreateExcursionActivity : AppCompatActivity() {
                 Log.d("PlaceItemsSize5", "${viewModel.placeItems.value?.size}")
                 viewModel.clearRouteData()
                 map.mapObjects.clear()
-                routePolyline = null}
-            else {
+                routePolyline = null
+            } else {
                 Log.d("RoutePolyline", routePolyline?.equals(null).toString())
                 Log.d("PlaceItemsSize2", "${viewModel.placeItems.value?.size}")
                 map.mapObjects.clear()
-                routePolyline = null}
+                routePolyline = null
+            }
         } else {
             Log.d("RoutePolyline", routePolyline?.equals(null).toString())
             Log.d("PlaceItemsSize4", "${viewModel.placeItems.value?.size}")

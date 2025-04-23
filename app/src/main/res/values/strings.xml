@@ -78,4 +78,15 @@
     <string name="descript_problem">Опишите проблему</string>
     <string name="reject">Отклонить</string>
     <string name="focus_on_user">Фокус на юзера</string>
+    <string name="add_tag_button">Добавить тэг</string>
+    <string name="add_tag_string">Введите тэг</string>
+    <string name="add_city_name_string">Введите название города</string>
+    <string name="empty_city_name">Название города не заполненно</string>
+    <string name="topic_string">Выберите тематику экскурсии</string>
+    <string-array name="topics">
+        <item>Семейная</item>
+        <item>Развлекательная</item>
+        <item>Позновательная</item>
+        <item>Активная</item>
+    </string-array>
 </resources>
