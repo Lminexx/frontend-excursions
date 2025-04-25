@@ -14,6 +14,7 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.location.Location
@@ -61,12 +62,6 @@ class CreateExcursionViewModel @Inject constructor(
     private val _routeLiveData = MutableLiveData<List<Point>>(emptyList())
     val routeLiveData: LiveData<List<Point>> get() = _routeLiveData
 
-    private val _prevPoint = MutableLiveData<Point?>()
-    val prevPoint: LiveData<Point?> get() = _prevPoint
-
-    private val _curPoint = MutableLiveData<Point?>()
-    val curPoint: LiveData<Point?> get() = _curPoint
-
     private val _userPos = MutableLiveData<Point>()
     val userPos: LiveData<Point> get() = _userPos
 
@@ -91,6 +86,7 @@ class CreateExcursionViewModel @Inject constructor(
             return tempFile
         } catch (e: IOException) {
             Log.e("getFileFromUri", "Error copying file from URI: $uri", e)
+            FirebaseCrashlytics.getInstance().recordException(e)
             throw e
         }
     }
@@ -98,10 +94,12 @@ class CreateExcursionViewModel @Inject constructor(
     fun createExcursion(context: Context, title: String, description: String, tags:List<String>, topic:String, city: String) {
         Log.d("CreatingExcursion", "CreatingExcursion")
         val excursion = CreatingExcursion(title, description, topic, tags, city)
+        val places = placeItems.value ?: emptyList()
+        Log.d("places", places.isNotEmpty().toString())
         viewModelScope.launch {
             try {
                 _createExcursion.value = false
-                val response = excursionRepository.createExcursion(excursion)
+                val response = excursionRepository.createExcursion(excursion).body()!!
                 val respondedExcursion = Excursion(
                     response.id,
                     response.title,
@@ -115,7 +113,10 @@ class CreateExcursionViewModel @Inject constructor(
                     response.approvedAt,
                     response.cityName
                 )
+                val id = response.id
+
                 excursionRepository.saveExcursionToDB(respondedExcursion)
+                geoRepository.uploadPlacesItems(places, id)
 
                 _message.value = context.getString(R.string.create_success)
 
@@ -124,6 +125,7 @@ class CreateExcursionViewModel @Inject constructor(
                         uploadPhotos(context, response.id)
                     } catch (e: Exception) {
                         Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
+                        FirebaseCrashlytics.getInstance().recordException(e)
                         _message.value = "Error uploading photos: ${e.message}"
                     }
                 }
@@ -131,6 +133,7 @@ class CreateExcursionViewModel @Inject constructor(
             } catch (e: Exception) {
                 _message.value = "Error: ${e.message}"
                 Log.e("CreatingExcursionError", e.message!!)
+                FirebaseCrashlytics.getInstance().recordException(e)
                 _createExcursion.value = false
             }
         }
@@ -145,11 +148,12 @@ class CreateExcursionViewModel @Inject constructor(
             } ?: emptyList()
             val excursionIdRequest =
                 excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-            val response = excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
+            excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
             Log.d("PhotoUpload", "Uploaded photos successfully")
             _selectedImages.postValue(emptyList())
         } catch (e: Exception) {
-            throw e
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Log.e("photo_exc", e.message.toString())
         }
     }
 
@@ -164,10 +168,10 @@ class CreateExcursionViewModel @Inject constructor(
                 _message.value = context.getString(R.string.empty_desc)
                 return false
             }
-            
-            places.isNullOrEmpty() -> {
+
+            places.isEmpty() -> {
                 _message.value = context.getString(R.string.empty_route)
-                return true
+                return false
             }
 
             city.isEmpty()->{
@@ -178,30 +182,30 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-
     suspend fun getRoute() {
         try {
-            val end = curPoint.value
-            val start = prevPoint.value
-            if (end == null || start == null) {
-                Log.d("Point", "Start or end point is null")
+            val places = placeItems.value ?: return
+            if (places.size < 2) {
+                _routeLiveData.postValue(emptyList())
                 return
             }
-            withContext(Dispatchers.IO) {
-                val route = geoRepository.getRoute(start, end)
-                _routeLiveData.postValue(route)
-            }
-        } catch (e: Exception) {
-            Log.e("Route", "Error getting route", e)
-        }
-    }
 
-    suspend fun getPhotos(point: Point): List<String> {
-        try {
-            return geoRepository.getPhotosByLocation(point)
+            val fullRoute = mutableListOf<Point>()
+            withContext(Dispatchers.IO) {
+                for (i in 0 until places.lastIndex) {
+                    val a = places[i]
+                    val b = places[i + 1]
+                    val segment = geoRepository.getRoute(
+                        Point(a.lat, a.lon),
+                        Point(b.lat, b.lon)
+                    )
+                    fullRoute.addAll(segment)
+                }
+            }
+            _routeLiveData.postValue(fullRoute)
         } catch (e: Exception) {
-            Log.e("GetPhotoException", "${e.message}")
-            return emptyList()
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Log.e("Route", "Error getting route", e)
         }
     }
 
@@ -222,19 +226,6 @@ class CreateExcursionViewModel @Inject constructor(
                 }
             }
         })
-    }
-
-    fun setPoint(point: Point) {
-        if (_curPoint.value == null) {
-            _curPoint.value = point
-            Log.d("curPoint", "${point.latitude}, ${point.longitude}")
-        } else {
-            _prevPoint.value = curPoint.value
-            _curPoint.value = point
-            Log.d("Меняем точки", "true")
-            Log.d("curPoint", "${point.latitude}, ${point.longitude}")
-            Log.d("prevPoint", "${_prevPoint.value?.latitude}, ${_prevPoint.value?.longitude}")
-        }
     }
 
     fun toggleSearchResultsVisibility() {
@@ -263,6 +254,7 @@ class CreateExcursionViewModel @Inject constructor(
             _searchResults.value = results
             _isSearchResultsVisible.value = results.isNotEmpty()
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.d("Exception", "казявка")
         }
     }
@@ -276,29 +268,19 @@ class CreateExcursionViewModel @Inject constructor(
 
     fun deletePlace(placeId: String) {
         try {
-            _deletingPlaceId.value = placeId
             _placeItems.value = _placeItems.value?.filterNot { it.id == placeId }
             Log.d("PLaceItems", "${placeItems.value?.size ?: "null"}")
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("DeleteException", e.message.toString())
         }
     }
 
-    fun getId(i: Int): String {
+    fun getId(): String {
         return geoRepository.getRandomId(i)
-    }
-
-    fun resetPoints() {
-        _prevPoint.value = null
-        _curPoint.value = null
-        _routeLiveData.value = emptyList()
     }
 
     fun clearRouteData() {
         _routeLiveData.value = emptyList()
-    }
-
-    fun deletePrevPoint() {
-        _prevPoint.value = null
     }
 }

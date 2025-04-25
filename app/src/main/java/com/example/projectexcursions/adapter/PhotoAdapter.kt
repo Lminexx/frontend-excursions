@@ -16,7 +16,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ItemPhotoBinding
-import com.example.projectexcursions.ui.fullscreen.FullScreenPhotoActivity
+import com.example.projectexcursions.ui.utilies.FullScreenPhotoActivity
 
 class PhotoAdapter(private val context: Context, private var photoList: List<Uri>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {

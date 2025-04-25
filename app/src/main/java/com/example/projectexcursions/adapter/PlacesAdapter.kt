@@ -30,7 +30,7 @@ class PlacesAdapter(
 
         holder.itemView.setOnClickListener { onItemClick(placeItem.name) }
         if (isCreating) {
-            holder.itemView.setOnClickListener{ onDeleteClick(placeItem.id) }
+            holder.binding.deletePlace.setOnClickListener{ onDeleteClick(placeItem.id) }
         } else {
             holder.binding.deletePlace.visibility = View.GONE
         }
