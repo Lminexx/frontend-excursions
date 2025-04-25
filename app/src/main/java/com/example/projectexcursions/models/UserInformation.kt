@@ -10,6 +10,6 @@ import kotlinx.serialization.Serializable
 data class UserInformation(
     @ColumnInfo(name = "userId")
     val id: Long,
-    val url: String = null.toString(),
+    val url: String,
     val username: String
 ) : Parcelable

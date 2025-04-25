@@ -75,11 +75,7 @@ class ExcursionViewModel @Inject constructor(
     fun loadExcursion(excursionId: Long) {
         viewModelScope.launch {
             try {
-                val response = excRepository.fetchExcursion(id = excursionId)
-                Log.d(
-                    "ExcContent", "${response.id}, \n${response.title}, " +
-                            "\n${response.description}, \n${response.user}, \n${response.favorite}"
-                )
+                val response = excRepository.fetchExcursion(id = excursionId).body()!!
                 val excursion = Excursion(
                     response.id,
                     response.title,
@@ -108,7 +104,7 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = excRepository.loadPhotos(excursionId)
-                val photoUris = response.map { Uri.parse(it.url) }
+                val photoUris = response.body()!!.map { Uri.parse(it.url) }
                 _photos.value = photoUris
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
@@ -120,7 +116,7 @@ class ExcursionViewModel @Inject constructor(
     fun loadPlaces(excursionId: Long) {
         viewModelScope.launch {
             try {
-                val response = geoRepository.loadPlaces(excursionId)
+                val response = geoRepository.loadPlaces(excursionId).body()!!
                 _places.value = response
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
@@ -137,10 +133,8 @@ class ExcursionViewModel @Inject constructor(
                 Log.d("Point", "Start or end point is null")
                 return
             }
-            withContext(Dispatchers.IO) {
-                val route = geoRepository.getRoute(start, end)
-                _routeLiveData.postValue(route)
-            }
+            val route = geoRepository.getRoute(start, end)
+            _routeLiveData.postValue(route)
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("Route", "Error getting route", e)
@@ -207,7 +201,7 @@ class ExcursionViewModel @Inject constructor(
     suspend fun updateRating(rating: Float): Float {
         val excursionId = _excursion.value?.id ?: return 0.0f
         return try {
-            val response = excRepository.uploadRating(excursionId, rating)
+            val response = excRepository.uploadRating(excursionId, rating).body()!!
             _excursion.postValue(
                 _excursion.value?.copy(
                     rating = response.ratingAVG,
@@ -229,14 +223,12 @@ class ExcursionViewModel @Inject constructor(
 
     suspend fun excursionRejected(id: Long) {
         excRepository.changeExcursionStatus(id, "REJECTED")
-        _disapproving.postValue(false)
-    }
+        _disapproving.postValue(false)    }
 
     suspend fun excursionApproved() {
         val id = excursion.value?.id ?: throw ApproveExcursionException()
         excRepository.changeExcursionStatus(id, "APPROVED")
-        _approve.postValue(false)
-
+        _disapproving.postValue(false)
     }
 
     suspend fun checkAuthStatus(): Boolean {

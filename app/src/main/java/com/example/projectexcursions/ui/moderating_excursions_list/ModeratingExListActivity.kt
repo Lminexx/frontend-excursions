@@ -48,6 +48,18 @@ class ModeratingExListActivity: AppCompatActivity() {
         hideShimmer()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        lifecycleScope.launch {
+            viewModel.moderatingExcursions.collectLatest { pagingData ->
+                Log.d("excursions", "$pagingData")
+                adapter.submitData(pagingData)
+                Log.d("GetAllExcursions", "${viewModel.moderatingExcursions}")
+            }
+        }
+    }
+
     private fun initCallback() {
         errorContainer.retryButton.setOnClickListener {
             adapter.retry()
@@ -57,32 +69,6 @@ class ModeratingExListActivity: AppCompatActivity() {
             override fun onExcursionClick(excursionsList: ExcursionsList) {
                 viewModel.clickExcursion(excursionsList)
             }
-        }
-
-        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                if (!query.isNullOrEmpty()) {
-                    viewModel.searchExcursionsQuery(query)
-                }
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText != null) {
-                    viewModel.searchExcursionsQuery(newText)
-                }
-                return true
-            }
-        })
-
-        binding.searchView.setOnCloseListener {
-            viewModel.resetSearch()
-            false
-        }
-
-        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            if (hasFocus)
-                lifecycleScope.launch { adapter.submitData(PagingData.empty()) }
         }
 
         binding.swipeRefresh.setOnRefreshListener {
