@@ -12,12 +12,11 @@ import com.example.projectexcursions.databinding.DisapproveExcurusionBottomSheet
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val COLLAPSED_HEIGHT = 200
-
 @AndroidEntryPoint
-class DisapproveExcursionFragment: BottomSheetDialogFragment() {
+class DisapproveExcursionFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: DisapproveExcurusionBottomSheetBinding
 
@@ -33,42 +32,24 @@ class DisapproveExcursionFragment: BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DisapproveExcurusionBottomSheetBinding.inflate(inflater, container, false)
-
         initCallback()
-
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
 
-        val density = requireContext().resources.displayMetrics.density
-
         dialog?.let {
             val bottomSheet = it.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout
             val behavior = BottomSheetBehavior.from(bottomSheet)
 
-            behavior.peekHeight = (COLLAPSED_HEIGHT * density).toInt()
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-            behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-                override fun onStateChanged(bottomSheet: View, newState: Int) {}
-
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    with(binding) {
-                        if (slideOffset > 0) {
-                            layoutCollapsed.alpha = 1 - 2 * slideOffset
-                            layoutExpanded.alpha = slideOffset * slideOffset
-
-                            if (slideOffset > 0.5) {
-                                layoutCollapsed.visibility = View.GONE
-                                layoutExpanded.visibility = View.VISIBLE
-                            }
-                        }
-                    }
-                }
-            })
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isHideable = false
         }
+
+        binding.layoutCollapsed.visibility = View.GONE
+        binding.layoutExpanded.visibility = View.VISIBLE
     }
 
     private fun initCallback() {
@@ -90,7 +71,7 @@ class DisapproveExcursionFragment: BottomSheetDialogFragment() {
 
         fun newInstance(id: Long): DisapproveExcursionFragment {
             val fragment = DisapproveExcursionFragment()
-            fragment.arguments?.apply {
+            fragment.arguments = Bundle().apply {
                 putLong(ID, id)
             }
             return fragment

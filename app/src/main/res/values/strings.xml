@@ -89,4 +89,8 @@
         <item>Позновательная</item>
         <item>Активная</item>
     </string-array>
+    <string name="or_login_by">или войти через:</string>
+    <string name="login_by_google">Войти через Google</string>
+    <string name="login_by_email">Войти по Email</string>
+    <string name="login_by_vk">Войти через VK</string>
 </resources>

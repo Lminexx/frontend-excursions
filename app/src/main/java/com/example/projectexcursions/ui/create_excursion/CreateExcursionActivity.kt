@@ -33,6 +33,7 @@ import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.example.projectexcursions.ui.utilies.ProgressBar
 import com.google.android.material.chip.Chip
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -42,6 +43,7 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.map.VisibleRegionUtils
 import com.yandex.mapkit.search.Response
@@ -55,7 +57,6 @@ import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
 class CreateExcursionActivity : AppCompatActivity() {
 
@@ -66,9 +67,10 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var placesAdapter: PlacesAdapter
     private lateinit var mapView: CustomMapView
     private lateinit var map: Map
-    private lateinit var placemark: PlacemarkMapObject
-    private var routePolyline: Polyline? = null
+    private lateinit var pinsLayer: MapObjectCollection
+    private lateinit var routeLayer: MapObjectCollection
     private val viewModel: CreateExcursionViewModel by viewModels()
+    private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
 
     private val REQUEST_CODE_PERMISSION = 1003
 
@@ -79,6 +81,9 @@ class CreateExcursionActivity : AppCompatActivity() {
         mapView = binding.mapview
         mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
+        val root = map.mapObjects
+        pinsLayer = root.addCollection()
+        routeLayer = root.addCollection()
 
         initData()
         initCallback()
@@ -110,7 +115,6 @@ class CreateExcursionActivity : AppCompatActivity() {
             val point = item.point
 
             val placeItem = createPlaceItem(id, name, point)
-            viewModel.setPoint(point)
             viewModel.addPlace(placeItem)
             viewModel.hideSearchResults()
         }
@@ -122,6 +126,16 @@ class CreateExcursionActivity : AppCompatActivity() {
             },
             onDeleteClick = { placeId ->
                 viewModel.deletePlace(placeId)
+                Log.d("placemarksMap", "Содержит ключи: ${placemarksMap.keys}")
+                placemarksMap[placeId]?.let { placemark ->
+                    mapView.post {
+                        placemark.parent.remove(placemark)
+                        placemarksMap.remove(placeId)
+                        Log.d("Удалено", "Удалена метка $placeId")
+                    }                }
+                placemarksMap.remove(placeId)
+                Log.d("placemarksMap", "Содержит ключи: ${placemarksMap.keys}")
+                Log.d("onDeleteClick", placeId)
             },
             isCreating = true,
             places = emptyList()
@@ -176,6 +190,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 false
             } catch (e: Exception) {
                 Log.d("CloseSearchException", e.message.toString())
+                FirebaseCrashlytics.getInstance().recordException(e)
                 false
             }
         }
@@ -239,34 +254,29 @@ class CreateExcursionActivity : AppCompatActivity() {
             binding.searchResultsRecycler.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
 
-        viewModel.curPoint.observe(this) { point ->
-            if (point != null) {
-                Log.d("nextPoint:", "observing")
-                setLocation(point)
-                if (viewModel.prevPoint.value != null) {
-                    lifecycleScope.launch {
-                        viewModel.getRoute()
-                    }
-                }
-            }
-        }
-
         viewModel.userPos.observe(this) { point ->
             setUserLocation(point)
         }
 
         viewModel.placeItems.observe(this) { placeItems ->
             try {
-                for (placeItem in placeItems) {
-                    Log.d("PLaceItem", "${placeItem.name}, ${placeItem.id}")
-                }
                 placesAdapter.updatePlaces(placeItems)
-                Log.d("PlaceItemsObserve", "true " + placeItems[placeItems.size - 1].name)
-            } catch (indexOutOfBound: IndexOutOfBoundsException) {
-                clearRoute()
-                Log.d("IndexOutOfBound", "хихи поймали дурачка)")
+                if (placeItems.size == 1) {
+                    clearRoute()
+                    setLocation(placeItems[0])
+                } else if (placeItems.size > 1) {
+                    lifecycleScope.launch {
+                        for (placeItem in placeItems) {
+                            setLocation(placeItem)
+                        }
+                        viewModel.getRoute()
+                    }
+                } else {
+                    clearRoute()
+                }
             } catch (e: Exception) {
                 clearRoute()
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.d("Exception", e.message.toString())
             }
         }
@@ -381,9 +391,10 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 
-    private fun setLocation(point: Point) {
-        Log.d("setLocation", "")
+    private fun setLocation(place: PlaceItem) {
+        Log.d("setLocation","")
         try {
+            val point = Point(place.lat, place.lon)
             map.move(
                 CameraPosition(
                     point,
@@ -394,10 +405,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
-            setPin(point)
+            setPin(place)
         } catch (eNull: NullPointerException) {
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
-                .show()
+            FirebaseCrashlytics.getInstance().recordException(eNull)
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -415,21 +426,30 @@ class CreateExcursionActivity : AppCompatActivity() {
                 null
             )
         } catch (eNull: NullPointerException) {
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
-                .show()
+            FirebaseCrashlytics.getInstance().recordException(eNull)
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun setPin(point: Point) {
+    private fun setPin(place: PlaceItem) {
         Log.d("setPin", "")
+        val point = Point(place.lat, place.lon)
+
+        if (placemarksMap.containsKey(place.id)) {
+            Log.d("setPin", "Метка с ID ${place.id} уже существует")
+            return
+        }
 
         val imageProvider = ImageProvider.fromResource(this, R.drawable.ic_location_pin)
 
-        placemark = map.mapObjects.addPlacemark().apply {
+        val placemark = pinsLayer.addPlacemark().apply {
             val iconStyle = IconStyle().apply { scale = 0.4f }
             geometry = point
             setIcon(imageProvider, iconStyle)
         }
+        Log.d("setPin", "Добавлен пин с ID: ${place.id}")
+
+        placemarksMap[place.id] = placemark
     }
 
     private fun search(query: String?) {
@@ -447,15 +467,12 @@ class CreateExcursionActivity : AppCompatActivity() {
                     Log.d("point", point?.equals(null).toString())
                     val name = result.obj?.name ?: return@mapNotNull null
                     Log.d("name", name.equals(null).toString())
-                    val id = viewModel.getId(7)
+                    val id = viewModel.getId()
                     Log.d("id", id.equals(null).toString())
                     SearchResult(id, name, point!!)
                 }
                 for (searchResult in searchResults) {
-                    Log.d(
-                        "SearchResult",
-                        "${searchResult.id}, ${searchResult.name}, ${searchResult.point}"
-                    )
+                    Log.d("SearchResult", "${searchResult.id}, ${searchResult.name}, ${searchResult.point}")
                 }
                 viewModel.updateSearchResults(searchResults)
             }
@@ -524,7 +541,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                     Log.d("longitude", longitude.toString())
                     Log.d("latitude", latitude.toString())
 
-                    viewModel.setPoint(point!!)
                     viewModel.addPlace(placeItem)
                 }
 
@@ -545,41 +561,26 @@ class CreateExcursionActivity : AppCompatActivity() {
             return@GeoObjectTapListener true
         } catch (e: Exception) {
             Log.e("GeoObjectException", "${e.message}")
+            FirebaseCrashlytics.getInstance().recordException(e)
             return@GeoObjectTapListener false
         }
     }
 
     private fun drawRoute(points: List<Point>) {
+        routeLayer.clear()
+
         if (points.isNotEmpty()) {
-            routePolyline = Polyline(points)
-            map.mapObjects.addPolyline(routePolyline!!)
+            val polyline = Polyline(points)
+            routeLayer.addPolyline(polyline)
         }
     }
 
     private fun clearRoute() {
-        Log.d("clearRoute", "")
-        Log.d("RoutePolyline", routePolyline?.equals(null).toString())
-        Log.d("PlaceItemsSize1", "${viewModel.placeItems.value?.size}")
-        if (routePolyline != null) {
-            Log.d("PlaceItemsSize3", "${viewModel.placeItems.value?.size}")
-            if (viewModel.placeItems.value?.size == 1) {
-                Log.d("RoutePolyline", routePolyline?.equals(null).toString())
-                Log.d("PlaceItemsSize5", "${viewModel.placeItems.value?.size}")
-                viewModel.clearRouteData()
-                map.mapObjects.clear()
-                routePolyline = null
-            } else {
-                Log.d("RoutePolyline", routePolyline?.equals(null).toString())
-                Log.d("PlaceItemsSize2", "${viewModel.placeItems.value?.size}")
-                map.mapObjects.clear()
-                routePolyline = null
-            }
-        } else {
-            Log.d("RoutePolyline", routePolyline?.equals(null).toString())
-            Log.d("PlaceItemsSize4", "${viewModel.placeItems.value?.size}")
-            map.mapObjects.clear()
-            viewModel.resetPoints()
-        }
+        Log.d("clearRoute","")
+        Log.d("RoutePolyline", routeLayer.equals(null).toString())
+        Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
+        viewModel.clearRouteData()
+        routeLayer.clear()
         Log.d("ClearRoute", "RouteClearead")
     }
 

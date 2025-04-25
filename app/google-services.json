@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "596243648831",
+    "project_id": "openworld-dbcfa",
+    "storage_bucket": "openworld-dbcfa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596243648831:android:4ed359cbcdab4d2d15438a",
+        "android_client_info": {
+          "package_name": "com.example.projectexcursions"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAti1VSYrdKFfG8li2NCjbhivz_rXwJbGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

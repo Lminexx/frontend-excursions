@@ -12,6 +12,7 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -74,11 +75,7 @@ class ExcursionViewModel @Inject constructor(
     fun loadExcursion(excursionId: Long) {
         viewModelScope.launch {
             try {
-                val response = excRepository.fetchExcursion(id = excursionId)
-                Log.d(
-                    "ExcContent", "${response.id}, \n${response.title}, " +
-                            "\n${response.description}, \n${response.user}, \n${response.favorite}"
-                )
+                val response = excRepository.fetchExcursion(id = excursionId).body()!!
                 val excursion = Excursion(
                     response.id,
                     response.title,
@@ -96,6 +93,7 @@ class ExcursionViewModel @Inject constructor(
                 _excursion.value = excursion
                 Log.d("ExcursionIsnInDB", "FetchExcursion")
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoadExcursion", e.message!!)
                 _excursion.value = null
             }
@@ -106,9 +104,10 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = excRepository.loadPhotos(excursionId)
-                val photoUris = response.map { Uri.parse(it.url) }
+                val photoUris = response.body()!!.map { Uri.parse(it.url) }
                 _photos.value = photoUris
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoadPhotos", e.message ?: "Unknown error")
             }
         }
@@ -117,9 +116,10 @@ class ExcursionViewModel @Inject constructor(
     fun loadPlaces(excursionId: Long) {
         viewModelScope.launch {
             try {
-                val response = geoRepository.loadPlaces(excursionId)
+                val response = geoRepository.loadPlaces(excursionId).body()!!
                 _places.value = response
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("PLacesError", e.message.toString())
             }
         }
@@ -133,11 +133,10 @@ class ExcursionViewModel @Inject constructor(
                 Log.d("Point", "Start or end point is null")
                 return
             }
-            withContext(Dispatchers.IO) {
-                val route = geoRepository.getRoute(start, end)
-                _routeLiveData.postValue(route)
-            }
+            val route = geoRepository.getRoute(start, end)
+            _routeLiveData.postValue(route)
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("Route", "Error getting route", e)
         }
     }
@@ -202,7 +201,7 @@ class ExcursionViewModel @Inject constructor(
     suspend fun updateRating(rating: Float): Float {
         val excursionId = _excursion.value?.id ?: return 0.0f
         return try {
-            val response = excRepository.uploadRating(excursionId, rating)
+            val response = excRepository.uploadRating(excursionId, rating).body()!!
             _excursion.postValue(
                 _excursion.value?.copy(
                     rating = response.ratingAVG,
@@ -211,6 +210,7 @@ class ExcursionViewModel @Inject constructor(
             )
             response.ratingAVG
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("UpdateRating", "Error updating rating for excursion $excursionId", e)
             _excursion.value?.rating ?: 0.0f
         }
@@ -223,14 +223,12 @@ class ExcursionViewModel @Inject constructor(
 
     suspend fun excursionRejected(id: Long) {
         excRepository.changeExcursionStatus(id, "REJECTED")
-        _disapproving.postValue(false)
-    }
+        _disapproving.postValue(false)    }
 
     suspend fun excursionApproved() {
         val id = excursion.value?.id ?: throw ApproveExcursionException()
         excRepository.changeExcursionStatus(id, "APPROVED")
-        _approve.postValue(false)
-
+        _disapproving.postValue(false)
     }
 
     suspend fun checkAuthStatus(): Boolean {
