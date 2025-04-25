@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -15,10 +16,10 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
+import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
-import com.example.projectexcursions.ui.excursions_list.ExListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -27,9 +28,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ExListFragment : Fragment(R.layout.excursions_list) {
 
-    private lateinit var binding: ExcursionsListBinding
     @Inject
     lateinit var adapter: ExcursionAdapter
+    private lateinit var errorContainer: ErrorBinding
+    private lateinit var binding: ExcursionsListBinding
     private val viewModel: ExListViewModel by viewModels()
 
     override fun onCreateView(
@@ -38,6 +40,8 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         savedInstanceState: Bundle?
     ): View {
         binding = ExcursionsListBinding.inflate(inflater, container, false)
+        errorContainer = binding.errorContainer
+
         return binding.root
     }
 
@@ -60,6 +64,10 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
     }
 
     private fun initCallback() {
+
+        errorContainer.retryButton.setOnClickListener {
+            adapter.retry()
+        }
 
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener {
             override fun onExcursionClick(excursionsList: ExcursionsList) {
@@ -110,14 +118,17 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
             binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
+                    errorContainer.errorLayout.visibility = View.GONE
                     showShimmer()
                 }
                 is LoadState.NotLoading -> {
                     hideShimmer()
+                    errorContainer.errorLayout.visibility = View.GONE
                 }
                 is LoadState.Error -> {
                     showShimmer()
-                    Toast.makeText(requireContext(), "Connection error", Toast.LENGTH_SHORT).show()
+                    binding.recyclerView.visibility = View.GONE
+                    errorContainer.errorLayout.visibility = View.VISIBLE
                 }
             }
         }

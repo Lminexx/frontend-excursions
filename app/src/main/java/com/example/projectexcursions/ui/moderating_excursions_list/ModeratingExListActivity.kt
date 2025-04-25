@@ -13,6 +13,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.adapter.ExcursionAdapter
+import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
@@ -24,14 +25,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ModeratingExListActivity: AppCompatActivity() {
 
-    private lateinit var binding: ExcursionsListBinding
     @Inject
     lateinit var adapter: ExcursionAdapter
+    private lateinit var errorContainer: ErrorBinding
+    private lateinit var binding: ExcursionsListBinding
     private val viewModel: ModeratingExListViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExcursionsListBinding.inflate(layoutInflater)
+        errorContainer = binding.errorContainer
         setContentView(binding.root)
 
         initData()
@@ -46,6 +49,10 @@ class ModeratingExListActivity: AppCompatActivity() {
     }
 
     private fun initCallback() {
+        errorContainer.retryButton.setOnClickListener {
+            adapter.retry()
+        }
+
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
             override fun onExcursionClick(excursionsList: ExcursionsList) {
                 viewModel.clickExcursion(excursionsList)
@@ -102,14 +109,17 @@ class ModeratingExListActivity: AppCompatActivity() {
             binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
-                    hideShimmer()
+                    errorContainer.errorLayout.visibility = View.GONE
+                    showShimmer()
                 }
                 is LoadState.NotLoading -> {
                     hideShimmer()
+                    errorContainer.errorLayout.visibility = View.GONE
                 }
                 is LoadState.Error -> {
-                    hideShimmer()
-                    Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show()
+                    showShimmer()
+                    binding.recyclerView.visibility = View.GONE
+                    errorContainer.errorLayout.visibility = View.VISIBLE
                 }
             }
         }
