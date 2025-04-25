@@ -24,14 +24,13 @@ class ModeratingExcursionsPagingSource (
         Log.d("Paging", "Offset: $position")
         Log.d("Paging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.loadModeratingExcursions(offset = position, limit = params.loadSize, status = "REJECTED")
+            val response = apiService.loadModeratingExcursions(offset = position, limit = params.loadSize, status = "PENDING").body()!!
             val excursions = response.content
             Log.d("PagingSource2", "$excursions")
             val pageInfo = response.page
             val prevKey = if (position == 0) null else position - 1
             val nextKey = if (pageInfo.number < pageInfo.totalPages) position + 1 else null
             Log.d("PagingSource3", "NextKey: $nextKey, PrevKey: $prevKey")
-
             LoadResult.Page(
                 data = excursions,
                 prevKey = prevKey,

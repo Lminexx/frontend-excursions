@@ -1,9 +1,5 @@
 package com.example.projectexcursions.models
 
-import android.net.Uri
-import androidx.room.Entity
-import com.yandex.mapkit.geometry.Point
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -18,6 +18,7 @@ import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Response
 import java.math.BigDecimal
 import javax.inject.Inject
 
@@ -45,17 +46,17 @@ class ExcursionRepositoryImpl @Inject constructor(
         excursionDao.insert(excursion)
     }
 
-    override suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): ExcursionsResponse {
+    override suspend fun fetchExcursions(offset: Int, limit: Int, isFavorite: Boolean, isMine: Boolean): Response<ExcursionsResponse> {
         Log.d("FetchingExs", "FetchExcursions")
         return apiService.getExcursions(offset, limit, isFavorite, isMine)
     }
 
-    override suspend fun fetchExcursion(id: Long): ExcursionResponse {
+    override suspend fun fetchExcursion(id: Long): Response<ExcursionResponse> {
         Log.d("FetchingEx", "Начинаем запрос экскурсии с ID: $id")
         try {
             val response = apiService.getExcursion(id)
             Log.d("FetchingExResponse", "Получен ответ: $response")
-            Log.d("FetchingExDetails", "ID: ${response.id}, Title: ${response.title}, User: ${response.user}")
+            Log.d("FetchingExDetails", "ID: ${response.body()!!.id}, Title: ${response.body()!!.title}, User: ${response.body()!!.user}")
             return response
         } catch (e: Exception) {
             Log.e("FetchingExError", "Ошибка при запросе экскурсии: ${e.message}")
@@ -85,7 +86,7 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAllExcursionsFromExcursion() = excursionDao.clearAll()
 
-    override suspend fun createExcursion(creatingExcursion: CreatingExcursion): ExcursionResponse {
+    override suspend fun createExcursion(creatingExcursion: CreatingExcursion): Response<ExcursionResponse> {
         return apiService.createExcursion(creatingExcursion)
     }
 
@@ -113,20 +114,20 @@ class ExcursionRepositoryImpl @Inject constructor(
         limit: Int,
         isFavorite: Boolean,
         isMine: Boolean
-    ): ExcursionsResponse {
+    ): Response<ExcursionsResponse> {
         Log.d("FetchingExs", "FetchExcursions")
         return apiService.searchExcursions(query, offset, limit, isFavorite, isMine)
     }
 
-    override suspend fun uploadPhotos(files: List<MultipartBody.Part>, excursionId: RequestBody): PhotoResponse {
+    override suspend fun uploadPhotos(files: List<MultipartBody.Part>, excursionId: RequestBody): Response<PhotoResponse> {
         return apiService.uploadPhotos(files, excursionId)
     }
 
-    override suspend fun loadPhotos(id: Long): List<PhotoResponse> {
+    override suspend fun loadPhotos(id: Long): Response<List<PhotoResponse>> {
         return apiService.loadPhotos(id)
     }
 
-    override suspend fun uploadRating(id:Long,rating:Float) : RatingResponse {
+    override suspend fun uploadRating(id:Long,rating:Float) : Response<RatingResponse> {
         return apiService.uploadRating(id, rating)
     }
     override suspend fun changeExcursionStatus(id: Long, status: String) {
@@ -137,7 +138,7 @@ class ExcursionRepositoryImpl @Inject constructor(
         offset: Int,
         limit: Int,
         status: String
-    ): ModeratingExcursionsResponse {
+    ): Response<ModeratingExcursionsResponse> {
         return apiService.loadModeratingExcursions(offset, limit, status)
     }
 }
