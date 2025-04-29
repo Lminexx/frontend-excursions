@@ -93,4 +93,8 @@
     <string name="login_by_google">Войти через Google</string>
     <string name="login_by_email">Войти по Email</string>
     <string name="login_by_vk">Войти через VK</string>
+    <string name="filter_by_tag_text">Фильтровать по тэгу</string>
+    <string name="filter_by_rating_text">Фильтрация по рейтингу</string>
+    <string name="filter_by_rating_value">(значение от 0 до 5)</string>
+    <string name="filter_by_approved_at_text">Фильтрация по дате публикации</string>
 </resources>

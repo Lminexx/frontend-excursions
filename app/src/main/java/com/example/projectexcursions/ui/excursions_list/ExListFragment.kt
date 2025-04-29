@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.excursions_list
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +20,7 @@ import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import com.example.projectexcursions.ui.excursions_list.ExListViewModel
+import com.example.projectexcursions.ui.filtration.FiltrationActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -96,6 +98,11 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
 
         binding.swipeRefresh.setOnRefreshListener {
             adapter.refresh()
+        }
+
+        binding.filterButton.setOnClickListener{
+            val intent = Intent(requireContext(), FiltrationActivity::class.java)
+            startActivity(intent)
         }
     }
 
