@@ -34,7 +34,6 @@ import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.example.projectexcursions.ui.utilies.ProgressBar
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.android.material.chip.Chip
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
