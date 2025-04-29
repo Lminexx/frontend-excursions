@@ -283,22 +283,8 @@ class CreateExcursionActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.deletingPLaceId.observe(this) { placeId ->
-            Log.d("DeletingPlace", "true")
-            clearRoute()
-            lifecycleScope.launch {
-                val places = viewModel.placeItems.value!!.filter { it.id != placeId }
-                for (place in places) {
-                    val point = Point(place.lat, place.lon)
-                    viewModel.setPoint(point)
-                }
-                if (places.size == 1)
-                    viewModel.deletePrevPoint()
-            }
-        }
-
-        viewModel.message.observe(this){ massage ->
-            Toast.makeText(this, massage, Toast.LENGTH_SHORT).show()
+        viewModel.message.observe(this){message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -469,7 +455,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                     Log.d("point", point?.equals(null).toString())
                     val name = result.obj?.name ?: return@mapNotNull null
                     Log.d("name", name.equals(null).toString())
-                    val id = viewModel.getId()
+                    val id = viewModel.getId(7)
                     Log.d("id", id.equals(null).toString())
                     SearchResult(id, name, point!!)
                 }

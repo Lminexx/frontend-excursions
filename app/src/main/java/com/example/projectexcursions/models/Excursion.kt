@@ -21,6 +21,6 @@ data class Excursion(
     val personalRating: Float,
     val tags: List<String>,
     val topic: String,
-    val approvedAt: String,
+    val approvedAt: String? = null,
     val cityName: String
 ) : Parcelable
