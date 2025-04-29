@@ -276,7 +276,7 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun getId(): String {
+    fun getId(i:Int): String {
         return geoRepository.getRandomId(i)
     }
 
