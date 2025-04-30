@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "edbe5d13b7590abfd93bf6bff38799c2",
+    "identityHash": "37047bc5afc64c3de19e7fc0c36c1bbe",
     "entities": [
       {
         "tableName": "excursions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `userId` INTEGER NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL NOT NULL, `tags` TEXT NOT NULL, `topic` TEXT NOT NULL, `approvedAt` TEXT NOT NULL, `cityName` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `userId` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL, `tags` TEXT NOT NULL, `topic` TEXT NOT NULL, `approvedAt` TEXT, `cityName` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -21,15 +21,15 @@
             "notNull": true
           },
           {
-            "fieldPath": "userId",
-            "columnName": "userId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "description",
             "columnName": "description",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -48,7 +48,7 @@
             "fieldPath": "personalRating",
             "columnName": "personalRating",
             "affinity": "REAL",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "tags",
@@ -66,7 +66,7 @@
             "fieldPath": "approvedAt",
             "columnName": "approvedAt",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "cityName",
@@ -86,7 +86,7 @@
       },
       {
         "tableName": "excursion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL NOT NULL, `tags` TEXT NOT NULL, `topic` TEXT NOT NULL, `approvedAt` TEXT, `cityName` TEXT NOT NULL, `userId` INTEGER NOT NULL, `url` TEXT NOT NULL, `username` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL, `tags` TEXT NOT NULL, `topic` TEXT NOT NULL, `approvedAt` TEXT, `cityName` TEXT NOT NULL, `userId` INTEGER NOT NULL, `url` TEXT NOT NULL, `username` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -122,7 +122,7 @@
             "fieldPath": "personalRating",
             "columnName": "personalRating",
             "affinity": "REAL",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "tags",
@@ -206,7 +206,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'edbe5d13b7590abfd93bf6bff38799c2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '37047bc5afc64c3de19e7fc0c36c1bbe')"
     ]
   }
 }

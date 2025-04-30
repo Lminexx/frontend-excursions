@@ -8,12 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
 import com.example.projectexcursions.databinding.ExcursionsListBinding
@@ -33,6 +35,25 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
     @Inject
     lateinit var adapter: ExcursionAdapter
     private val viewModel: ExListViewModel by viewModels()
+
+    private val filterLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val data = result.data
+            val rating = data?.getStringExtra("rating")?.toFloatOrNull()
+            val startDate = data?.getStringExtra("start_date")
+            val endDate = data?.getStringExtra("end_date")
+            val tags = data?.getStringArrayListExtra("tags") ?: emptyList()
+            val minDuration = data?.getStringExtra("min_duration")?.toIntOrNull()
+            val maxDuration = data?.getStringExtra("max_duration")?.toIntOrNull()
+            val topic = data?.getStringExtra("topic")
+            val city = data?.getStringExtra("city")
+
+
+            viewModel.setFiltrationData(rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -102,13 +123,19 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
 
         binding.filterButton.setOnClickListener{
             val intent = Intent(requireContext(), FiltrationActivity::class.java)
-            startActivity(intent)
+            filterLauncher.launch(intent)
         }
     }
 
     private fun subscribe() {
         lifecycleScope.launch {
             viewModel.excursions.collectLatest { pagingData ->
+                adapter.submitData(pagingData)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.filterExcursions.collectLatest { pagingData ->
                 adapter.submitData(pagingData)
             }
         }
@@ -152,4 +179,5 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         binding.shimmerLayout.visibility = View.GONE
         binding.recyclerView.visibility = View.VISIBLE
     }
+
 }
