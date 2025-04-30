@@ -16,13 +16,13 @@ import kotlinx.parcelize.Parcelize
 data class ExcursionsList(
     @PrimaryKey val id: Long,
     val title: String,
-    val userId: Long,
     val description: String,
+    val userId: Long,
     val favorite: Boolean = false,
     val rating: Float,
-    val personalRating: Float,
+    val personalRating: Float?=null,
     val tags: List<String>,
     val topic: String,
-    val approvedAt: String,
+    val approvedAt: String?=null,
     val cityName: String
 ): Parcelable

@@ -89,7 +89,14 @@
         <item>TRIP</item>
         <item>ACADEMIC</item>
     </string-array>
-    <string name="or_login_by">или войти через:</string>
+    <string-array name="topics_filter">
+        <item></item>
+        <item>UNDEFINED</item>
+        <item>WALKING</item>
+        <item>TRIP</item>
+        <item>ACADEMIC</item>
+    </string-array>
+    <string name="or_login_by">или войти <через></через>:</string>
     <string name="login_by_google">Войти через Google</string>
     <string name="login_by_email">Войти по Email</string>
     <string name="login_by_vk">Войти через VK</string>
@@ -97,4 +104,16 @@
     <string name="filter_by_rating_text">Фильтрация по рейтингу</string>
     <string name="filter_by_rating_value">(значение от 0 до 5)</string>
     <string name="filter_by_approved_at_text">Фильтрация по дате публикации</string>
+    <string name="filter_by_approved_at_start">Начальная дата</string>
+    <string name="filter_by_approved_at_end">Конечная дата</string>
+    <string name="filter_by_duration_text">Фильтрация по продолжительности</string>
+    <string name="filter_by_duration_start">min значение</string>
+    <string name="filter_by_duration_end">max значение</string>
+    <string name="filter_by_topic_text">Фильтрация по теме экскурсии</string>
+    <string name="filter">Фильтровать</string>
+    <string name="filter_by_city_text">Фильтрация по городу</string>
+    <string name="filter_by_city_value">Название города</string>
+    <string name="topic_in_excursion">Тема:</string>
+    <string name="city_in_excursion">Город:</string>
+    <string name="tags_in_excursion">Теги:</string>
 </resources>

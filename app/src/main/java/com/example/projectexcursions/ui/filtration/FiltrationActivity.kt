@@ -1,5 +1,6 @@
 package com.example.projectexcursions.ui.filtration
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Toast
@@ -11,6 +12,7 @@ import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.databinding.ActivityFilterBinding
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.max
 
 @AndroidEntryPoint
 class FiltrationActivity : AppCompatActivity() {
@@ -27,15 +29,49 @@ class FiltrationActivity : AppCompatActivity() {
         subscribe()
     }
 
-    private fun initData(){
+    private fun initData() {
 
     }
 
-    private fun subscribe(){
-
+    private fun subscribe() {
+        viewModel.filter.observe(this) { filter ->
+            if (filter) {
+                finish()
+            }
+        }
     }
 
-    private fun initCallback(){
+    private fun initCallback() {
+        binding.buttonFiltration.setOnClickListener {
+            val rating = binding.filtrationRatingValue.text.toString()
+            val startDate = binding.filtrationApprovedAtStart.text.toString()
+            val endDate = binding.filtrationApprovedAtEnd.text.toString()
+            val minDuration = binding.filtrationDurationStart.text.toString()
+            val maxDuration = binding.filtrationDurationEnd.text.toString()
+            //if (binding.topicValue.selectedItem.toString() != "-") {
+                val topic = binding.topicValue.selectedItem.toString()
+//            } else {
+//                val topic:String
+//            }
+            val city = binding.filtrationCityValue.text.toString()
+            val selectedTags = mutableListOf<String>()
+            for (i in 0 until binding.tagsChips.childCount) {
+                val chip = binding.tagsChips.getChildAt(i) as? Chip
+                chip?.let { selectedTags.add(it.text.toString()) }
+            }
+            setResult(RESULT_OK, Intent().apply {
+                putExtra("rating", rating)
+                putExtra("start_date", startDate)
+                putExtra("end_date", endDate)
+                putExtra("tags", ArrayList(selectedTags))
+                putExtra("min_duration", minDuration)
+                putExtra("max_duration", maxDuration)
+                putExtra("topic", topic)
+                putExtra("city", city)
+            })
+            viewModel.clickFilter()
+        }
+
         binding.addTagsButton.setOnClickListener {
             addNewChip()
         }

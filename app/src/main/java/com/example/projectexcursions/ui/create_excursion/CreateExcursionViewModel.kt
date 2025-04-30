@@ -93,7 +93,7 @@ class CreateExcursionViewModel @Inject constructor(
 
     fun createExcursion(context: Context, title: String, description: String, tags:List<String>, topic:String, city: String) {
         Log.d("CreatingExcursion", "CreatingExcursion")
-        val excursion = CreatingExcursion(title, description, topic, tags, city)
+        val excursion = CreatingExcursion(title, description, city, tags, topic)
         val places = placeItems.value ?: emptyList()
         Log.d("places", places.isNotEmpty().toString())
         viewModelScope.launch {
