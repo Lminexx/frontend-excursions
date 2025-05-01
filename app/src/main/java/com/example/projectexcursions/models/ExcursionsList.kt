@@ -4,10 +4,9 @@ import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.projectexcursions.utils.Converters
+import com.example.projectexcursions.ui.utilies.Converters
 import kotlinx.serialization.Serializable
 import kotlinx.parcelize.Parcelize
-
 
 @Parcelize
 @Serializable
@@ -23,6 +22,8 @@ data class ExcursionsList(
     val personalRating: Float?=null,
     val tags: List<String>,
     val topic: String,
-    val approvedAt: String?=null,
-    val cityName: String
+    val approvedAt: String,
+    val cityName: String,
+    val photoId: Long,
+    val photoUrl: String
 ): Parcelable

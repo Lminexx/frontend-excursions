@@ -49,7 +49,7 @@ class ExListViewModel @Inject constructor(
 
     var selectedExcursionsList: ExcursionsList? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalPagingApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     var excursions: Flow<PagingData<ExcursionsList>> = isSearching
         .flatMapLatest { searching ->
             if (searching) {
