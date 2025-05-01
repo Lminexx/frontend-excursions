@@ -13,7 +13,7 @@ import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.models.Token
 import com.example.projectexcursions.ui.utilies.Converters
 
-@Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 1)
+@Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class OpenWorldDB: RoomDatabase() {
     abstract fun excursionsDao(): ExcursionsDao

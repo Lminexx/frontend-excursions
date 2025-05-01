@@ -75,6 +75,30 @@ class RegViewModel @Inject constructor(
         }
     }
 
+    fun registerWithGoogle(username: String, avatar: Uri) {
+        viewModelScope.launch {
+            try {
+                val password = ""
+
+                _username.value = username
+                _password.value = password
+                _avatar.value = avatar
+
+                val user = User(username, password)
+                val response = apiService.registerUser(user)
+                if (response.isSuccessful) {
+                    _message.value = "Регистрация успешна"
+                    _regStatus.value = true
+                } else {
+                    _message.value = "Ошибка регистрации на сервере"
+                }
+            } catch (e: Exception) {
+                Log.e("GoogleRegError", "Ошибка: ${e.message}")
+                FirebaseCrashlytics.getInstance().recordException(e)
+            }
+        }
+    }
+
     private fun isInputLangValid(input: String): Boolean {
         val regex = "^[a-zA-Z0-9!@#\$%^&*()_+{}\\[\\]:;<>,.?~\\-=\\s]*\$".toRegex()
         return regex.matches(input)
