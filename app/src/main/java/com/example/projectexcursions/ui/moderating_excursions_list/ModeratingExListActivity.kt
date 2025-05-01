@@ -3,20 +3,18 @@ package com.example.projectexcursions.ui.moderating_excursions_list
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.SearchView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
-import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.adapter.ExcursionAdapter
 import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
+import com.example.projectexcursions.ui.utilies.ExcursionsListException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -106,6 +104,7 @@ class ModeratingExListActivity: AppCompatActivity() {
                     showShimmer()
                     binding.recyclerView.visibility = View.GONE
                     errorContainer.errorLayout.visibility = View.VISIBLE
+                    errorContainer.errorMessage.text = LoadState.Error(ExcursionsListException()).toString()
                 }
             }
         }

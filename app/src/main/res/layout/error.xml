@@ -18,10 +18,20 @@
         app:tint="@android:color/holo_red_dark" />
 
     <TextView
-        android:id="@+id/errorMessage"
+        android:id="@+id/cant_load_excs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/cant_fetch_excursions"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/errorMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/unknownerror"
         android:textSize="18sp"
         android:textColor="@android:color/black"
         android:layout_marginTop="16dp"
