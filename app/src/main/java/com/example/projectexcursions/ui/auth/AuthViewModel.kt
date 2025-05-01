@@ -101,7 +101,7 @@ class AuthViewModel @Inject constructor(
             try {
                 val user = User(login, password)
                 val response = apiService.authUser(user)
-                _token.value = response.token
+                _token.value = response.body()!!.token
                 tokenRepository.saveToken(Token(token = token.value!!))
                 Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
                 _avatar.value?.let { avatarUri ->
@@ -147,9 +147,9 @@ class AuthViewModel @Inject constructor(
                 MultipartBody.Part.createFormData("file", file.name, requestFile)
             val fileName = file.name.toRequestBody("text/plain".toMediaTypeOrNull())
             val response = apiService.uploadAvatar(fileName, multipartBody)
-            _token.postValue(response.token)
+            _token.postValue(response.body()!!.token)
             tokenRepository.clearToken()
-            tokenRepository.saveToken(Token(token = response.token))
+            tokenRepository.saveToken(Token(token = response.body()!!.token))
             Log.d("Avatar", "Avatar uploaded successfully")
             Log.d("CachedToken", "${tokenRepository.getCachedToken()}")
         } catch (e: IOException) {
@@ -200,9 +200,5 @@ class AuthViewModel @Inject constructor(
 
     fun clickComeBack() {
         _wantComeBack.value = true
-    }
-
-    fun cameBack() {
-        _wantComeBack.value = false
     }
 }
