@@ -116,4 +116,7 @@
     <string name="topic_in_excursion">Тема:</string>
     <string name="city_in_excursion">Город:</string>
     <string name="tags_in_excursion">Теги:</string>
+    <string name="error_excursions">Ошибка загрузки экскурсий</string>
+    <string name="cant_fetch_excursions">Не удалось загрузить экскурсии</string>
+    <string name="retry_fetch">Повторить загрузку</string>
 </resources>
