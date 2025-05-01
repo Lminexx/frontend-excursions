@@ -11,7 +11,7 @@ import com.example.projectexcursions.databases.daos.TokenDao
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.models.Token
-import com.example.projectexcursions.utils.Converters
+import com.example.projectexcursions.ui.utilies.Converters
 
 @Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 1)
 @TypeConverters(Converters::class)

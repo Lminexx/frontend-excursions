@@ -1,4 +1,4 @@
-package com.example.projectexcursions.utils
+package com.example.projectexcursions.ui.utilies
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

@@ -85,4 +85,5 @@
     <string name="error_excursions">Ошибка загрузки экскурсий</string>
     <string name="cant_fetch_excursions">Не удалось загрузить экскурсии: </string>
     <string name="retry_fetch">Повторить загрузку</string>
+    <string name="ecursionphoto">EcursionPhoto</string>
 </resources>
