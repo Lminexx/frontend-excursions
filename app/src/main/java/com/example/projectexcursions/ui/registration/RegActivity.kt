@@ -1,6 +1,8 @@
 package com.example.projectexcursions.ui.registration
 
 import android.app.Activity
+import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -54,7 +56,7 @@ class RegActivity: AppCompatActivity() {
             if (isSuccessful) {
                 val username = viewModel.username.value!!
                 val password = viewModel.password.value!!
-                val avatar = viewModel.avatar.value!!
+                val avatar = viewModel.avatar.value ?: resourceUri(R.drawable.ic_app_v3)
                 Log.d("DataBeforeSend", "$username, $password")
                 val intent = createRegIntent(username, password, avatar, true)
                 Log.d("RegIntent", "CreateRegIntent")
@@ -89,6 +91,14 @@ class RegActivity: AppCompatActivity() {
             }
         }
 
+    private fun Context.resourceUri(resourceId: Int): Uri = with(resources) {
+        Uri.Builder()
+            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+            .authority(getResourcePackageName(resourceId))
+            .appendPath(getResourceTypeName(resourceId))
+            .appendPath(getResourceEntryName(resourceId))
+            .build()
+    }
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {

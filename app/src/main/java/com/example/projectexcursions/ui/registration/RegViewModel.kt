@@ -61,19 +61,16 @@ class RegViewModel @Inject constructor(
                     val user = User(username, password)
                     val response = apiService.registerUser(user)
                     Log.d("RegistrationResponse", "Response: $response")
-                    _message.value = context.getString(R.string.user_registered)
-                    _regStatus.value = true
+                    if (response.isSuccessful) {
+                        _message.value = response.message()
+                        _regStatus.value = true
+                    }
                 } else {
                     _message.value = context.getString(R.string.lang_error)
                 }
             } catch (e: Exception) {
                 Log.e("RegistrationError", "Ошибка при регистрации: ${e.message}")
-                if (e.message!!.contains("409"))
-                    _message.value = context.getString(R.string.user_exists)
-                else {
-                    _message.value = e.message
-                    FirebaseCrashlytics.getInstance().recordException(e)
-                }
+                FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
     }
