@@ -244,19 +244,11 @@ class CreateExcursionActivity : AppCompatActivity() {
         viewModel.placeItems.observe(this) { placeItems ->
             try {
                 placesAdapter.updatePlaces(placeItems)
-                if (placeItems.size == 1) {
-                    clearRoute()
-                    setLocation(placeItems[0])
-                } else if (placeItems.size > 1) {
-                    lifecycleScope.launch {
-                        for (placeItem in placeItems) {
-                            setLocation(placeItem)
-                        }
-                        viewModel.getRoute()
-                    }
-                } else {
-                    clearRoute()
-                }
+                Log.d("PlaceItemsObserve", "true " + placeItems[placeItems.size - 1].name)
+            } catch (indexOutOfBound: IndexOutOfBoundsException) {
+                clearRoute()
+                FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
+                Log.d("IndexOutOfBound", "хихи поймали дурачка)")
             } catch (e: Exception) {
                 clearRoute()
                 FirebaseCrashlytics.getInstance().recordException(e)
