@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectexcursions.ApproveExcursionException
+import com.example.projectexcursions.ui.utilies.ApproveExcursionException
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
@@ -18,7 +18,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
@@ -76,10 +75,6 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = excRepository.fetchExcursion(id = excursionId)
-                Log.d(
-                    "ExcContent", "${response.id}, \n${response.title}, " +
-                            "\n${response.description}, \n${response.user}, \n${response.favorite}"
-                )
                 val excursion = Excursion(
                     response.id,
                     response.title,
