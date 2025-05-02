@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.projectexcursions.R
-import com.example.projectexcursions.ui.utilies.UsernameNotFoundException
+import com.example.projectexcursions.utilies.UsernameNotFoundException
 import com.example.projectexcursions.databinding.FragmentProfileBinding
 import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.created_excursions_list.CreatedExListActivity
