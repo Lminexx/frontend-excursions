@@ -107,4 +107,18 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("status") status: String
     ): Response<ModeratingExcursionsResponse>
+
+    @GET("excursion/filter")
+    suspend fun loadFiltrationExcursions(
+        @Query("tags") tags: List<String>,
+        @Query("minRating") minRating: Float?,
+        @Query("minDuration") minDuration: Int?,
+        @Query("maxDuration") maxDuration: Int?,
+        @Query("startDate") startDate: String?,
+        @Query("endDate") endDate:String?,
+        @Query("topic") topic: String?,
+        @Query("cityName") cityName: String?,
+        @Query("offset") offset: Int?,
+        @Query("limit") limit: Int?
+    ): Response<ExcursionsResponse>
 }

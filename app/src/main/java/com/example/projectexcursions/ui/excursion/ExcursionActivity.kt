@@ -9,10 +9,12 @@ import android.os.Handler
 import android.os.Looper
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -26,6 +28,7 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
+import com.google.android.material.chip.Chip
 import com.example.projectexcursions.utilies.CustomMapView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
@@ -53,6 +56,7 @@ class ExcursionActivity : AppCompatActivity() {
     private lateinit var map: Map
     private lateinit var mapView: CustomMapView
     private lateinit var placemark: PlacemarkMapObject
+    private var isDetailedInfoVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +65,16 @@ class ExcursionActivity : AppCompatActivity() {
         mapView = binding.mapview
         mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
+
+        binding.detailedInfoHeader.setOnClickListener {
+            isDetailedInfoVisible = !isDetailedInfoVisible
+            binding.detailedInfoContainer.visibility =
+                if (isDetailedInfoVisible) View.VISIBLE else View.GONE
+            binding.detailedInfoArrow.animate()
+                .rotation(if (isDetailedInfoVisible) 180f else 0f)
+                .setDuration(200)
+                .start()
+        }
 
         initCallback()
         initData()
@@ -137,6 +151,9 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
                 binding.excursionRating.text = excursion.rating.toString()
+                binding.topicValue.text = excursion.topic
+                binding.cityValue.text = excursion.cityName
+                addNewChip(excursion.tags)
                 if (excursion.personalRating == null) {
                     binding.myRatingText.alpha = 0.0F
                 } else {
@@ -241,7 +258,10 @@ class ExcursionActivity : AppCompatActivity() {
                 val id = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
                 if (id != -1L) {
                     val disapproveExcursionFrag = DisapproveExcursionFragment.newInstance(id)
-                    disapproveExcursionFrag.show(supportFragmentManager, "DisapproveExcursionFragment")
+                    disapproveExcursionFrag.show(
+                        supportFragmentManager,
+                        "DisapproveExcursionFragment"
+                    )
                 }
             } else finish()
             Log.d("disapproving", disapproving.toString())
@@ -337,6 +357,29 @@ class ExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun addNewChip(tags: List<String>) {
+        for (tag in tags) {
+            try {
+                val inflater = LayoutInflater.from(this)
+                val newChip =
+                    inflater.inflate(
+                        R.layout.layout_chip_entry,
+                        binding.tagsChipsView,
+                        false
+                    ) as Chip
+                newChip.text = tag
+                newChip.setCloseIconVisible(false)
+                newChip.isClickable = false
+                newChip.setChipBackgroundColorResource(R.color.lighter_blue)
+                newChip.setTextColor(ContextCompat.getColor(this, R.color.white))
+                binding.tagsChipsView.addView(newChip)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(this, "Error: " + e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun showShimmer() {
         binding.shimmerLayout.visibility = View.VISIBLE
         binding.shimmerLayout.startShimmer()
@@ -393,7 +436,10 @@ class ExcursionActivity : AppCompatActivity() {
     companion object {
         private const val EXTRA_EXCURSION_ID = "EXTRA_EXCURSION_ID"
         private const val EXTRA_IS_MODERATING = "EXTRA_IS_MODERATING"
-        internal fun Context.createExcursionActivityIntent(excursionId: Long, isModerating: Boolean): Intent =
+        internal fun Context.createExcursionActivityIntent(
+            excursionId: Long,
+            isModerating: Boolean
+        ): Intent =
             Intent(this, ExcursionActivity::class.java).apply {
                 putExtra(EXTRA_EXCURSION_ID, excursionId)
                 putExtra(EXTRA_IS_MODERATING, isModerating)
