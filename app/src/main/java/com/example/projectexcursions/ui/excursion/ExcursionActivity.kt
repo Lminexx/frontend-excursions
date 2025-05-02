@@ -23,13 +23,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.example.projectexcursions.ui.utilies.ApproveExcursionException
+import com.example.projectexcursions.utilies.ApproveExcursionException
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
-import com.example.projectexcursions.ui.utilies.CustomMapView
 import com.google.android.material.chip.Chip
+import com.example.projectexcursions.utilies.CustomMapView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
