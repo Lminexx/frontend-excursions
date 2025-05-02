@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,7 +25,6 @@ import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import com.example.projectexcursions.ui.excursions_list.ExListViewModel
 import com.example.projectexcursions.ui.filtration.FiltrationActivity
-import com.example.projectexcursions.utilies.ExcursionsListException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -163,8 +163,7 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
                 is LoadState.Error -> {
                     showShimmer()
                     binding.recyclerView.visibility = View.GONE
-                    errorContainer.errorLayout.visibility = View.VISIBLE
-                    errorContainer.errorMessage.text = LoadState.Error(ExcursionsListException()).toString()
+                    //errorContainer.errorLayout.visibility = View.VISIBLE
                 }
             }
         }

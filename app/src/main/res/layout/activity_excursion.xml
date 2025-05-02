@@ -97,17 +97,28 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_ex_fav_hollow" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewImages"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPagerImages"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="240dp"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/excursionDescription"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/excursionDescription" />
+            app:layout_constraintEnd_toEndOf="parent"
+            android:orientation="horizontal"/>
 
-        <!-- Добавляем новый элемент для подробной информации -->
+        <com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
+            android:id="@+id/dotsIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:dotsColor="@color/black"
+            app:dotsSize="8dp"
+            app:dotsStrokeColor="@color/dark_grey"
+            app:layout_constraintTop_toBottomOf="@id/viewPagerImages"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/detailedInfoHeader"
             android:layout_width="match_parent"
@@ -116,7 +127,7 @@
             android:clickable="true"
             android:focusable="true"
             android:background="?attr/selectableItemBackground"
-            app:layout_constraintTop_toBottomOf="@id/recyclerViewImages">
+            app:layout_constraintTop_toBottomOf="@id/fragment_container">
 
             <TextView
                 android:id="@+id/detailedInfoText"
@@ -221,7 +232,7 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/detailedInfoContainer">
+            app:layout_constraintTop_toBottomOf="@id/dotsIndicator">
 
             <com.example.projectexcursions.utilies.CustomMapView
                 android:id="@+id/mapview"
@@ -244,7 +255,7 @@
             android:id="@+id/rating_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/fragment_container"
+            app:layout_constraintTop_toBottomOf="@id/detailedInfoContainer"
             tools:layout_editor_absoluteX="16dp">
 
             <TextView
@@ -305,7 +316,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
         <ImageButton
             android:id="@+id/approveButton"
             android:layout_width="54dp"
@@ -314,7 +324,7 @@
             android:layout_marginEnd="8dp"
             android:background="#00FFFFFF"
             android:contentDescription="@string/approve"
-            app:layout_constraintTop_toBottomOf="@id/fragment_container"
+            app:layout_constraintTop_toBottomOf="@id/detailedInfoContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@drawable/approve" />
@@ -326,7 +336,7 @@
             android:layout_marginVertical="16dp"
             android:background="#00FFFFFF"
             android:contentDescription="@string/pend"
-            app:layout_constraintTop_toBottomOf="@id/fragment_container"
+            app:layout_constraintTop_toBottomOf="@id/detailedInfoContainer"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@drawable/comment_exc" />

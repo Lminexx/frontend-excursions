@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
     <include
         android:id="@+id/errorContainer"
         layout="@layout/error"
@@ -18,68 +17,45 @@
         android:iconifiedByDefault="true"
         android:queryHint="@string/search_hint" />
 
-    <View
-        android:id="@+id/divider_view"
-        android:layout_width="match_parent"
-        android:layout_height="1dp" />
-
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmerLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <SearchView
-            android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:iconifiedByDefault="true"
-            android:queryHint="@string/search_hint" />
-
         <View
             android:id="@+id/divider_view"
             android:layout_width="match_parent"
             android:layout_height="1dp" />
 
-        <FrameLayout
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+            <include layout="@layout/shimmer_item_excursion" />
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/shimmerLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <include layout="@layout/shimmer_item_excursion" />
-                    <include layout="@layout/shimmer_item_excursion" />
-                    <include layout="@layout/shimmer_item_excursion" />
-                    <include layout="@layout/shimmer_item_excursion" />
-                    <include layout="@layout/shimmer_item_excursion" />
-                </LinearLayout>
-            </com.facebook.shimmer.ShimmerFrameLayout>
-
-            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-                android:id="@+id/swipeRefresh"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="visible">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        </FrameLayout>
-
-    </LinearLayout>
+            android:layout_weight="1" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/filterButton"
@@ -87,7 +63,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        android:contentDescription="@string/filtration"
         android:src="@drawable/ic_filter"
         app:backgroundTint="@color/lighter_blue" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

@@ -17,16 +17,29 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginTop="60dp"
+        android:contentDescription="@string/logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_app_v3" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="48dp">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:paddingHorizontal="48dp"
+        app:layout_constraintTop_toBottomOf="@id/logo">
 
         <EditText
             android:id="@+id/input_pass"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:hint="@string/password_hint"
             android:importantForAutofill="no"
             android:inputType="textPassword"
@@ -38,25 +51,12 @@
             android:id="@+id/input_login"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:hint="@string/login_hint"
             android:importantForAutofill="no"
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/logo" />
-
-        <ImageView
-            android:id="@+id/logo"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_marginTop="60dp"
-            android:contentDescription="@string/logo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_app_v3" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/buttAuth"
@@ -77,7 +77,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginHorizontal="4dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/border_pattern_2"
             android:text="@string/reg_string"
             android:textColor="@color/white"
@@ -90,8 +90,8 @@
             android:id="@+id/or"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/or_login_by"
-            android:layout_marginTop="16dp"
+            android:text="@string/or"
+            android:layout_marginTop="4dp"
             android:textSize="20sp"
             android:textColor="@color/blue"
             android:fontFamily="@font/app_font1"
@@ -99,48 +99,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/buttReg" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <Button
+            android:id="@+id/buttonGoogleSignIn"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginHorizontal="52dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/google"
+            android:drawableStart="@drawable/ic_google"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/white"
+            app:cornerRadius="8dp"
+            app:iconGravity="textStart"
+            app:iconSize="24dp"
+            app:iconPadding="8dp"
+            app:iconTint="@null"
             app:layout_constraintTop_toBottomOf="@id/or"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-            <ImageButton
-                android:id="@+id/google_auth"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="8dp"
-                android:contentDescription="@string/login_by_google"
-                android:textColor="@color/black"
-                android:background="@drawable/ic_google"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <ImageButton
-                android:id="@+id/email_auth"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginHorizontal="16dp"
-                android:background="@drawable/ic_email"
-                android:contentDescription="@string/login_by_email"
-                app:layout_constraintStart_toEndOf="@id/google_auth"
-                app:layout_constraintEnd_toStartOf="@id/vk_auth"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/vk_auth"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/ic_vk"
-                android:contentDescription="@string/login_by_vk"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
