@@ -83,6 +83,9 @@
     <string name="login_by_email">Войти по Email</string>
     <string name="login_by_vk">Войти через VK</string>
     <string name="error_excursions">Ошибка загрузки экскурсий</string>
-    <string name="cant_fetch_excursions">Не удалось загрузить экскурсии</string>
+    <string name="cant_fetch_excursions">Не удалось загрузить экскурсии: </string>
     <string name="retry_fetch">Повторить загрузку</string>
+    <string name="unknownerror">UnknownError</string>
+    <string name="default_web_client_id">596243648831-n94ipknkjdbm2b5legjsdkc6fo15ghs0.apps.googleusercontent.com</string>
+    <string name="excursionphoto">Фото экскурсии</string>
 </resources>
