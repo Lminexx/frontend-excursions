@@ -56,6 +56,7 @@ import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 
 
+
 @AndroidEntryPoint
 class CreateExcursionActivity : AppCompatActivity() {
 

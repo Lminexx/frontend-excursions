@@ -57,11 +57,6 @@ class RegActivity: AppCompatActivity() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-        binding.buttonGoogleSignIn.setOnClickListener {
-            signInWithGoogle()
-        }
-
     }
 
     private fun initCallback() {
@@ -75,6 +70,10 @@ class RegActivity: AppCompatActivity() {
 
         binding.buttonAddAvatar.setOnClickListener {
             openImagePicker()
+        }
+
+        binding.buttonGoogleSignIn.setOnClickListener {
+            signInWithGoogle()
         }
     }
 
@@ -160,6 +159,8 @@ class RegActivity: AppCompatActivity() {
                     val user = firebaseAuth.currentUser
                     val username = user?.displayName ?: user?.email ?: "unknown"
                     val avatar = user?.photoUrl ?: resourceUri(R.drawable.ic_app_v3)
+                    val token = account.idToken
+                    Log.d("FirebaseToken", token ?: "ZeroToken")
 
                     viewModel.registerWithGoogle(username, avatar)
 

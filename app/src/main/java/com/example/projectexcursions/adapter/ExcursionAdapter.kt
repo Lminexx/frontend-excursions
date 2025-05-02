@@ -41,7 +41,7 @@ class ExcursionAdapter(
                 }
 
                 Glide.with(binding.photo.context)
-                    .load(excursionsList.photoUrl)
+                    .load(excursionsList.url)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.color.lighter_blue)

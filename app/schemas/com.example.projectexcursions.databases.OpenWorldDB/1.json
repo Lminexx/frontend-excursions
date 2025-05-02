@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "37047bc5afc64c3de19e7fc0c36c1bbe",
+    "identityHash": "cb678252bdb68654858ea7b7a7fe6eaf",
     "entities": [
       {
         "tableName": "excursions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `userId` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL, `tags` TEXT NOT NULL, `topic` TEXT NOT NULL, `approvedAt` TEXT, `cityName` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `userId` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL, `tags` TEXT NOT NULL, `topic` TEXT NOT NULL, `approvedAt` TEXT, `cityName` TEXT NOT NULL, `photoUrl` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -71,6 +71,12 @@
           {
             "fieldPath": "cityName",
             "columnName": "cityName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "photoUrl",
+            "columnName": "photoUrl",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -206,7 +212,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '37047bc5afc64c3de19e7fc0c36c1bbe')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cb678252bdb68654858ea7b7a7fe6eaf')"
     ]
   }
 }

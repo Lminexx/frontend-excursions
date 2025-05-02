@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -28,9 +30,11 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
-import com.google.android.material.chip.Chip
 import com.example.projectexcursions.utilies.CustomMapView
+import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -57,6 +61,8 @@ class ExcursionActivity : AppCompatActivity() {
     private lateinit var mapView: CustomMapView
     private lateinit var placemark: PlacemarkMapObject
     private var isDetailedInfoVisible = false
+    private lateinit var viewPager: ViewPager2
+    private lateinit var indicator: SpringDotsIndicator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,16 +71,6 @@ class ExcursionActivity : AppCompatActivity() {
         mapView = binding.mapview
         mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
-
-        binding.detailedInfoHeader.setOnClickListener {
-            isDetailedInfoVisible = !isDetailedInfoVisible
-            binding.detailedInfoContainer.visibility =
-                if (isDetailedInfoVisible) View.VISIBLE else View.GONE
-            binding.detailedInfoArrow.animate()
-                .rotation(if (isDetailedInfoVisible) 180f else 0f)
-                .setDuration(200)
-                .start()
-        }
 
         initCallback()
         initData()
@@ -109,9 +105,11 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         adapter = PhotoAdapter(this, listOf())
-        binding.recyclerViewImages.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerViewImages.adapter = adapter
+        viewPager = binding.viewPagerImages
+        viewPager.adapter = adapter
+
+        indicator = binding.dotsIndicator
+        indicator.setViewPager2(viewPager)
 
         showShimmer()
 
@@ -324,6 +322,16 @@ class ExcursionActivity : AppCompatActivity() {
                 }
             }
         }
+
+        binding.detailedInfoHeader.setOnClickListener {
+            isDetailedInfoVisible = !isDetailedInfoVisible
+            binding.detailedInfoContainer.visibility =
+                if (isDetailedInfoVisible) View.VISIBLE else View.GONE
+            binding.detailedInfoArrow.animate()
+                .rotation(if (isDetailedInfoVisible) 180f else 0f)
+                .setDuration(200)
+                .start()
+        }
     }
 
     private fun setLocation(point: Point) {
@@ -387,14 +395,14 @@ class ExcursionActivity : AppCompatActivity() {
         binding.authorContainer.visibility = View.GONE
         binding.excursionDescription.visibility = View.GONE
         binding.favoriteButton.visibility = View.GONE
-        binding.recyclerViewImages.visibility = View.GONE
+        viewPager.visibility = View.GONE
+        indicator.visibility = View.GONE
         binding.mapview.visibility = View.GONE
         binding.places.visibility = View.GONE
         binding.approveButton.visibility = View.GONE
         binding.commentButton.visibility = View.GONE
-        binding.mainRatingConteiner.visibility = View.GONE
-        binding.myRatingContainer.visibility = View.GONE
-        binding.ratingDescription.visibility = View.GONE
+        binding.ratingContainer.visibility = View.GONE
+        binding.detailedInfoHeader.visibility = View.GONE
     }
 
     private fun hideShimmer() {
@@ -404,25 +412,22 @@ class ExcursionActivity : AppCompatActivity() {
         binding.authorContainer.visibility = View.VISIBLE
         binding.excursionDescription.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
-        binding.recyclerViewImages.visibility = View.VISIBLE
+        viewPager.visibility = View.VISIBLE
+        indicator.visibility = View.VISIBLE
         binding.mapview.visibility = View.VISIBLE
         binding.places.visibility = View.VISIBLE
-        binding.ratingDescription.visibility = View.VISIBLE
+        binding.detailedInfoHeader.visibility = View.VISIBLE
         val isModerating = intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
         if (isModerating) {
             binding.favoriteButton.visibility = View.GONE
-            binding.mainRatingConteiner.visibility = View.GONE
-            binding.myRatingContainer.visibility = View.GONE
-            binding.ratingDescription.visibility = View.GONE
+            binding.ratingContainer.visibility = View.GONE
             binding.commentButton.visibility = View.VISIBLE
             binding.approveButton.visibility = View.VISIBLE
         } else {
             binding.commentButton.visibility = View.GONE
             binding.approveButton.visibility = View.GONE
             binding.favoriteButton.visibility = View.VISIBLE
-            binding.mainRatingConteiner.visibility = View.VISIBLE
-            binding.myRatingContainer.visibility = View.VISIBLE
-            binding.ratingDescription.visibility = View.VISIBLE
+            binding.ratingContainer.visibility = View.VISIBLE
         }
     }
 
