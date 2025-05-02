@@ -1,6 +1,7 @@
-package com.example.projectexcursions.ui.utilies
+package com.example.projectexcursions.utilies
 
 import androidx.room.TypeConverter
+import com.example.projectexcursions.models.UserInformation
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

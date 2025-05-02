@@ -1,4 +1,4 @@
-package com.example.projectexcursions.ui.utilies
+package com.example.projectexcursions.utilies
 
 import android.content.Context
 import android.util.AttributeSet

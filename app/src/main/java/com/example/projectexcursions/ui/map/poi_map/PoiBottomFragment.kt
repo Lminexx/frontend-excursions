@@ -68,6 +68,8 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
             binding.poiName.text = poiName
             binding.poiAddressCollapsed.text = poiAddress
             binding.poiAddressExpanded.text = poiAddress
+            binding.poiDescExpanded.text = poiDesc
+            binding.poiDescCollapsed.text = poiDesc
 
             behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {}
