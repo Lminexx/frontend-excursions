@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
@@ -28,6 +29,7 @@ import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
+import com.google.android.material.chip.Chip
 import com.example.projectexcursions.utilies.CustomMapView
 import com.example.projectexcursions.utilies.ProgressBar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -52,6 +54,7 @@ import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class CreateExcursionActivity : AppCompatActivity() {
@@ -88,7 +91,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d("onStart","")
+        Log.d("onStart", "")
         MapKitFactory.getInstance().onStart()
         mapView.onStart()
         viewModel.getUserPosition()
@@ -97,7 +100,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         mapView.onStop()
-        Log.d("onStart","")
+        Log.d("onStart", "")
         MapKitFactory.getInstance().onStop()
     }
 
@@ -137,7 +140,8 @@ class CreateExcursionActivity : AppCompatActivity() {
             places = emptyList()
         )
 
-        binding.recyclerViewSelectedImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewSelectedImages.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.searchResultsRecycler.layoutManager = LinearLayoutManager(this)
         binding.places.layoutManager = LinearLayoutManager(this)
         binding.searchResultsRecycler.adapter = searchResultsAdapter
@@ -165,7 +169,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         map.addTapListener(geoObjectTapListener())
 
-        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 search(query)
                 return true
@@ -195,6 +199,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                 viewModel.toggleSearchResultsVisibility()
             }
         }
+
+        binding.addTagsButton.setOnClickListener {
+            addNewChip()
+        }
     }
 
     private fun subscribe() {
@@ -210,8 +218,18 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
                 val photos = viewModel.selectedImages.value ?: emptyList()
-                if (viewModel.isExcursionCorrect(this, title, description, places)) {
-                    viewModel.createExcursion(this@CreateExcursionActivity, title, description)
+                val tags = binding.tagsChips
+                val chipTexts = mutableListOf<String>()
+                for (i in 0 until tags.childCount) {
+                    val chip = tags.getChildAt(i) as? Chip
+                    chip?.let {
+                        chipTexts.add(it.text.toString())
+                    }
+                }
+                val city = binding.cityName.text.toString()
+                val topic= binding.topic.selectedItem.toString()
+                if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
+                    viewModel.createExcursion(this@CreateExcursionActivity, title, description, chipTexts, topic, city)
                 }
             }
         }
@@ -252,6 +270,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                 FirebaseCrashlytics.getInstance().recordException(e)
                 Log.d("Exception", e.message.toString())
             }
+        }
+
+        viewModel.message.observe(this){message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -299,6 +321,32 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun addNewChip() {
+        val keyword: String = binding.addTagsString.text.toString()
+        println(keyword)
+        if (keyword.isEmpty()) {
+            Toast.makeText(this, "Пожалуйста, введите тэг", Toast.LENGTH_SHORT).show()
+            return
+        }
+        try {
+            val inflater = LayoutInflater.from(this)
+            val newChip =
+                inflater.inflate(R.layout.layout_chip_entry, binding.tagsChips, false) as Chip
+            newChip.text = keyword
+            newChip.setCloseIconVisible(true)
+            newChip.setChipBackgroundColorResource(R.color.lighter_blue)
+            newChip.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.tagsChips.addView(newChip)
+            newChip.setOnCloseIconClickListener {
+                binding.tagsChips.removeView(newChip)
+            }
+            binding.addTagsString.setText("")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error: " + e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "image/*"
@@ -342,7 +390,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun setUserLocation(point: Point) {
-        Log.d("setUserLocation","")
+        Log.d("setUserLocation", "")
         try {
             map.move(
                 CameraPosition(

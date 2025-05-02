@@ -13,6 +13,7 @@ import com.example.projectexcursions.net.ExcursionsResponse
 import com.example.projectexcursions.net.PhotoResponse
 import com.example.projectexcursions.net.RatingResponse
 import com.example.projectexcursions.paging_sources.ExcursionPagingSource
+import com.example.projectexcursions.paging_sources.FiltrationExcursionPagingSource
 import com.example.projectexcursions.paging_sources.ModeratingExcursionsPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
@@ -33,6 +34,9 @@ class ExcursionRepositoryImpl @Inject constructor(
     override fun searchExcursionPagingSource(query: String, isMine: Boolean, isFavorite: Boolean) = SearchExcursionPagingSource(apiService, query, isMine, isFavorite)
 
     override fun moderatingExcursionsPagingSource() = ModeratingExcursionsPagingSource(apiService)
+
+    override fun filtrationExcursionPagingSource(rating: Float?, startDate:String?, endDate:String?, tags:List<String>, minDuration:Int?, maxDuration:Int?, topic:String?,city:String?)
+    = FiltrationExcursionPagingSource(apiService, rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 

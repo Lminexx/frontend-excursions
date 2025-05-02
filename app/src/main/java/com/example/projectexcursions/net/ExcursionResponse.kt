@@ -12,9 +12,9 @@ data class ExcursionResponse(
     val user: UserInformation,
     val favorite: Boolean = false,
     val rating: Float,
-    val personalRating: Float,
-    val tags: List<String> = listOf(""),
-    val topic: String = "",
-    val approvedAt: String = "",
-    val cityName: String = ""
+    val personalRating: Float?=null,
+    val tags: List<String>,
+    val topic: String,
+    val approvedAt: String? = null,
+    val cityName: String
 )

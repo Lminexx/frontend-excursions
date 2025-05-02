@@ -9,6 +9,7 @@ import com.example.projectexcursions.net.ExcursionsResponse
 import com.example.projectexcursions.net.PhotoResponse
 import com.example.projectexcursions.net.RatingResponse
 import com.example.projectexcursions.paging_sources.ExcursionPagingSource
+import com.example.projectexcursions.paging_sources.FiltrationExcursionPagingSource
 import com.example.projectexcursions.paging_sources.ModeratingExcursionsPagingSource
 import com.example.projectexcursions.paging_sources.SearchExcursionPagingSource
 import okhttp3.MultipartBody
@@ -22,6 +23,9 @@ interface ExcursionRepository {
     fun searchExcursionPagingSource(query: String, isMine: Boolean, isFavorite: Boolean): SearchExcursionPagingSource
 
     fun moderatingExcursionsPagingSource(): ModeratingExcursionsPagingSource
+
+    fun filtrationExcursionPagingSource(rating: Float?, startDate:String?, endDate:String?, tags:List<String>, minDuration:Int?, maxDuration:Int?, topic:String?,city:String?):
+            FiltrationExcursionPagingSource
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
 

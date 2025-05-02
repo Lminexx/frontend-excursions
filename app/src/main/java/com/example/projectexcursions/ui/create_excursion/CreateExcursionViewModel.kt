@@ -91,9 +91,9 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun createExcursion(context: Context, title: String, description: String) {
+    fun createExcursion(context: Context, title: String, description: String, tags:List<String>, topic:String, city: String) {
         Log.d("CreatingExcursion", "CreatingExcursion")
-        val excursion = CreatingExcursion(title, description)
+        val excursion = CreatingExcursion(title, description, city, tags, topic)
         val places = placeItems.value ?: emptyList()
         Log.d("places", places.isNotEmpty().toString())
         viewModelScope.launch {
@@ -157,7 +157,7 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>): Boolean {
+    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>, city: String): Boolean {
         when {
             title.isBlank() -> {
                 _message.value = context.getString(R.string.empty_title)
@@ -171,6 +171,11 @@ class CreateExcursionViewModel @Inject constructor(
 
             places.isEmpty() -> {
                 _message.value = context.getString(R.string.empty_route)
+                return false
+            }
+
+            city.isEmpty()->{
+                _message.value=context.getString(R.string.empty_city_name)
                 return false
             }
             else -> return true
@@ -271,7 +276,7 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun getId(i: Int): String {
+    fun getId(i:Int): String {
         return geoRepository.getRandomId(i)
     }
 
