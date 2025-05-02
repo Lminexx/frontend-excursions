@@ -16,12 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
-import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.databinding.MineActivityExcursionBinding
-import com.example.projectexcursions.ui.main.MainActivity
-import com.example.projectexcursions.ui.mine_excursion.MineExcursionActivity.Companion.createMineExcursionActivityIntent
-import com.example.projectexcursions.ui.utilies.CustomMapView
-import com.example.projectexcursions.ui.utilies.ProgressBar
+import com.example.projectexcursions.utilies.CustomMapView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -31,7 +27,6 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
-import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay

@@ -1,4 +1,4 @@
-package com.example.projectexcursions.ui.utilies
+package com.example.projectexcursions.utilies
 
 
 class UsernameNotFoundException(message: String): Exception(message)

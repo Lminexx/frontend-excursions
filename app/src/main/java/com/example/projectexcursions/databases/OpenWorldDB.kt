@@ -11,9 +11,9 @@ import com.example.projectexcursions.databases.daos.TokenDao
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.models.Token
-import com.example.projectexcursions.ui.utilies.Converters
+import com.example.projectexcursions.utilies.Converters
 
-@Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 2)
+@Database(entities = [ExcursionsList::class, Excursion::class, Token::class], version = 3)
 @TypeConverters(Converters::class)
 abstract class OpenWorldDB: RoomDatabase() {
     abstract fun excursionsDao(): ExcursionsDao
