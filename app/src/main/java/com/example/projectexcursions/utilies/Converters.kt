@@ -1,4 +1,4 @@
-package com.example.projectexcursions.ui.utilies
+package com.example.projectexcursions.utilies
 
 import androidx.room.TypeConverter
 import com.example.projectexcursions.models.UserInformation
@@ -15,17 +15,5 @@ class Converters {
     @TypeConverter
     fun fromList(list: List<String>): String {
         return Gson().toJson(list)
-    }
-
-    @TypeConverter
-    fun fromUserInformation(user: UserInformation?): String? {
-        return Gson().toJson(user)
-    }
-
-    @TypeConverter
-    fun toUserInformation(data: String?): UserInformation? {
-        return data?.let {
-            Gson().fromJson(it, UserInformation::class.java)
-        }
     }
 }

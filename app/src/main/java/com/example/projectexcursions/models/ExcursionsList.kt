@@ -4,9 +4,10 @@ import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.projectexcursions.ui.utilies.Converters
+import com.example.projectexcursions.utilies.Converters
 import kotlinx.serialization.Serializable
 import kotlinx.parcelize.Parcelize
+
 
 @Parcelize
 @Serializable
@@ -15,16 +16,14 @@ import kotlinx.parcelize.Parcelize
 data class ExcursionsList(
     @PrimaryKey val id: Long,
     val title: String,
-    val userId: Long,
-    val user: UserInformation,
-    val username: String? = null,
     val description: String,
+    val userId: Long,
     val favorite: Boolean = false,
     val rating: Float,
-    val personalRating: Float? = null,
+    val personalRating: Float?=null,
     val tags: List<String>,
     val topic: String,
-    val approvedAt: String,
+    val approvedAt: String?=null,
     val cityName: String,
     val photoId: Long,
     val photoUrl: String
