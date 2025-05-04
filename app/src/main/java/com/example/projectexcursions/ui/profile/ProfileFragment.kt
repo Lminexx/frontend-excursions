@@ -16,11 +16,19 @@ import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.created_excursions_list.CreatedExListActivity
 import com.example.projectexcursions.ui.moderating_excursions_list.ModeratingExListActivity
 import com.example.projectexcursions.ui.main.MainActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
+    @Inject
+    lateinit var firebaseAuth: FirebaseAuth
+    @Inject
+    lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var binding: FragmentProfileBinding
     private val viewModel: ProfileViewModel by viewModels()
     private var isModerator = false
@@ -89,11 +97,15 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 username ?: throw UsernameNotFoundException("Usera net v tokene")
         }
 
-        viewModel.wantComeBack.observe(viewLifecycleOwner) { wannaLogOut ->
+        viewModel.logout.observe(viewLifecycleOwner) { wannaLogOut ->
             if (wannaLogOut) {
                 Log.d("WantLogOut", "true")
-                viewModel.logout()
-                (requireActivity() as? MainActivity)?.updateBottomNavSelectionToList()
+                if (firebaseAuth.currentUser != null) {
+                    firebaseAuth.signOut()
+                    googleSignInClient.signOut()
+                    viewModel.logout()
+                    (requireActivity() as? MainActivity)?.updateBottomNavSelectionToList()
+                }
             }
         }
 
