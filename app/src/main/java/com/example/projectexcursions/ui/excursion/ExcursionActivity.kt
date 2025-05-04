@@ -366,6 +366,7 @@ class ExcursionActivity : AppCompatActivity() {
     }
 
     private fun addNewChip(tags: List<String>) {
+        binding.tagsChipsView.removeAllViews()
         for (tag in tags) {
             try {
                 val inflater = LayoutInflater.from(this)
