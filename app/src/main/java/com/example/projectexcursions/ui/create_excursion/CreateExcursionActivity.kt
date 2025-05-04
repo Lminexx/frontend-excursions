@@ -21,7 +21,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
@@ -33,6 +35,7 @@ import com.google.android.material.chip.Chip
 import com.example.projectexcursions.utilies.CustomMapView
 import com.example.projectexcursions.utilies.ProgressBar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -54,7 +57,7 @@ import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
-
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -71,6 +74,8 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var routeLayer: MapObjectCollection
     private val viewModel: CreateExcursionViewModel by viewModels()
     private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
+    private lateinit var viewPager: ViewPager2
+    private lateinit var indicator: SpringDotsIndicator
 
     private val REQUEST_CODE_PERMISSION = 1003
 
@@ -106,7 +111,6 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        adapter = PhotoAdapter(this, emptyList())
 
         searchResultsAdapter = SearchResultsAdapter { item ->
             Log.d("searchAdapter", "true")
@@ -141,14 +145,18 @@ class CreateExcursionActivity : AppCompatActivity() {
             places = emptyList()
         )
 
-        binding.recyclerViewSelectedImages.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        adapter = PhotoAdapter(this, listOf())
+
+        viewPager = binding.viewPagerImages
+        viewPager.adapter = adapter
+
+        indicator = binding.dotsIndicator
+        indicator.setViewPager2(viewPager)
+
         binding.searchResultsRecycler.layoutManager = LinearLayoutManager(this)
         binding.places.layoutManager = LinearLayoutManager(this)
         binding.searchResultsRecycler.adapter = searchResultsAdapter
         binding.places.adapter = placesAdapter
-        binding.recyclerViewSelectedImages.setHasFixedSize(true)
-        binding.recyclerViewSelectedImages.adapter = adapter
         progressBar = ProgressBar()
     }
 
@@ -218,7 +226,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
-                val photos = viewModel.selectedImages.value ?: emptyList()
                 val tags = binding.tagsChips
                 val chipTexts = mutableListOf<String>()
                 for (i in 0 until tags.childCount) {
@@ -239,11 +246,16 @@ class CreateExcursionActivity : AppCompatActivity() {
             if (!points.isNullOrEmpty()) {
                 Log.d("RouteData", points.size.toString())
                 drawRoute(points)
+            } else {
+                routeLayer.clear()
             }
         }
 
         viewModel.selectedImages.observe(this) { selectedImages ->
-            adapter.updatePhotos(selectedImages)
+            if (selectedImages.isNotEmpty()) {
+                showImages()
+                adapter.updatePhotos(selectedImages)
+            }
         }
 
         viewModel.searchResults.observe(this) { results ->
@@ -260,12 +272,10 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.placeItems.observe(this) { placeItems ->
             try {
-                placesAdapter.updatePlaces(placeItems)
-                Log.d("PlaceItemsObserve", "true " + placeItems[placeItems.size - 1].name)
-            } catch (indexOutOfBound: IndexOutOfBoundsException) {
-                clearRoute()
-                FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
-                Log.d("IndexOutOfBound", "хихи поймали дурачка)")
+                lifecycleScope.launch {
+                    placesAdapter.updatePlaces(placeItems)
+                    viewModel.getRoute()
+                }
             } catch (e: Exception) {
                 clearRoute()
                 FirebaseCrashlytics.getInstance().recordException(e)
@@ -493,13 +503,6 @@ class CreateExcursionActivity : AppCompatActivity() {
 
             val placeItem = createPlaceItem(id, name, point)
 
-            if (metadata != null) {
-                map.selectGeoObject(metadata)
-                Log.d("GeoObject", "Выбран объект с ID: ${metadata.objectId}")
-            } else {
-                Log.e("GeoObject", "Метаданные умерли(((")
-            }
-
             val searchManager =
                 SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
             val searchOptions = SearchOptions().apply {
@@ -520,6 +523,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                     Log.d("latitude", latitude.toString())
 
                     viewModel.addPlace(placeItem)
+                    setLocation(placeItem)
                 }
 
                 override fun onSearchError(p0: Error) {
@@ -570,6 +574,11 @@ class CreateExcursionActivity : AppCompatActivity() {
         val lat = point?.latitude
         val lon = point?.longitude
         return PlaceItem(id, name, lat!!, lon!!)
+    }
+
+    private fun showImages() {
+        binding.viewPagerImages.visibility = View.VISIBLE
+        binding.dotsIndicator.visibility = View.VISIBLE
     }
 }
 //TODO сделать получение списка фото места

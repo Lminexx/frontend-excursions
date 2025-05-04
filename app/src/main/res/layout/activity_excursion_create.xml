@@ -41,15 +41,29 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/excursionTitle" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewSelectedImages"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPagerImages"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="240dp"
             android:layout_marginTop="16dp"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/excursionDescription"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="horizontal"/>
+
+        <com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
+            android:id="@+id/dotsIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:dotsColor="@color/black"
+            app:dotsSize="8dp"
+            app:dotsStrokeColor="@color/dark_grey"
+            app:layout_constraintTop_toBottomOf="@id/viewPagerImages"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
             android:id="@+id/buttonSelectImage"
@@ -58,7 +72,7 @@
             android:text="@string/pick_photo"
             android:textColor="@color/lighter_blue"
             android:background="@drawable/border_pattern_1"
-            app:layout_constraintTop_toBottomOf="@id/recyclerViewSelectedImages"
+            app:layout_constraintTop_toBottomOf="@id/dotsIndicator"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"/>
@@ -81,7 +95,7 @@
 
             <EditText
                 android:id="@+id/addTagsString"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="text"
@@ -91,15 +105,13 @@
 
             <Button
                 android:id="@+id/addTagsButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="252dp"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
                 android:text="@string/add_tag_button"
                 android:textColor="@color/white"
-                android:textSize="14sp"
-                android:padding="4dp"
+                android:textSize="12sp"
                 android:background="@drawable/border_pattern_2"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
