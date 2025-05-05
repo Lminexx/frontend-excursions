@@ -34,59 +34,60 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(
+    fun provideSecureOkHttpClient(
         tokenRepo: TokenRepository,
-        okHttpClientBuilder: OkHttpClient.Builder
+        app: Application
     ): OkHttpClient {
-        return okHttpClientBuilder
-            .addInterceptor { chain ->
-                val token = runBlocking { tokenRepo.getToken()?.token }
-                val request = chain.request()
-                val requestBuilder = request.newBuilder()
-                if (token != null) {
-                    requestBuilder.addHeader("Authorization", token.toString())
-                }
-                chain.proceed(requestBuilder.build())
-            }
-            .build()
-    }
-
-    @Provides
-    fun provideOkHttpClientBuilder(app: Application): OkHttpClient.Builder {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
         val certificateFactory = CertificateFactory.getInstance("X.509")
-
         val inputStream = app.resources.openRawResource(R.raw.server)
         val certificate = certificateFactory.generateCertificate(inputStream)
         inputStream.close()
 
-        val keyStoreType = KeyStore.getDefaultType()
-        val keyStore = KeyStore.getInstance(keyStoreType)
-        keyStore.load(null, null)
-        keyStore.setCertificateEntry("ca", certificate)
+        val keyStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+            load(null, null)
+            setCertificateEntry("ca", certificate)
+        }
 
-        val tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm()
-        val trustManagerFactory = TrustManagerFactory.getInstance(tmfAlgorithm)
-        trustManagerFactory.init(keyStore)
+        val trustManagerFactory = TrustManagerFactory.getInstance(
+            TrustManagerFactory.getDefaultAlgorithm()
+        ).apply {
+            init(keyStore)
+        }
 
-        val trustManagers = trustManagerFactory.trustManagers
-        val x509TrustManager = trustManagers[0] as X509TrustManager
+        val x509TrustManager = trustManagerFactory.trustManagers[0] as X509TrustManager
 
-        val sslContext = SSLContext.getInstance("SSL")
-        sslContext.init(null, arrayOf(x509TrustManager), null)
-        val sslSocketFactory = sslContext.socketFactory
+        val sslContext = SSLContext.getInstance("SSL").apply {
+            init(null, arrayOf(x509TrustManager), null)
+        }
 
         return OkHttpClient.Builder()
-            .sslSocketFactory(sslSocketFactory, x509TrustManager)
+            .sslSocketFactory(sslContext.socketFactory, x509TrustManager)
             .hostnameVerifier(myHostNameVerifier())
             .addInterceptor(loggingInterceptor)
+            .addInterceptor { chain ->
+                val token = runBlocking { tokenRepo.getToken()?.token }
+                val requestBuilder = chain.request().newBuilder()
+                if (token != null) {
+                    requestBuilder.addHeader("Authorization", token.toString())
+                }
+                chain.proceed(requestBuilder.build())
+            }
             .connectTimeout(30, TimeUnit.SECONDS)
-            .callTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
 
+    @Provides
+    fun provideDefaultOkHttpClientBuilder(): OkHttpClient.Builder {
+        return OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
     }
 
     @Singleton
