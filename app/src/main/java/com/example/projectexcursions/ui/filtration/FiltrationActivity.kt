@@ -48,11 +48,7 @@ class FiltrationActivity : AppCompatActivity() {
             val endDate = binding.filtrationApprovedAtEnd.text.toString()
             val minDuration = binding.filtrationDurationStart.text.toString()
             val maxDuration = binding.filtrationDurationEnd.text.toString()
-            //if (binding.topicValue.selectedItem.toString() != "-") {
-                val topic = binding.topicValue.selectedItem.toString()
-//            } else {
-//                val topic:String
-//            }
+            val topic = binding.topicValue.selectedItem.toString()
             val city = binding.filtrationCityValue.text.toString()
             val selectedTags = mutableListOf<String>()
             for (i in 0 until binding.tagsChips.childCount) {
