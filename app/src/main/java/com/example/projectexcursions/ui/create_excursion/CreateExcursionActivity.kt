@@ -243,11 +243,15 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.routeLiveData.observe(this) { points ->
-            if (!points.isNullOrEmpty()) {
-                Log.d("RouteData", points.size.toString())
-                drawRoute(points)
-            } else {
-                routeLayer.clear()
+            try {
+                if (!points.isNullOrEmpty()) {
+                    Log.d("RouteData", points.size.toString())
+                    drawRoute(points)
+                } else {
+                    routeLayer.clear()
+                }
+            } catch (e: NullPointerException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
 
