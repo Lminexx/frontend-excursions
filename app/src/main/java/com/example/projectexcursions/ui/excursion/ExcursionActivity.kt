@@ -138,8 +138,11 @@ class ExcursionActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun subscribe() {
         viewModel.wantComeBack.observe(this) { wannaComeback ->
-            if (wannaComeback)
+            if (wannaComeback) {
                 viewModel.cameBack()
+                finish()
+            }
+
         }
 
         viewModel.excursion.observe(this) { excursion ->
@@ -195,6 +198,7 @@ class ExcursionActivity : AppCompatActivity() {
                 Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT)
                     .show()
             }
+            viewModel.isMine()
         }
 
         viewModel.favorite.observe(this) { favorite ->
@@ -265,6 +269,17 @@ class ExcursionActivity : AppCompatActivity() {
         viewModel.approve.observe(this) { approved ->
             if (approved) finish()
         }
+
+        viewModel.isMine.observe(this){mine->
+            if(!mine){
+                binding.editButton.visibility = View.GONE
+                binding.deleteButton.visibility = View.GONE
+            }
+            else{
+                binding.editButton.visibility = View.VISIBLE
+                binding.deleteButton.visibility = View.VISIBLE
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -329,6 +344,17 @@ class ExcursionActivity : AppCompatActivity() {
                 .setDuration(200)
                 .start()
         }
+
+        binding.deleteButton.setOnClickListener {
+            it.isClickable = false
+            Handler(Looper.getMainLooper()).postDelayed({
+                it.isClickable = true
+            }, 1000)
+            lifecycleScope.launch {
+                viewModel.deleteExcursion()
+                setResult(RESULT_OK)
+            }
+        }
     }
 
     private fun setLocation(point: Point) {
@@ -363,6 +389,7 @@ class ExcursionActivity : AppCompatActivity() {
     }
 
     private fun addNewChip(tags: List<String>) {
+        binding.tagsChipsView.removeAllViews()
         for (tag in tags) {
             try {
                 val inflater = LayoutInflater.from(this)
