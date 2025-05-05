@@ -65,8 +65,8 @@
         android:layout_margin="16dp"
         android:contentDescription="@string/filtration"
         android:src="@drawable/ic_filter"
+        android:layout_gravity="bottom|end"
         app:backgroundTint="@color/lighter_blue"
-        app:layout_anchor="@id/swipeRefresh"
-        app:layout_anchorGravity="bottom|end" />
+        app:layout_anchor="@id/swipeRefresh" />
 
 </FrameLayout>
