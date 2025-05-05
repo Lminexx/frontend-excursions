@@ -21,13 +21,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegActivity: AppCompatActivity() {
 
+    @Inject
+    lateinit var googleSignInClient: GoogleSignInClient
+    @Inject
+    lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binding: ActivityRegBinding
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient
     private val viewModel: RegViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +38,6 @@ class RegActivity: AppCompatActivity() {
         binding = ActivityRegBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initGso()
         initCallback()
         subscribe()
     }
@@ -46,17 +48,6 @@ class RegActivity: AppCompatActivity() {
         binding.inputLogin.text.clear()
         binding.inputPass.text.clear()
         binding.repeatPass.text.clear()
-    }
-
-    private fun initGso() {
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
     private fun initCallback() {
@@ -70,10 +61,6 @@ class RegActivity: AppCompatActivity() {
 
         binding.buttonAddAvatar.setOnClickListener {
             openImagePicker()
-        }
-
-        binding.buttonGoogleSignIn.setOnClickListener {
-            signInWithGoogle()
         }
     }
 
@@ -132,42 +119,6 @@ class RegActivity: AppCompatActivity() {
             type = "image/*"
         }
         pickImages.launch(intent)
-    }
-
-    private val googleSignInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)!!
-            firebaseAuthWithGoogle(account)
-        } catch (e: ApiException) {
-            Toast.makeText(this, "Google sign in failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        googleSignInLauncher.launch(signInIntent)
-    }
-
-    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-        firebaseAuth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    val user = firebaseAuth.currentUser
-                    val username = user?.displayName ?: user?.email ?: "unknown"
-                    val avatar = user?.photoUrl ?: resourceUri(R.drawable.ic_app_v3)
-                    val token = account.idToken
-                    Log.d("FirebaseToken", token ?: "ZeroToken")
-
-                    viewModel.registerWithGoogle(username, avatar)
-
-                } else {
-                    Toast.makeText(this, "Firebase auth failed", Toast.LENGTH_SHORT).show()
-                }
-            }
     }
 
     companion object {

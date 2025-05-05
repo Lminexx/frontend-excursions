@@ -215,9 +215,6 @@ class ExcursionActivity : AppCompatActivity() {
 
         viewModel.places.observe(this) { places ->
             try {
-                for (place in places) {
-                    Log.d("PLaceItem", "${place.name}, ${place.id}")
-                }
                 lifecycleScope.launch {
                     for (place in places) {
                         val point = Point(place.lat, place.lon)
@@ -453,8 +450,8 @@ class ExcursionActivity : AppCompatActivity() {
         } else {
             binding.commentButton.visibility = View.GONE
             binding.approveButton.visibility = View.GONE
-            binding.favoriteButton.visibility = View.VISIBLE
-            binding.ratingContainer.visibility = View.VISIBLE
+            viewPager.visibility = View.GONE
+            indicator.visibility = View.GONE
         }
     }
 

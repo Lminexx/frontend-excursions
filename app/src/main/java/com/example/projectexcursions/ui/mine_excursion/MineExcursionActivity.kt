@@ -13,12 +13,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.MineActivityExcursionBinding
 import com.example.projectexcursions.utilies.CustomMapView
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -44,6 +46,8 @@ class MineExcursionActivity : AppCompatActivity() {
     private lateinit var map: Map
     private lateinit var mapView: CustomMapView
     private lateinit var placemark: PlacemarkMapObject
+    private lateinit var viewPager: ViewPager2
+    private lateinit var indicator: SpringDotsIndicator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,9 +85,11 @@ class MineExcursionActivity : AppCompatActivity() {
         }
 
         adapter = PhotoAdapter(this, listOf())
-        binding.recyclerViewImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerViewImages.adapter = adapter
+        viewPager = binding.viewPagerImages
+        viewPager.adapter = adapter
 
+        indicator = binding.dotsIndicator
+        indicator.setViewPager2(viewPager)
         showShimmer()
 
         viewModel.loadExcursion(excursionId)
@@ -258,7 +264,8 @@ class MineExcursionActivity : AppCompatActivity() {
         binding.excursionDescription.visibility = View.GONE
         binding.deleteExcursion.visibility = View.GONE
         binding.favoriteButton.visibility = View.GONE
-        binding.recyclerViewImages.visibility = View.GONE
+        viewPager.visibility = View.GONE
+        indicator.visibility = View.GONE
         binding.mapview.visibility = View.GONE
         binding.places.visibility = View.GONE
     }
@@ -271,7 +278,8 @@ class MineExcursionActivity : AppCompatActivity() {
         binding.excursionDescription.visibility = View.VISIBLE
         binding.deleteExcursion.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
-        binding.recyclerViewImages.visibility = View.VISIBLE
+        viewPager.visibility = View.VISIBLE
+        indicator.visibility = View.VISIBLE
         binding.mapview.visibility = View.VISIBLE
         binding.places.visibility = View.VISIBLE
     }
