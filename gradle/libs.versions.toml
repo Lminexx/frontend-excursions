@@ -1,6 +1,6 @@
 [versions]
 activityKtx = "1.9.3"
-agp = "8.4.1"
+agp = "8.9.2"
 coreSplashscreen = "1.0.1"
 dotsindicator = "4.3"
 firebaseBom = "32.7.2"
@@ -10,7 +10,7 @@ gson = "2.10.1"
 hiltAndroid = "2.51.1"
 javaJwt = "3.18.2"
 jwtdecode = "2.0.0"
-kotlin = "1.9.21"
+kotlin = "2.0.0"
 coreKtx = "1.10.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -35,6 +35,7 @@ shimmerVersion = "0.5.0"
 swiperefreshlayout = "1.1.0"
 circleimageview = "3.1.0"
 navigationCommonKtx = "2.8.7"
+identityJvm = "202411.1"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -83,6 +84,7 @@ circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circ
 glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
 androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "navigationCommonKtx" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+identity-jvm = { group = "com.android.identity", name = "identity-jvm", version.ref = "identityJvm" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

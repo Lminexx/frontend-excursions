@@ -85,7 +85,6 @@
     <string name="empty_city_name">Название города не заполненно</string>
     <string name="topic_string">Выберите тематику экскурсии</string>
     <string-array name="topics_filter">
-        <item></item>
         <item>UNDEFINED</item>
         <item>WALKING</item>
         <item>TRIP</item>

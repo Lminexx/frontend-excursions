@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.android.identity.util.UUID
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.registration.RegActivity
@@ -20,6 +22,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -61,8 +64,6 @@ class AuthActivity: AppCompatActivity() {
                 resultIntent.putExtra("prev_frag", prevFrag)
                 setResult(Activity.RESULT_OK, resultIntent)
                 finish()
-            } else {
-                Toast.makeText(this, getString(R.string.error_auth), Toast.LENGTH_SHORT).show()
             }
         }
 

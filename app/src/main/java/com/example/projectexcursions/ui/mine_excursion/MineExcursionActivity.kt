@@ -160,7 +160,6 @@ class MineExcursionActivity : AppCompatActivity() {
                     }
                 }
                 placesAdapter.updatePlaces(places)
-                Log.d("PlaceItemsObserve", "true " + places[places.size - 1].name)
             } catch (indexOutOfBound: IndexOutOfBoundsException) {
                 FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
                 Log.d("IndexOutOfBound", "хихи поймали дурачка)")
