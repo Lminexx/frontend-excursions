@@ -194,8 +194,7 @@ class ExcursionActivity : AppCompatActivity() {
                     viewModel.fav()
                 else
                     viewModel.notFav()
-            } else {
-                Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT)
+            } else { Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT)
                     .show()
             }
             viewModel.isMine()
@@ -427,6 +426,8 @@ class ExcursionActivity : AppCompatActivity() {
         binding.commentButton.visibility = View.GONE
         binding.ratingContainer.visibility = View.GONE
         binding.detailedInfoHeader.visibility = View.GONE
+        binding.deleteButton.visibility = View.GONE
+        binding.editButton.visibility = View.GONE
     }
 
     private fun hideShimmer() {
@@ -441,6 +442,9 @@ class ExcursionActivity : AppCompatActivity() {
         binding.mapview.visibility = View.VISIBLE
         binding.places.visibility = View.VISIBLE
         binding.detailedInfoHeader.visibility = View.VISIBLE
+        binding.ratingContainer.visibility = View.VISIBLE
+        binding.deleteButton.visibility = View.VISIBLE
+        binding.editButton.visibility = View.VISIBLE
         val isModerating = intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
         if (isModerating) {
             binding.favoriteButton.visibility = View.GONE
