@@ -47,6 +47,7 @@
     <string name="my_exc_list">Мои экскурсии</string>
     <string name="add_to_fav">Добавить в избранное</string>
     <string name="delete_exc">Удалить экскурсию</string>
+    <string name="edit_exc">Редактировать экскурсию</string>
     <string name="you_want">Вы хотите</string>
     <string name="or">или</string>
     <string name="reg_string_qm">Зарегестрироваться?</string>
@@ -84,17 +85,10 @@
     <string name="empty_city_name">Название города не заполненно</string>
     <string name="topic_string">Выберите тематику экскурсии</string>
     <string-array name="topics">
-        <item>UNDEFINED</item>
-        <item>WALKING</item>
-        <item>TRIP</item>
-        <item>ACADEMIC</item>
-    </string-array>
-    <string-array name="topics_filter">
-        <item></item>
-        <item>UNDEFINED</item>
-        <item>WALKING</item>
-        <item>TRIP</item>
-        <item>ACADEMIC</item>
+        <item>Семейная</item>
+        <item>Развлекательная</item>
+        <item>Позновательная</item>
+        <item>Активная</item>
     </string-array>
     <string name="or_login_by">или войти через:</string>
     <string name="login_by_google">Войти через Google</string>

@@ -16,6 +16,8 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,8 +39,8 @@ class ExcursionViewModel @Inject constructor(
     private val _deleteExcursion = MutableLiveData<Boolean>()
     val deleteExcursion: LiveData<Boolean> get() = _deleteExcursion
 
-    private val _username = MutableLiveData<String>()
-    val username: LiveData<String> get() = _username
+    private val _username = MutableLiveData<String?>()
+    val username: LiveData<String?> get() = _username
 
     private val _photos = MutableLiveData<List<Uri>>()
     val photos: LiveData<List<Uri>> get() = _photos
@@ -63,6 +65,9 @@ class ExcursionViewModel @Inject constructor(
 
     private val _id = MutableLiveData<Long>()
     val id: LiveData<Long> get() = _id
+
+    private val _isMine = MutableLiveData<Boolean>()
+    val isMine: LiveData<Boolean> get() = _isMine
 
     init {
         if (tokenRepository.getCachedToken() != null)
@@ -156,7 +161,7 @@ class ExcursionViewModel @Inject constructor(
         val token = tokenRepository.getCachedToken()
         val decodedToken = token?.let { tokenRepository.decodeToken(it.token) }
         val name = decodedToken?.get("username")!!.asString()
-        _username.value = name!!
+        _username.value = name
     }
 
     fun disapprove() {
@@ -194,6 +199,12 @@ class ExcursionViewModel @Inject constructor(
         }
     }
 
+    fun isMine() {
+        _excursion.value?.let { currentExcursion ->
+            _isMine.value = currentExcursion.user.username==_username.value
+        }
+    }
+
 
     suspend fun updateRating(rating: Float): Float {
         val excursionId = _excursion.value?.id ?: return 0.0f
@@ -213,6 +224,22 @@ class ExcursionViewModel @Inject constructor(
         }
     }
 
+    fun deleteExcursion() {
+        try {
+            viewModelScope.launch {
+                Log.d("DeleteEx", "DeleteExcursion")
+                excursion.value?.let { excRepository.deleteExcursion(it.id) }
+                _wantComeBack.value = true
+            }
+        } catch (http: HttpException) {
+            FirebaseCrashlytics.getInstance().recordException(http)
+        } catch (io: IOException) {
+            FirebaseCrashlytics.getInstance().recordException(io)
+        } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
+        }
+    }
+
     suspend fun excursionPended(id: Long) {
         excRepository.changeExcursionStatus(id, "PENDING")
         _disapproving.postValue(false)
@@ -220,7 +247,8 @@ class ExcursionViewModel @Inject constructor(
 
     suspend fun excursionRejected(id: Long) {
         excRepository.changeExcursionStatus(id, "REJECTED")
-        _disapproving.postValue(false)    }
+        _disapproving.postValue(false)
+    }
 
     suspend fun excursionApproved() {
         val id = excursion.value?.id ?: throw ApproveExcursionException()
