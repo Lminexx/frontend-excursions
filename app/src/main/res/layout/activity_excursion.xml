@@ -30,7 +30,7 @@
             android:id="@+id/excursionTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="52dp"
+            android:layout_marginEnd="90dp"
             android:text="@string/excursion_title"
             android:textColor="@color/black"
             android:textSize="20sp"
@@ -87,13 +87,35 @@
             app:layout_constraintTop_toBottomOf="@id/authorContainer" />
 
         <ImageButton
+            android:id="@+id/editButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="#00FFFFFF"
+            android:contentDescription="@string/edit_exc"
+            app:layout_constraintLeft_toRightOf="@id/excursionTitle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_edit_ex" />
+
+        <ImageButton
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="#00FFFFFF"
+            android:contentDescription="@string/delete_exc"
+            app:layout_constraintLeft_toRightOf="@id/editButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_ex_del" />
+
+        <ImageButton
             android:id="@+id/favoriteButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:background="#00FFFFFF"
             android:contentDescription="@string/add_to_fav"
-            app:layout_constraintLeft_toRightOf="@id/excursionTitle"
+            app:layout_constraintLeft_toRightOf="@id/deleteButton"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_ex_fav_hollow" />
 

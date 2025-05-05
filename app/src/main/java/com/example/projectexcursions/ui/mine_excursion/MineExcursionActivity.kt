@@ -278,9 +278,5 @@ class MineExcursionActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_EXCURSION_ID = "EXTRA_EXCURSION_ID"
-
-        internal fun Context.createMineExcursionActivityIntent(excursionId: Long): Intent =
-            Intent(this, MineExcursionActivity::class.java)
-                .putExtra(EXTRA_EXCURSION_ID, excursionId)
     }
 }
