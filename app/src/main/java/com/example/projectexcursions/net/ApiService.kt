@@ -121,4 +121,5 @@ interface ApiService {
         @Query("offset") offset: Int?,
         @Query("limit") limit: Int?
     ): Response<ExcursionsResponse>
+
 }

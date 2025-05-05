@@ -163,7 +163,6 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
                 is LoadState.Error -> {
                     showShimmer()
                     binding.recyclerView.visibility = View.GONE
-                    //errorContainer.errorLayout.visibility = View.VISIBLE
                 }
             }
         }

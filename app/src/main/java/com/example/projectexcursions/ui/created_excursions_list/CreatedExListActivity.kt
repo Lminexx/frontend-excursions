@@ -16,7 +16,7 @@ import com.example.projectexcursions.adapter.ExcursionAdapter
 import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
-import com.example.projectexcursions.ui.mine_excursion.MineExcursionActivity.Companion.createMineExcursionActivityIntent
+import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -44,7 +44,6 @@ class CreatedExListActivity: AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
         hideShimmer()
     }
 
@@ -128,8 +127,8 @@ class CreatedExListActivity: AppCompatActivity() {
             if (wantGoToEx) {
                 val excursion = viewModel.selectedExcursionsList
                 if (excursion != null) {
-                    val intent = this.createMineExcursionActivityIntent(excursionId = excursion.id)
-                    mineExcursionLauncher.launch(intent)
+                    val intent = this.createExcursionActivityIntent(excursionId = excursion.id, false)
+                    startActivity(intent)
                     viewModel.goneToExcursion()
                 }
             }
