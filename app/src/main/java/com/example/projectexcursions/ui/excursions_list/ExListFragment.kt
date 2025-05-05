@@ -163,6 +163,7 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
                 is LoadState.Error -> {
                     showShimmer()
                     binding.recyclerView.visibility = View.GONE
+                    errorContainer.errorLayout.visibility = View.VISIBLE
                 }
             }
         }
@@ -183,12 +184,13 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         binding.shimmerLayout.visibility = View.VISIBLE
         binding.shimmerLayout.startShimmer()
         binding.recyclerView.visibility = View.GONE
+        binding.filterButton.visibility = View.GONE
     }
 
     private fun hideShimmer() {
         binding.shimmerLayout.stopShimmer()
         binding.shimmerLayout.visibility = View.GONE
         binding.recyclerView.visibility = View.VISIBLE
+        binding.filterButton.visibility = View.VISIBLE
     }
-
 }

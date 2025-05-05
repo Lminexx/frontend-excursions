@@ -28,7 +28,11 @@ class PlacesAdapter(
         val placeItem = places[position]
         holder.bind(placeItem)
 
-        holder.itemView.setOnClickListener { onItemClick(placeItem.name) }
+        holder.itemView.setOnClickListener { onItemClick(placeItem.name ?: "Имя потеряно") }
+
+        if (placeItem.name == null)
+            holder.binding.placeName.text = "Имя потеряно"
+
         if (isCreating) {
             holder.binding.deletePlace.setOnClickListener{ onDeleteClick(placeItem.id) }
         } else {

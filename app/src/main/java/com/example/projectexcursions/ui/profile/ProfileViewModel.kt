@@ -1,14 +1,11 @@
 package com.example.projectexcursions.ui.profile
 
-import android.content.Context
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.auth0.android.jwt.Claim
-import com.example.projectexcursions.models.Token
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -25,8 +22,8 @@ class ProfileViewModel @Inject constructor(
     private val _wantCreate = MutableLiveData<Boolean>()
     val wantCreate: LiveData<Boolean> get() = _wantCreate
 
-    private val _wantComeBack = MutableLiveData<Boolean>()
-    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
+    private val _wantLogout = MutableLiveData<Boolean>()
+    val logout: LiveData<Boolean> get() = _wantLogout
 
     private val _message = MutableLiveData<String>()
     val message: LiveData<String> get() = _message
@@ -81,7 +78,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun clickComeBack() {
-        _wantComeBack.value = true
+        _wantLogout.value = true
     }
 
     fun createdExcsList() {
