@@ -6,6 +6,7 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import com.example.projectexcursions.net.ApiService
+import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -27,6 +28,9 @@ class OpenWorldApp : Application() {
 
     @Inject
     lateinit var apiService: ApiService
+
+    @Inject
+    lateinit var excRepository: ExcursionRepository
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -63,6 +67,14 @@ class OpenWorldApp : Application() {
                 Toast.makeText(applicationContext, e.message ?: "Unknown error", Toast.LENGTH_SHORT)
                     .show()
             }
+        }
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+
+        applicationScope.launch {
+            excRepository.deleteAllExcursionsFromExcursion()
         }
     }
 }

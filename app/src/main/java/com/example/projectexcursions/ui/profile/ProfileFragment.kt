@@ -105,6 +105,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     googleSignInClient.signOut()
                     viewModel.logout()
                     (requireActivity() as? MainActivity)?.updateBottomNavSelectionToList()
+                } else {
+                    viewModel.logout()
+                    (requireActivity() as? MainActivity)?.updateBottomNavSelectionToList()
                 }
             }
         }
