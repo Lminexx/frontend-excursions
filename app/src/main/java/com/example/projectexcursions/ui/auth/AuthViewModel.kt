@@ -51,9 +51,6 @@ class AuthViewModel @Inject constructor(
     private val _avatar = MutableLiveData<Uri>()
     val avatar: LiveData<Uri> get() = _avatar
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
-
     private val _role = MutableLiveData<String?>()
     val role: LiveData<String?> get() = _role
 
@@ -164,7 +161,6 @@ class AuthViewModel @Inject constructor(
     }
 
     private suspend fun uploadAvatar(context: Context, uri: Uri) {
-        _isLoading.value = true
         try {
             val file = getFileFromUri(context, uri)
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
@@ -201,8 +197,6 @@ class AuthViewModel @Inject constructor(
             _validationMessage.postValue("Неизвестная ошибка: ${e.message}")
             FirebaseCrashlytics.getInstance().recordException(e)
             throw e
-        } finally {
-            _isLoading.value = false
         }
     }
 

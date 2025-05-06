@@ -150,11 +150,9 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
                         animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)
                         emptyListContainer.emptyListLayout.visibility = View.VISIBLE
                         emptyListContainer.emptyListLayout.startAnimation(animation)
-                        binding.filterButton.visibility = View.GONE
                     } else {
                         binding.recyclerView.visibility = View.VISIBLE
                         emptyListContainer.emptyListLayout.visibility = View.GONE
-                        binding.filterButton.visibility = View.VISIBLE
                     }
                 }
                 is LoadState.Error -> {
@@ -193,7 +191,6 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
             val maxDuration = data?.getStringExtra("max_duration")?.toIntOrNull()
             val topic = data?.getStringExtra("topic")
             val city = data?.getStringExtra("city")
-
 
             viewModel.setFiltrationData(rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
         }

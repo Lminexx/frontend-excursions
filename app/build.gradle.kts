@@ -132,6 +132,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.play.services.auth)
     implementation(libs.dotsindicator)
+    implementation(libs.blurry)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
     kapt(libs.glide.compiler)
