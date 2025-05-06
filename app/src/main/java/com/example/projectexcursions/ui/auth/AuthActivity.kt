@@ -9,20 +9,16 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.android.identity.util.UUID
-import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.registration.RegActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import jp.wasabeef.blurry.Blurry
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -40,7 +36,7 @@ class AuthActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
-        setResult(Activity.RESULT_CANCELED)
+        setResult(RESULT_CANCELED)
         setContentView(binding.root)
 
         initCallback()
@@ -62,7 +58,7 @@ class AuthActivity: AppCompatActivity() {
                 val role = viewModel.role.value
                 val resultIntent = createAuthResultIntent(isAuthSuccess = true, isModerator = role == "MODERATOR" || role == "ADMIN")
                 resultIntent.putExtra("prev_frag", prevFrag)
-                setResult(Activity.RESULT_OK, resultIntent)
+                setResult(RESULT_OK, resultIntent)
                 finish()
             }
         }
@@ -108,13 +104,14 @@ class AuthActivity: AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REG_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val isReg = data?.getBooleanExtra(RegActivity.EXTRA_REG_STATUS, false) ?: false
+            val isReg = data?.getBooleanExtra(RegActivity.EXTRA_REG_STATUS, false) == true
             Log.d("DataNaN?", "$data")
             if (isReg) {
+                blur()
                 Log.d("RegIntent", "GetRegIntent")
-                val username = data?.getStringExtra(RegActivity.EXTRA_REG_USERNAME)
-                val password = data?.getStringExtra(RegActivity.EXTRA_REG_PASSWORD)
-                val avatar = data?.getParcelableExtra<Uri>(RegActivity.EXTRA_REG_AVATAR)
+                val username = data.getStringExtra(RegActivity.EXTRA_REG_USERNAME)
+                val password = data.getStringExtra(RegActivity.EXTRA_REG_PASSWORD)
+                val avatar = data.getParcelableExtra<Uri>(RegActivity.EXTRA_REG_AVATAR)
                 if (avatar != null) {
                     viewModel.setAvatar(avatar)
                 }
@@ -144,6 +141,7 @@ class AuthActivity: AppCompatActivity() {
     }
 
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        blur()
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
@@ -159,6 +157,14 @@ class AuthActivity: AppCompatActivity() {
                     Toast.makeText(this, "Firebase auth failed", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun blur() {
+        Blurry.with(this)
+            .radius(10)
+            .sampling(2)
+            .async()
+            .onto(binding.parentLayout)
     }
 
     companion object {
