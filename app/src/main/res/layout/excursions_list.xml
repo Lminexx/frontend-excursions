@@ -14,6 +14,10 @@
             layout="@layout/error"
             android:visibility="gone"/>
 
+        <include
+            android:id="@+id/emptyListContainer"
+            layout="@layout/empty_list"
+            android:visibility="gone"/>
 
         <SearchView
             android:id="@+id/search_view"
