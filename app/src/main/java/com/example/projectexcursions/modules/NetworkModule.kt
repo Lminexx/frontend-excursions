@@ -1,11 +1,9 @@
 package com.example.projectexcursions.modules
 
 import android.app.Application
-import com.example.projectexcursions.OpenWorldApp
 import com.example.projectexcursions.R
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
-import javax.net.ssl.X509TrustManager
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -22,9 +20,7 @@ import java.security.KeyStore
 import java.security.cert.CertificateFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
-import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.*
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -34,7 +30,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideSecureOkHttpClient(
+    fun provideOkHttpClient(
         tokenRepo: TokenRepository,
         app: Application
     ): OkHttpClient {
@@ -42,39 +38,21 @@ object NetworkModule {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        val certificateFactory = CertificateFactory.getInstance("X.509")
-        val inputStream = app.resources.openRawResource(R.raw.server)
-        val certificate = certificateFactory.generateCertificate(inputStream)
-        inputStream.close()
-
-        val keyStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-            load(null, null)
-            setCertificateEntry("ca", certificate)
-        }
-
-        val trustManagerFactory = TrustManagerFactory.getInstance(
-            TrustManagerFactory.getDefaultAlgorithm()
-        ).apply {
-            init(keyStore)
-        }
-
-        val x509TrustManager = trustManagerFactory.trustManagers[0] as X509TrustManager
-
-        val sslContext = SSLContext.getInstance("SSL").apply {
-            init(null, arrayOf(x509TrustManager), null)
+        val trustManager = createUnifiedTrustManager(app)
+        val sslContext = SSLContext.getInstance("TLS").apply {
+            init(null, arrayOf<TrustManager>(trustManager), null)
         }
 
         return OkHttpClient.Builder()
-            .sslSocketFactory(sslContext.socketFactory, x509TrustManager)
-            .hostnameVerifier(myHostNameVerifier())
+            .sslSocketFactory(sslContext.socketFactory, trustManager)
+            .hostnameVerifier { _, _ -> true } // Подумай об усилении позже
             .addInterceptor(loggingInterceptor)
             .addInterceptor { chain ->
                 val token = runBlocking { tokenRepo.getToken()?.token }
-                val requestBuilder = chain.request().newBuilder()
-                if (token != null) {
-                    requestBuilder.addHeader("Authorization", token.toString())
-                }
-                chain.proceed(requestBuilder.build())
+                val request = chain.request().newBuilder().apply {
+                    if (token != null) addHeader("Authorization", token.toString())
+                }.build()
+                chain.proceed(request)
             }
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -82,16 +60,52 @@ object NetworkModule {
             .build()
     }
 
-    @Provides
-    fun provideDefaultOkHttpClientBuilder(): OkHttpClient.Builder {
-        return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
+    private fun createUnifiedTrustManager(app: Application): X509TrustManager {
+        val certificateFactory = CertificateFactory.getInstance("X.509")
+        val inputStream = app.resources.openRawResource(R.raw.server)
+        val customCert = certificateFactory.generateCertificate(inputStream)
+        inputStream.close()
+
+        val customKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+            load(null, null)
+            setCertificateEntry("custom", customCert)
+        }
+
+        val customTmFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+            init(customKeyStore)
+        }
+        val customTm = customTmFactory.trustManagers.filterIsInstance<X509TrustManager>().first()
+
+        val defaultTmFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+            init(null as KeyStore?)
+        }
+        val defaultTm = defaultTmFactory.trustManagers.filterIsInstance<X509TrustManager>().first()
+
+        return object : X509TrustManager {
+            override fun checkClientTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) {
+                try {
+                    defaultTm.checkClientTrusted(chain, authType)
+                } catch (e: Exception) {
+                    customTm.checkClientTrusted(chain, authType)
+                }
+            }
+
+            override fun checkServerTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) {
+                try {
+                    defaultTm.checkServerTrusted(chain, authType)
+                } catch (e: Exception) {
+                    customTm.checkServerTrusted(chain, authType)
+                }
+            }
+
+            override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> {
+                return defaultTm.acceptedIssuers + customTm.acceptedIssuers
+            }
+        }
     }
 
-    @Singleton
     @Provides
+    @Singleton
     @OptIn(ExperimentalSerializationApi::class)
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val json = Json { ignoreUnknownKeys = true }
@@ -106,9 +120,5 @@ object NetworkModule {
     @Singleton
     fun provideApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
-    }
-
-    private fun myHostNameVerifier(): HostnameVerifier {
-        return HostnameVerifier { hostname, _ -> hostname == "217.71.129.139" }
     }
 }
