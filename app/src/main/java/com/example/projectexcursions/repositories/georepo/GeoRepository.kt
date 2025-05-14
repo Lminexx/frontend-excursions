@@ -17,4 +17,6 @@ interface GeoRepository {
     suspend fun uploadPlacesItems(places: List<PlaceItem>, id: Long)
 
     suspend fun loadPlaces(id: Long): Response<List<PlaceItem>>
+
+    suspend fun updatePoints(places: List<PlaceItem>, id: Long)
 }
