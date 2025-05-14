@@ -47,11 +47,12 @@
     <string name="my_exc_list">Мои экскурсии</string>
     <string name="add_to_fav">Добавить в избранное</string>
     <string name="delete_exc">Удалить экскурсию</string>
+    <string name="edit_exc">Редактировать экскурсию</string>
     <string name="you_want">Вы хотите</string>
     <string name="or">или</string>
     <string name="reg_string_qm">Зарегестрироваться?</string>
     <string name="authorize">Войдите</string>
-    <string name="open">Откройте</string>
+    <string name="open_your_world">Откройте свой мир</string>
     <string name="your_world">свой мир</string>
     <string name="pick_photo">Выбрать фото</string>
     <string name="photo">Фото</string>
@@ -83,12 +84,6 @@
     <string name="add_city_name_string">Введите название города</string>
     <string name="empty_city_name">Название города не заполненно</string>
     <string name="topic_string">Выберите тематику экскурсии</string>
-    <string-array name="topics">
-        <item>UNDEFINED</item>
-        <item>WALKING</item>
-        <item>TRIP</item>
-        <item>ACADEMIC</item>
-    </string-array>
     <string-array name="topics_filter">
         <item></item>
         <item>UNDEFINED</item>
@@ -96,7 +91,7 @@
         <item>TRIP</item>
         <item>ACADEMIC</item>
     </string-array>
-    <string name="or_login_by">или войти <через></через>:</string>
+    <string name="or_login_by">или войти через:</string>
     <string name="login_by_google">Войти через Google</string>
     <string name="login_by_email">Войти по Email</string>
     <string name="login_by_vk">Войти через VK</string>
@@ -122,4 +117,6 @@
     <string name="unknownerror">UnknownError</string>
     <string name="default_web_client_id">596243648831-n94ipknkjdbm2b5legjsdkc6fo15ghs0.apps.googleusercontent.com</string>
     <string name="excursionphoto">Фото экскурсии</string>
+    <string name="filtration">Фильтрация</string>
+    <string name="google">Войти через Google</string>
 </resources>

@@ -9,11 +9,15 @@ import okhttp3.RequestBody
 
 interface TokenRepository {
 
+    suspend fun validateToken(apiService: ApiService)
+
+    suspend fun deleteToken(token: String)
+
+    suspend fun getTokens(): List<Token?>
+
     suspend fun saveToken(token: Token)
 
     suspend fun getToken(): Token?
-
-    suspend fun getTokens(): List<Token?>
 
     suspend fun clearToken()
 
@@ -22,9 +26,4 @@ interface TokenRepository {
     fun decodeToken(token: String): Map<String, Claim>?
 
     fun getCachedToken(): Token?
-
-    suspend fun deleteToken(token: String)
-
-    suspend fun validateToken(apiService: ApiService)
-
 }

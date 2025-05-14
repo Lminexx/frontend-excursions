@@ -6,16 +6,29 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.registration.RegActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AuthActivity: AppCompatActivity() {
 
+    @Inject
+    lateinit var googleSignInClient: GoogleSignInClient
+    @Inject
+    lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binding: ActivityAuthBinding
     private val viewModel: AuthViewModel by viewModels()
 
@@ -24,9 +37,9 @@ class AuthActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
-
         setResult(Activity.RESULT_CANCELED)
         setContentView(binding.root)
+
         initCallback()
         subscribe()
     }
@@ -80,6 +93,15 @@ class AuthActivity: AppCompatActivity() {
         }
         binding.buttReg.setOnClickListener { viewModel.clickRegister() }
         binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
+
+        binding.buttonGoogleSignIn.setOnClickListener {
+            if (firebaseAuth.currentUser != null) {
+                firebaseAuth.signOut()
+                googleSignInClient.signOut().addOnCompleteListener {
+                    signInWithGoogle()
+                }
+            } else signInWithGoogle()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -101,6 +123,41 @@ class AuthActivity: AppCompatActivity() {
                 viewModel.validateAndLogin(this, username!!, password!!)
             }
         }
+    }
+
+    private fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        googleSignInLauncher.launch(signInIntent)
+    }
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)!!
+            firebaseAuthWithGoogle(account)
+        } catch (e: ApiException) {
+            Toast.makeText(this, "Google sign in failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        firebaseAuth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = firebaseAuth.currentUser
+                    user?.getIdToken(true)
+                        ?.addOnSuccessListener { result ->
+                            val token = result.token
+                            Log.d("FirebaseToken", token ?: "ZeroToken")
+                            if (token != null) viewModel.firebaseAuth(token)
+                        }
+                } else {
+                    Toast.makeText(this, "Firebase auth failed", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     companion object {
