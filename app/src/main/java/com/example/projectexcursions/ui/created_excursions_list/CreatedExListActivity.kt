@@ -167,12 +167,4 @@ class CreatedExListActivity: AppCompatActivity() {
         binding.shimmerLayout.visibility = View.GONE
         binding.recyclerView.visibility = View.VISIBLE
     }
-
-    private val mineExcursionLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            adapter.refresh()
-        }
-    }
 }
