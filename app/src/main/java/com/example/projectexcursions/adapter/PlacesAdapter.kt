@@ -13,7 +13,7 @@ import com.example.projectexcursions.models.PlaceItem
 
 class PlacesAdapter(
     private val context: Context,
-    private val onItemClick: (String) -> Unit,
+    private val onItemClick: (PlaceItem) -> Unit,
     private val onDeleteClick: (String) -> Unit,
     private val isCreating: Boolean,
     private var places: List<PlaceItem>
@@ -28,10 +28,12 @@ class PlacesAdapter(
         val placeItem = places[position]
         holder.bind(placeItem)
 
-        holder.itemView.setOnClickListener { onItemClick(placeItem.name ?: "Имя потеряно") }
+        holder.itemView.setOnClickListener { onItemClick(placeItem) }
 
         if (placeItem.name == null)
             holder.binding.placeName.text = "Имя потеряно"
+        else
+            holder.binding.placeName.text = placeItem.name
 
         if (isCreating) {
             holder.binding.deletePlace.setOnClickListener{ onDeleteClick(placeItem.id) }

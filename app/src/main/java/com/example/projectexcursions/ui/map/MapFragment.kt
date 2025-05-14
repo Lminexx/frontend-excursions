@@ -23,7 +23,7 @@ import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.pointrepo.PointRepositoryImpl
-import com.example.projectexcursions.ui.map.poi_map.PoiBottomFragment
+import com.example.projectexcursions.ui.map.PoiBottomFragment
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -179,7 +179,13 @@ class MapFragment: Fragment(R.layout.fragment_map) {
             }
         }
 
-        binding.userPos.setOnClickListener { viewModel.getUserLocation() }
+        binding.userPos.setOnClickListener {
+            binding.userPos.isEnabled = false
+            Handler(Looper.getMainLooper()).postDelayed({
+                viewModel.getUserLocation()
+                binding.userPos.isEnabled = true
+            }, 1500)
+        }
     }
 
     private fun subscribe() {
@@ -367,7 +373,7 @@ class MapFragment: Fragment(R.layout.fragment_map) {
 
                 viewModel.setEndPoint(point)
 
-                val bottomSheetFragment = PoiBottomFragment.newInstance(name, address, description)
+                val bottomSheetFragment = PoiBottomFragment.newInstance(name, address, description, true)
                 bottomSheetFragment.show(parentFragmentManager, "PoiBottomFragment")
             }
 

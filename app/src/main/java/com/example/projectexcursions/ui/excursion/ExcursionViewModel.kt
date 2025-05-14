@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @HiltViewModel
 class ExcursionViewModel @Inject constructor(
@@ -37,9 +38,6 @@ class ExcursionViewModel @Inject constructor(
 
     private val _favorite = MutableLiveData<Boolean>()
     val favorite: LiveData<Boolean> get() = _favorite
-
-    private val _deleteExcursion = MutableLiveData<Boolean>()
-    val deleteExcursion: LiveData<Boolean> get() = _deleteExcursion
 
     private val _username = MutableLiveData<String?>()
     val username: LiveData<String?> get() = _username
@@ -92,7 +90,7 @@ class ExcursionViewModel @Inject constructor(
                 Log.d("ExcursionIsnInDB", "FetchExcursion")
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
-                Log.e("LoadExcursion", e.message!!)
+                Log.e("LoadExcursion", e.message ?: "null")
                 _excursion.value = null
             }
         }
@@ -102,7 +100,7 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = excRepository.loadPhotos(excursionId)
-                val photoUris = response.body()!!.map { Uri.parse(it.url) }
+                val photoUris = response.body()!!.map { it.url.toUri() }
                 _photos.value = photoUris
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
