@@ -6,9 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,14 +16,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
+import com.example.projectexcursions.databinding.EmptyListBinding
 import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
-import com.example.projectexcursions.ui.excursions_list.ExListViewModel
 import com.example.projectexcursions.ui.filtration.FiltrationActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -36,9 +35,10 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
     @Inject
     lateinit var adapter: ExcursionAdapter
     private lateinit var errorContainer: ErrorBinding
+    private lateinit var emptyListContainer: EmptyListBinding
     private lateinit var binding: ExcursionsListBinding
+    private lateinit var animation: Animation
     private val viewModel: ExListViewModel by viewModels()
-
     private val filterLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -48,13 +48,11 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
             val startDate = data?.getStringExtra("start_date")
             val endDate = data?.getStringExtra("end_date")
             val tags = data?.getStringArrayListExtra("tags") ?: emptyList()
-            val minDuration = data?.getStringExtra("min_duration")?.toIntOrNull()
-            val maxDuration = data?.getStringExtra("max_duration")?.toIntOrNull()
             val topic = data?.getStringExtra("topic")
             val city = data?.getStringExtra("city")
 
 
-            viewModel.setFiltrationData(rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
+            viewModel.setFiltrationData(rating, startDate, endDate, tags, topic,city)
         }
     }
 
@@ -65,12 +63,14 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
     ): View {
         binding = ExcursionsListBinding.inflate(inflater, container, false)
         errorContainer = binding.errorContainer
+        emptyListContainer = binding.emptyListContainer
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initData()
         initCallback()
         subscribe()
@@ -88,7 +88,6 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
     }
 
     private fun initCallback() {
-
         errorContainer.retryButton.setOnClickListener {
             adapter.retry()
         }
@@ -151,19 +150,30 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
 
         adapter.addLoadStateListener { loadState ->
             binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
+            val isEmptyList = adapter.itemCount == 0
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
-                    errorContainer.errorLayout.visibility = View.GONE
                     showShimmer()
                 }
                 is LoadState.NotLoading -> {
                     hideShimmer()
-                    errorContainer.errorLayout.visibility = View.GONE
+                    if (isEmptyList) {
+                        binding.recyclerView.visibility = View.GONE
+                        animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)
+                        emptyListContainer.emptyListLayout.visibility = View.VISIBLE
+                        emptyListContainer.emptyListLayout.startAnimation(animation)
+                    } else {
+                        binding.recyclerView.visibility = View.VISIBLE
+                        emptyListContainer.emptyListLayout.visibility = View.GONE
+                    }
                 }
                 is LoadState.Error -> {
-                    showShimmer()
+                    hideShimmer()
                     binding.recyclerView.visibility = View.GONE
+                    binding.filterButton.visibility = View.GONE
+                    animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)
                     errorContainer.errorLayout.visibility = View.VISIBLE
+                    errorContainer.errorLayout.startAnimation(animation)
                 }
             }
         }
@@ -177,6 +187,24 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
                     viewModel.goneToExcursion()
                 }
             }
+        }
+    }
+
+    private val filterLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val data = result.data
+            val rating = data?.getStringExtra("rating")?.toFloatOrNull()
+            val startDate = data?.getStringExtra("start_date")
+            val endDate = data?.getStringExtra("end_date")
+            val tags = data?.getStringArrayListExtra("tags") ?: emptyList()
+            val minDuration = data?.getStringExtra("min_duration")?.toIntOrNull()
+            val maxDuration = data?.getStringExtra("max_duration")?.toIntOrNull()
+            val topic = data?.getStringExtra("topic")
+            val city = data?.getStringExtra("city")
+
+            viewModel.setFiltrationData(rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
         }
     }
 
