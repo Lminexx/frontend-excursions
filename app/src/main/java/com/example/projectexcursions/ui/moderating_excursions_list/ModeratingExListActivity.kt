@@ -3,13 +3,17 @@ package com.example.projectexcursions.ui.moderating_excursions_list
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
+import com.example.projectexcursions.databinding.EmptyListBinding
 import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
@@ -25,14 +29,17 @@ class ModeratingExListActivity: AppCompatActivity() {
 
     @Inject
     lateinit var adapter: ExcursionAdapter
+    private lateinit var animation: Animation
     private lateinit var errorContainer: ErrorBinding
     private lateinit var binding: ExcursionsListBinding
+    private lateinit var emptyListContainer: EmptyListBinding
     private val viewModel: ModeratingExListViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExcursionsListBinding.inflate(layoutInflater)
         errorContainer = binding.errorContainer
+        emptyListContainer = binding.emptyListContainer
         setContentView(binding.root)
 
         initData()
@@ -91,20 +98,30 @@ class ModeratingExListActivity: AppCompatActivity() {
 
         adapter.addLoadStateListener { loadState ->
             binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
+            val isEmptyList = adapter.itemCount == 0
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
-                    errorContainer.errorLayout.visibility = View.GONE
                     showShimmer()
                 }
                 is LoadState.NotLoading -> {
                     hideShimmer()
-                    errorContainer.errorLayout.visibility = View.GONE
+                    if (isEmptyList) {
+                        binding.recyclerView.visibility = View.GONE
+                        animation = AnimationUtils.loadAnimation(this, R.anim.appear_pop_up)
+                        emptyListContainer.emptyListLayout.visibility = View.VISIBLE
+                        emptyListContainer.emptyListLayout.startAnimation(animation)
+                    } else {
+                        binding.recyclerView.visibility = View.VISIBLE
+                        emptyListContainer.emptyListLayout.visibility = View.GONE
+                    }
                 }
                 is LoadState.Error -> {
-                    showShimmer()
+                    hideShimmer()
                     binding.recyclerView.visibility = View.GONE
+                    binding.filterButton.visibility = View.GONE
+                    animation = AnimationUtils.loadAnimation(this, R.anim.appear_pop_up)
                     errorContainer.errorLayout.visibility = View.VISIBLE
-                    errorContainer.errorMessage.text = LoadState.Error(ExcursionsListException()).toString()
+                    errorContainer.errorLayout.startAnimation(animation)
                 }
             }
         }
