@@ -35,8 +35,8 @@ class ExcursionRepositoryImpl @Inject constructor(
 
     override fun moderatingExcursionsPagingSource() = ModeratingExcursionsPagingSource(apiService)
 
-    override fun filtrationExcursionPagingSource(rating: Float?, startDate:String?, endDate:String?, tags:List<String>, minDuration:Int?, maxDuration:Int?, topic:String?,city:String?)
-    = FiltrationExcursionPagingSource(apiService, rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
+    override fun filtrationExcursionPagingSource(rating: Float?, startDate:String?, endDate:String?, tags:List<String>, topic:String?,city:String?)
+    = FiltrationExcursionPagingSource(apiService, rating, startDate, endDate, tags, topic,city)
 
     override suspend fun getAllExcursionsFromDB() = excursionsDao.getAllExcursions()
 
@@ -145,4 +145,10 @@ class ExcursionRepositoryImpl @Inject constructor(
     ): Response<ModeratingExcursionsResponse> {
         return apiService.loadModeratingExcursions(offset, limit, status)
     }
+
+    override suspend fun editExcursion(id:Long, editingExcursion: CreatingExcursion) {
+        return apiService.editExcursion(id, editingExcursion)
+    }
+
+
 }

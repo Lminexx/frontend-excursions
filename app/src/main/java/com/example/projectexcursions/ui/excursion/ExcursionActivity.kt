@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -30,6 +31,8 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
+import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
+import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import com.example.projectexcursions.utilies.CustomMapView
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -63,6 +66,13 @@ class ExcursionActivity : AppCompatActivity() {
     private var isDetailedInfoVisible = false
     private lateinit var viewPager: ViewPager2
     private lateinit var indicator: SpringDotsIndicator
+    private val editLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            recreate()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -152,7 +162,7 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
                 binding.excursionRating.text = excursion.rating.toString()
-                binding.topicValue.text = excursion.topic
+                binding.topicValue.text = translateTopic(excursion.topic)
                 binding.cityValue.text = excursion.cityName
                 addNewChip(excursion.tags)
                 if (excursion.personalRating == null) {
@@ -194,7 +204,8 @@ class ExcursionActivity : AppCompatActivity() {
                     viewModel.fav()
                 else
                     viewModel.notFav()
-            } else { Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT)
+            } else {
+                Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT)
                     .show()
             }
             viewModel.isMine()
@@ -269,12 +280,11 @@ class ExcursionActivity : AppCompatActivity() {
             if (approved) finish()
         }
 
-        viewModel.isMine.observe(this){mine->
-            if(!mine){
+        viewModel.isMine.observe(this) { mine ->
+            if (!mine) {
                 binding.editButton.visibility = View.GONE
                 binding.deleteButton.visibility = View.GONE
-            }
-            else{
+            } else {
                 binding.editButton.visibility = View.VISIBLE
                 binding.deleteButton.visibility = View.VISIBLE
             }
@@ -354,6 +364,29 @@ class ExcursionActivity : AppCompatActivity() {
                 setResult(RESULT_OK)
             }
         }
+
+        binding.editButton.setOnClickListener {
+            val intent = Intent(this, CreateExcursionActivity::class.java).apply {
+                putExtra("id", viewModel.excursion.value?.id ?: -1)
+                putExtra("title", binding.excursionTitle.text.toString())
+                putExtra("description", binding.excursionDescription.text.toString())
+                putExtra("topic", binding.topicValue.text.toString())
+                putExtra("city", binding.cityValue.text.toString())
+                var count = 0
+                viewModel.excursion.value?.tags?.forEach { tag ->
+                    count++
+                    putExtra("tag$count", tag)
+                }
+                putExtra("tag_count", count)
+                count = 0
+                viewModel.photos.value?.forEach { photo ->
+                    count++
+                    putExtra("photo$count", photo.toString())
+                }
+                putExtra("photo_count", count)
+            }
+            editLauncher.launch(intent)
+        }
     }
 
     private fun setLocation(point: Point) {
@@ -411,6 +444,16 @@ class ExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun translateTopic(topic: String): String {
+        return when (topic) {
+            "UNDEFINED" -> "Другая"
+            "WALKING" -> "Пешая"
+            "TRIP" -> "Путешествие"
+            "ACADEMIC" -> "Позновательная"
+            else -> "UNDEFINED"
+        }
+    }
+
     private fun showShimmer() {
         binding.shimmerLayout.visibility = View.VISIBLE
         binding.shimmerLayout.startShimmer()
@@ -454,8 +497,6 @@ class ExcursionActivity : AppCompatActivity() {
         } else {
             binding.commentButton.visibility = View.GONE
             binding.approveButton.visibility = View.GONE
-            viewPager.visibility = View.GONE
-            indicator.visibility = View.GONE
         }
     }
 

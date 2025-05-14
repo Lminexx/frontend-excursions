@@ -112,8 +112,6 @@ interface ApiService {
     suspend fun loadFiltrationExcursions(
         @Query("tags") tags: List<String>,
         @Query("minRating") minRating: Float?,
-        @Query("minDuration") minDuration: Int?,
-        @Query("maxDuration") maxDuration: Int?,
         @Query("startDate") startDate: String?,
         @Query("endDate") endDate:String?,
         @Query("topic") topic: String?,
@@ -124,4 +122,16 @@ interface ApiService {
 
     @POST("user/login/google")
     suspend fun firebaseAuth(@Header("Authorization") token: String): Response<AuthResponse>
+
+    @PUT("excursion/update/{id}")
+    suspend fun editExcursion(
+        @Path("id") id: Long,
+        @Body editingExcursion: CreatingExcursion
+    )
+
+    @POST("excursion/update/points")
+    suspend fun updatePoints(
+        @Query("excursionId") excursionId: Long,
+        @Body places: List<PlaceItem>
+    )
 }

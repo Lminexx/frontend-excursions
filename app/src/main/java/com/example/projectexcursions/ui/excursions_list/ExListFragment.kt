@@ -48,13 +48,11 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
             val startDate = data?.getStringExtra("start_date")
             val endDate = data?.getStringExtra("end_date")
             val tags = data?.getStringArrayListExtra("tags") ?: emptyList()
-            val minDuration = data?.getStringExtra("min_duration")?.toIntOrNull()
-            val maxDuration = data?.getStringExtra("max_duration")?.toIntOrNull()
             val topic = data?.getStringExtra("topic")
             val city = data?.getStringExtra("city")
 
 
-            viewModel.setFiltrationData(rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
+            viewModel.setFiltrationData(rating, startDate, endDate, tags, topic,city)
         }
     }
 
