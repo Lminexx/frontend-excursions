@@ -24,7 +24,7 @@ interface ExcursionRepository {
 
     fun moderatingExcursionsPagingSource(): ModeratingExcursionsPagingSource
 
-    fun filtrationExcursionPagingSource(rating: Float?, startDate:String?, endDate:String?, tags:List<String>, minDuration:Int?, maxDuration:Int?, topic:String?,city:String?):
+    fun filtrationExcursionPagingSource(rating: Float?, startDate:String?, endDate:String?, tags:List<String>, topic:String?,city:String?):
             FiltrationExcursionPagingSource
 
     suspend fun getAllExcursionsFromDB(): List<ExcursionsList>
@@ -66,4 +66,5 @@ interface ExcursionRepository {
 
     suspend fun loadModeratingExcursions(offset: Int, limit: Int, status: String): Response<ModeratingExcursionsResponse>
 
+    suspend fun editExcursion(id: Long, editingExcursion: CreatingExcursion)
 }

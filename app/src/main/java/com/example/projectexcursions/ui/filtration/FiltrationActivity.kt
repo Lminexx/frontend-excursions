@@ -46,9 +46,7 @@ class FiltrationActivity : AppCompatActivity() {
             val rating = binding.filtrationRatingValue.text.toString()
             val startDate = binding.filtrationApprovedAtStart.text.toString()
             val endDate = binding.filtrationApprovedAtEnd.text.toString()
-            val minDuration = binding.filtrationDurationStart.text.toString()
-            val maxDuration = binding.filtrationDurationEnd.text.toString()
-            val topic = binding.topicValue.selectedItem.toString()
+            val topic = translateTopic(binding.topicValue.selectedItem.toString())
             val city = binding.filtrationCityValue.text.toString()
             val selectedTags = mutableListOf<String>()
             for (i in 0 until binding.tagsChips.childCount) {
@@ -60,8 +58,6 @@ class FiltrationActivity : AppCompatActivity() {
                 putExtra("start_date", startDate)
                 putExtra("end_date", endDate)
                 putExtra("tags", ArrayList(selectedTags))
-                putExtra("min_duration", minDuration)
-                putExtra("max_duration", maxDuration)
                 putExtra("topic", topic)
                 putExtra("city", city)
             })
@@ -96,6 +92,17 @@ class FiltrationActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error: " + e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun translateTopic(topic:String):String{
+        return when (topic){
+            "Другая" -> "UNDEFINED"
+            "Пешая" -> "WALKING"
+            "Путешествие" -> "TRIP"
+            "Позновательная" -> "ACADEMIC"
+            else ->
+                ""
         }
     }
 }
