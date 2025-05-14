@@ -84,11 +84,18 @@
     <string name="add_city_name_string">Введите название города</string>
     <string name="empty_city_name">Название города не заполненно</string>
     <string name="topic_string">Выберите тематику экскурсии</string>
+    <string-array name="topics">
+        <item>Другая</item>
+        <item>Пешая</item>
+        <item>Путешествие</item>
+        <item>Позновательная</item>
+    </string-array>
     <string-array name="topics_filter">
-        <item>UNDEFINED</item>
-        <item>WALKING</item>
-        <item>TRIP</item>
-        <item>ACADEMIC</item>
+        <item></item>
+        <item>Другая</item>
+        <item>Пешая</item>
+        <item>Путешествие</item>
+        <item>Позновательная</item>
     </string-array>
     <string name="or_login_by">или войти через:</string>
     <string name="login_by_google">Войти через Google</string>
@@ -118,6 +125,7 @@
     <string name="excursionphoto">Фото экскурсии</string>
     <string name="filtration">Фильтрация</string>
     <string name="google">Войти через Google</string>
+    <string name="edit_success">Экскурсия изменена</string>
     <string name="so_quiet_naaah">Тут так тихо…</string>
     <string name="login">Войти</string>
     <string name="unknown_user">Пользователя не существует</string>

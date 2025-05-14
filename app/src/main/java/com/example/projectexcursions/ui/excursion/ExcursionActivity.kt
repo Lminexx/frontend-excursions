@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +31,8 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
+import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
+import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import com.example.projectexcursions.ui.map.PoiBottomFragment
@@ -64,6 +67,13 @@ class ExcursionActivity : AppCompatActivity() {
     private lateinit var mapView: CustomMapView
     private lateinit var viewPager: ViewPager2
     private lateinit var indicator: SpringDotsIndicator
+    private val editLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            recreate()
+        }
+    }
     private lateinit var pinsLayer: MapObjectCollection
     private lateinit var routeLayer: MapObjectCollection
     private var isDetailedInfoVisible = false
@@ -158,7 +168,7 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
                 binding.excursionRating.text = excursion.rating.toString()
-                binding.topicValue.text = excursion.topic
+                binding.topicValue.text = translateTopic(excursion.topic)
                 binding.cityValue.text = excursion.cityName
                 addNewChip(excursion.tags)
                 if (excursion.personalRating == null) {
@@ -358,6 +368,29 @@ class ExcursionActivity : AppCompatActivity() {
                 setResult(RESULT_OK)
             }
         }
+
+        binding.editButton.setOnClickListener {
+            val intent = Intent(this, CreateExcursionActivity::class.java).apply {
+                putExtra("id", viewModel.excursion.value?.id ?: -1)
+                putExtra("title", binding.excursionTitle.text.toString())
+                putExtra("description", binding.excursionDescription.text.toString())
+                putExtra("topic", binding.topicValue.text.toString())
+                putExtra("city", binding.cityValue.text.toString())
+                var count = 0
+                viewModel.excursion.value?.tags?.forEach { tag ->
+                    count++
+                    putExtra("tag$count", tag)
+                }
+                putExtra("tag_count", count)
+                count = 0
+                viewModel.photos.value?.forEach { photo ->
+                    count++
+                    putExtra("photo$count", photo.toString())
+                }
+                putExtra("photo_count", count)
+            }
+            editLauncher.launch(intent)
+        }
     }
 
     private fun setLocation(place: PlaceItem) {
@@ -422,6 +455,16 @@ class ExcursionActivity : AppCompatActivity() {
                 e.printStackTrace()
                 Toast.makeText(this, "Error: " + e.message, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun translateTopic(topic: String): String {
+        return when (topic) {
+            "UNDEFINED" -> "Другая"
+            "WALKING" -> "Пешая"
+            "TRIP" -> "Путешествие"
+            "ACADEMIC" -> "Позновательная"
+            else -> "UNDEFINED"
         }
     }
 
