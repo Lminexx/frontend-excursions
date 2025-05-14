@@ -85,6 +85,7 @@ class ModeratingExListActivity: AppCompatActivity() {
         showShimmer()
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
+        binding.searchView.visibility = View.GONE
     }
 
     private fun subscribe() {

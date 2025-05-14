@@ -122,7 +122,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         placesAdapter = PlacesAdapter(
             context = this,
-            onItemClick = { placeName ->
+            onItemClick = { place ->
                 Log.d("PlaceName", "Пока ниче не сделано")
             },
             onDeleteClick = { placeId ->

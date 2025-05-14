@@ -121,15 +121,16 @@ class AuthViewModel @Inject constructor(
                 _loginStatus.value = false
                 val errorMessage = when (e.code()) {
                     401, 403 -> context.getString(R.string.error_auth)
+                    404 -> context.getString(R.string.unknown_user)
                     else -> context.getString(R.string.error_auth)
                 }
                 FirebaseCrashlytics.getInstance().recordException(e)
                 _validationMessage.value = errorMessage
             } catch (e: Exception) {
-                _loginStatus.value = false
-                _validationMessage.value = e.localizedMessage
+                _validationMessage.value = e.message ?: context.getString(R.string.unknown_user)
                 FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoginError", "Login error: ", e)
+                _loginStatus.value = false
             }
         }
     }
