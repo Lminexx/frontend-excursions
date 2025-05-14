@@ -119,4 +119,6 @@
     <string name="filtration">Фильтрация</string>
     <string name="google">Войти через Google</string>
     <string name="so_quiet_naaah">Тут так тихо…</string>
+    <string name="login">Войти</string>
+    <string name="unknown_user">Пользователя не существует</string>
 </resources>

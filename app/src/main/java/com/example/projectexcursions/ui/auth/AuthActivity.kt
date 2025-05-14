@@ -77,7 +77,7 @@ class AuthActivity: AppCompatActivity() {
             }
         }
 
-        viewModel.validationMessage.observe(this) {message ->
+        viewModel.validationMessage.observe(this) { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -86,7 +86,7 @@ class AuthActivity: AppCompatActivity() {
         binding.buttAuth.setOnClickListener {
             val login = binding.inputLogin.text.toString().trim()
             val password = binding.inputPass.text.toString().trim()
-            viewModel.validateAndLogin(this ,login, password)
+            viewModel.validateAndLogin(this, login, password)
         }
         binding.buttReg.setOnClickListener { viewModel.clickRegister() }
         binding.buttComeBack.setOnClickListener { viewModel.clickComeBack() }
