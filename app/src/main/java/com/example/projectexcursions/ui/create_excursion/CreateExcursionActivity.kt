@@ -33,7 +33,6 @@ import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.google.android.material.chip.Chip
 import com.example.projectexcursions.utilies.CustomMapView
-import com.example.projectexcursions.utilies.ProgressBar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
 import com.yandex.mapkit.Animation
@@ -65,17 +64,16 @@ class CreateExcursionActivity : AppCompatActivity() {
 
     private lateinit var adapter: PhotoAdapter
     private lateinit var binding: ActivityExcursionCreateBinding
-    private lateinit var progressBar: ProgressBar
     private lateinit var searchResultsAdapter: SearchResultsAdapter
     private lateinit var placesAdapter: PlacesAdapter
     private lateinit var mapView: CustomMapView
     private lateinit var map: Map
     private lateinit var pinsLayer: MapObjectCollection
     private lateinit var routeLayer: MapObjectCollection
-    private val viewModel: CreateExcursionViewModel by viewModels()
-    private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
     private lateinit var viewPager: ViewPager2
     private lateinit var indicator: SpringDotsIndicator
+    private val viewModel: CreateExcursionViewModel by viewModels()
+    private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
 
     private val REQUEST_CODE_PERMISSION = 1003
 
@@ -111,7 +109,6 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-
         searchResultsAdapter = SearchResultsAdapter { item ->
             Log.d("searchAdapter", "true")
             val id = item.id
@@ -157,7 +154,6 @@ class CreateExcursionActivity : AppCompatActivity() {
         binding.places.layoutManager = LinearLayoutManager(this)
         binding.searchResultsRecycler.adapter = searchResultsAdapter
         binding.places.adapter = placesAdapter
-        progressBar = ProgressBar()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -215,12 +211,6 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun subscribe() {
-        viewModel.wantComeBack.observe(this) { wannaComeBack ->
-            if (wannaComeBack) {
-                finish()
-            }
-        }
-
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
                 val title = binding.excursionTitle.text.toString().trim()
@@ -239,6 +229,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
                     viewModel.createExcursion(this@CreateExcursionActivity, title, description, chipTexts, topic, city)
                 }
+                finish()
             }
         }
 
@@ -294,7 +285,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
     private val pickImages =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
+            if (result.resultCode == RESULT_OK) {
                 val clipData = result.data?.clipData
                 val imageUris = mutableListOf<Uri>()
                 if (clipData != null) {

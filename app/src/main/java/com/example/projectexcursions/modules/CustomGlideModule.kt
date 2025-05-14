@@ -20,7 +20,7 @@ class CustomGlideModule : AppGlideModule() {
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface GlideOkHttpClientEntryPoint {
-        fun okHttpClientBuilder(): OkHttpClient.Builder
+        fun okHttpClient(): OkHttpClient
     }
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
@@ -32,7 +32,7 @@ class CustomGlideModule : AppGlideModule() {
         registry.replace(
             GlideUrl::class.java,
             InputStream::class.java,
-            OkHttpUrlLoader.Factory(entryPoint.okHttpClientBuilder().build())
+            OkHttpUrlLoader.Factory(entryPoint.okHttpClient())
         )
     }
 }

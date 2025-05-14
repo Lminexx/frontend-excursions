@@ -14,6 +14,10 @@
             layout="@layout/error"
             android:visibility="gone"/>
 
+        <include
+            android:id="@+id/emptyListContainer"
+            layout="@layout/empty_list"
+            android:visibility="gone"/>
 
         <SearchView
             android:id="@+id/search_view"
@@ -66,6 +70,7 @@
         android:contentDescription="@string/filtration"
         android:src="@drawable/ic_filter"
         android:layout_gravity="bottom|end"
+        android:elevation="16dp"
         app:backgroundTint="@color/lighter_blue"
         app:layout_anchor="@id/swipeRefresh" />
 

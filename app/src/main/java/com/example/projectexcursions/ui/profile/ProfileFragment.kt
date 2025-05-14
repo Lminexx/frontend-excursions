@@ -16,7 +16,6 @@ import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.created_excursions_list.CreatedExListActivity
 import com.example.projectexcursions.ui.moderating_excursions_list.ModeratingExListActivity
 import com.example.projectexcursions.ui.main.MainActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,12 +56,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun initData() {
-        if (isModerator) {
+        if (isModerator)
             binding.moderatingExcursions.visibility = View.VISIBLE
-            binding.createdExcursionsList.visibility = View.GONE
-            binding.buttCreateExcursion.visibility = View.GONE
-        }
-        else binding.moderatingExcursions.visibility = View.GONE
+        else
+            binding.moderatingExcursions.visibility = View.GONE
 
         val decodedToken = viewModel.getDecodeToken()
         val url = decodedToken?.get("url")?.asString()

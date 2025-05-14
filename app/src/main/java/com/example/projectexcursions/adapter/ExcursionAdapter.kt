@@ -1,7 +1,6 @@
 package com.example.projectexcursions.adapter
 
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup

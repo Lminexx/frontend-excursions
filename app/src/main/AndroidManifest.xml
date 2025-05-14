@@ -52,10 +52,6 @@
             android:exported="true">
         </activity>
         <activity
-            android:name="com.example.projectexcursions.ui.mine_excursion.MineExcursionActivity"
-            android:exported="true">
-        </activity>
-        <activity
             android:name="com.example.projectexcursions.utilies.FullScreenPhotoActivity"
             android:exported="true">
         </activity>
