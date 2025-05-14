@@ -14,6 +14,7 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,6 +22,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
@@ -31,8 +33,9 @@ import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
-import com.google.android.material.chip.Chip
 import com.example.projectexcursions.utilies.CustomMapView
+import com.example.projectexcursions.utilies.ProgressBar
+import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
 import com.yandex.mapkit.Animation
@@ -56,6 +59,7 @@ import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -133,7 +137,8 @@ class CreateExcursionActivity : AppCompatActivity() {
                         placemark.parent.remove(placemark)
                         placemarksMap.remove(placeId)
                         Log.d("Удалено", "Удалена метка $placeId")
-                    }                }
+                    }
+                }
                 placemarksMap.remove(placeId)
                 Log.d("placemarksMap", "Содержит ключи: ${placemarksMap.keys}")
                 Log.d("onDeleteClick", placeId)
@@ -154,16 +159,43 @@ class CreateExcursionActivity : AppCompatActivity() {
         binding.places.layoutManager = LinearLayoutManager(this)
         binding.searchResultsRecycler.adapter = searchResultsAdapter
         binding.places.adapter = placesAdapter
+        progressBar = ProgressBar()
+        if (intent.getStringExtra("title") != null) {
+            binding.buttonCreateExcursion.text = "Изменить"
+            binding.excursionTitle.setText(intent.getStringExtra("title"))
+            binding.excursionDescription.setText(intent.getStringExtra("description"))
+            binding.topic.setSelection(
+                (binding.topic.adapter as ArrayAdapter<String>).getPosition(
+                    intent.getStringExtra("topic")
+                )
+            )
+            binding.cityName.setText(intent.getStringExtra("city"))
+            for (i in 1..intent.getIntExtra("tag_count", 0)) {
+                addNewChip(intent.getStringExtra("tag$i").toString())
+            }
+            for (i in 1..intent.getIntExtra("photo_count", 0)) {
+                viewModel.addSelectedImages(intent.getStringExtra("photo$i")?.toUri())
+            }
+            viewModel.loadPlaces(intent.getLongExtra("id", -1))
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initCallback() {
         binding.buttonCreateExcursion.setOnClickListener {
-            it.isClickable = false
-            Handler(Looper.getMainLooper()).postDelayed({
-                it.isClickable = true
-            }, 5000)
-            viewModel.clickCreateExcursion()
+            if (intent.getStringExtra("title") == null) {
+                it.isClickable = false
+                Handler(Looper.getMainLooper()).postDelayed({
+                    it.isClickable = true
+                }, 5000)
+                viewModel.clickCreateExcursion()
+            } else{
+                it.isClickable = false
+                Handler(Looper.getMainLooper()).postDelayed({
+                    it.isClickable = true
+                }, 5000)
+                viewModel.clickEditExcursion()
+            }
         }
 
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
@@ -211,6 +243,42 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun subscribe() {
+        viewModel.wantComeBack.observe(this) { wannaComeBack ->
+            if (wannaComeBack) {
+                setResult(RESULT_OK)
+                finish()
+            }
+        }
+
+        viewModel.editExcursion.observe(this) { wannaEdit ->
+            if (wannaEdit){
+                val title = binding.excursionTitle.text.toString().trim()
+                val description = binding.excursionDescription.text.toString().trim()
+                val places = viewModel.placeItems.value ?: emptyList()
+                val tags = binding.tagsChips
+                val chipTexts = mutableListOf<String>()
+                for (i in 0 until tags.childCount) {
+                    val chip = tags.getChildAt(i) as? Chip
+                    chip?.let {
+                        chipTexts.add(it.text.toString())
+                    }
+                }
+                val city = binding.cityName.text.toString()
+                val topic = translateTopic(binding.topic.selectedItem.toString())
+                if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
+                    viewModel.editExcursion(
+                        this@CreateExcursionActivity,
+                        title,
+                        description,
+                        chipTexts,
+                        topic,
+                        city,
+                        intent.getLongExtra("id", -1)
+                    )
+                }
+            }
+        }
+
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
                 val title = binding.excursionTitle.text.toString().trim()
@@ -225,9 +293,16 @@ class CreateExcursionActivity : AppCompatActivity() {
                     }
                 }
                 val city = binding.cityName.text.toString()
-                val topic= binding.topic.selectedItem.toString()
+                val topic = translateTopic(binding.topic.selectedItem.toString())
                 if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
-                    viewModel.createExcursion(this@CreateExcursionActivity, title, description, chipTexts, topic, city)
+                    viewModel.createExcursion(
+                        this@CreateExcursionActivity,
+                        title,
+                        description,
+                        chipTexts,
+                        topic,
+                        city
+                    )
                 }
                 finish()
             }
@@ -270,6 +345,9 @@ class CreateExcursionActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     placesAdapter.updatePlaces(placeItems)
                     viewModel.getRoute()
+                    for (place in placeItems){
+                        setLocation(place)
+                    }
                 }
             } catch (e: Exception) {
                 clearRoute()
@@ -278,7 +356,7 @@ class CreateExcursionActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.message.observe(this){message ->
+        viewModel.message.observe(this) { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -353,6 +431,29 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun addNewChip(tag: String) {
+        try {
+            val inflater = LayoutInflater.from(this)
+            val newChip =
+                inflater.inflate(
+                    R.layout.layout_chip_entry,
+                    binding.tagsChips,
+                    false
+                ) as Chip
+            newChip.text = tag
+            newChip.setCloseIconVisible(true)
+            newChip.setChipBackgroundColorResource(R.color.lighter_blue)
+            newChip.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.tagsChips.addView(newChip)
+            newChip.setOnCloseIconClickListener {
+                binding.tagsChips.removeView(newChip)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error: " + e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "image/*"
@@ -375,7 +476,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     }
 
     private fun setLocation(place: PlaceItem) {
-        Log.d("setLocation","")
+        Log.d("setLocation", "")
         try {
             val point = Point(place.lat, place.lon)
             map.move(
@@ -391,7 +492,8 @@ class CreateExcursionActivity : AppCompatActivity() {
             setPin(place)
         } catch (eNull: NullPointerException) {
             FirebaseCrashlytics.getInstance().recordException(eNull)
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -410,7 +512,8 @@ class CreateExcursionActivity : AppCompatActivity() {
             )
         } catch (eNull: NullPointerException) {
             FirebaseCrashlytics.getInstance().recordException(eNull)
-            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Индиана Джонс нашёл неприятный артефакт", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -455,7 +558,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                     SearchResult(id, name, point!!)
                 }
                 for (searchResult in searchResults) {
-                    Log.d("SearchResult", "${searchResult.id}, ${searchResult.name}, ${searchResult.point}")
+                    Log.d(
+                        "SearchResult",
+                        "${searchResult.id}, ${searchResult.name}, ${searchResult.point}"
+                    )
                 }
                 viewModel.updateSearchResults(searchResults)
             }
@@ -552,8 +658,19 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun translateTopic(topic: String): String {
+        return when (topic) {
+            "Другая" -> "UNDEFINED"
+            "Пешая" -> "WALKING"
+            "Путешествие" -> "TRIP"
+            "Позновательная" -> "ACADEMIC"
+            else ->
+                "UNDEFINED"
+        }
+    }
+
     private fun clearRoute() {
-        Log.d("clearRoute","")
+        Log.d("clearRoute", "")
         Log.d("RoutePolyline", routeLayer.equals(null).toString())
         Log.d("PlaceItemsSize", "${viewModel.placeItems.value?.size}")
         viewModel.clearRouteData()
