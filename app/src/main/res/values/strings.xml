@@ -127,4 +127,6 @@
     <string name="google">Войти через Google</string>
     <string name="edit_success">Экскурсия изменена</string>
     <string name="so_quiet_naaah">Тут так тихо…</string>
+    <string name="login">Войти</string>
+    <string name="unknown_user">Пользователя не существует</string>
 </resources>
