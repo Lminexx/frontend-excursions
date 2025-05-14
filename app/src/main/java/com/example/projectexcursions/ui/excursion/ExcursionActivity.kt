@@ -12,12 +12,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -30,10 +31,14 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
+import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
+import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
+import com.example.projectexcursions.models.PlaceItem
+import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import com.example.projectexcursions.ui.map.PoiBottomFragment
 import com.example.projectexcursions.utilies.CustomMapView
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -42,27 +47,40 @@ import com.yandex.mapkit.geometry.Polyline
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class ExcursionActivity : AppCompatActivity() {
 
-    private val viewModel: ExcursionViewModel by viewModels()
+    @Inject
+    lateinit var tokenRepo: TokenRepository
     private lateinit var binding: ActivityExcursionBinding
     private lateinit var adapter: PhotoAdapter
     private lateinit var placesAdapter: PlacesAdapter
-    private var routePolyline: Polyline? = null
     private lateinit var map: Map
     private lateinit var mapView: CustomMapView
-    private lateinit var placemark: PlacemarkMapObject
-    private var isDetailedInfoVisible = false
     private lateinit var viewPager: ViewPager2
     private lateinit var indicator: SpringDotsIndicator
+    private val editLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            recreate()
+        }
+    }
+    private lateinit var pinsLayer: MapObjectCollection
+    private lateinit var routeLayer: MapObjectCollection
+    private var isDetailedInfoVisible = false
+    private val viewModel: ExcursionViewModel by viewModels()
+    private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
+    private val isAuth = tokenRepo.getCachedToken() != null
+    private val isModerating = isAuth && intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +89,9 @@ class ExcursionActivity : AppCompatActivity() {
         mapView = binding.mapview
         mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
+        val root = map.mapObjects
+        pinsLayer = root.addCollection()
+        routeLayer = root.addCollection()
 
         initCallback()
         initData()
@@ -96,13 +117,9 @@ class ExcursionActivity : AppCompatActivity() {
     private fun initData() {
         val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
 
-        val isModerating = intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
-        if (isModerating)
-            binding.favoriteButton.visibility = View.GONE
-        else {
-            binding.commentButton.visibility = View.GONE
-            binding.approveButton.visibility = View.GONE
-        }
+        val isAuth = tokenRepo.getCachedToken() != null
+        if (isAuth)
+            binding
 
         adapter = PhotoAdapter(this, listOf())
         viewPager = binding.viewPagerImages
@@ -142,7 +159,6 @@ class ExcursionActivity : AppCompatActivity() {
                 viewModel.cameBack()
                 finish()
             }
-
         }
 
         viewModel.excursion.observe(this) { excursion ->
@@ -152,7 +168,7 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
                 binding.excursionRating.text = excursion.rating.toString()
-                binding.topicValue.text = excursion.topic
+                binding.topicValue.text = translateTopic(excursion.topic)
                 binding.cityValue.text = excursion.cityName
                 addNewChip(excursion.tags)
                 if (excursion.personalRating == null) {
@@ -194,7 +210,18 @@ class ExcursionActivity : AppCompatActivity() {
                     viewModel.fav()
                 else
                     viewModel.notFav()
-            } else { Toast.makeText(this, this.getString(R.string.excursion_eaten), Toast.LENGTH_SHORT)
+            } else {
+                AlertDialog.Builder(this)
+                    .setTitle("Экскурсия съедена")
+                    .setMessage("Произошло проблема при загрузке")
+                    .setPositiveButton("Попробовать снова") { dialog, _ ->
+                        viewModel.loadExcursion(intent.getLongExtra(EXTRA_EXCURSION_ID, -1))
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Пока:(") { _, _ ->
+                        finish()
+                    }
+                    .setCancelable(false)
                     .show()
             }
             viewModel.isMine()
@@ -215,39 +242,27 @@ class ExcursionActivity : AppCompatActivity() {
         viewModel.places.observe(this) { places ->
             try {
                 lifecycleScope.launch {
-                    for (place in places) {
-                        val point = Point(place.lat, place.lon)
-                        viewModel.setPoint(point)
-                        delay(500)
-                    }
+                    for (place in places)
+                        setLocation(place)
+                    if (places.size > 1) viewModel.getRoute()
                 }
                 placesAdapter.updatePlaces(places)
-                Log.d("PlaceItemsObserve", "true " + places[places.size - 1].name)
-            } catch (indexOutOfBound: IndexOutOfBoundsException) {
-                FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
-                Log.d("IndexOutOfBound", "хихи поймали дурачка)")
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
                 Log.d("Exception", e.message.toString())
             }
         }
 
-        viewModel.routeLiveData.observe(this) { points ->
-            if (!points.isNullOrEmpty()) {
-                Log.d("RouteData", points.size.toString())
-                drawRoute(points)
-            }
-        }
-
-        viewModel.curPoint.observe(this) { point ->
-            if (point != null) {
-                Log.d("nextPoint:", "observing")
-                setLocation(point)
-                if (viewModel.prevPoint.value != null) {
-                    lifecycleScope.launch {
-                        viewModel.getRoute()
-                    }
+        viewModel.route.observe(this) { points ->
+            try {
+                if (!points.isNullOrEmpty()) {
+                    Log.d("RouteData", points.size.toString())
+                    drawRoute(points)
+                } else {
+                    routeLayer.clear()
                 }
+            } catch (e: NullPointerException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
 
@@ -269,12 +284,11 @@ class ExcursionActivity : AppCompatActivity() {
             if (approved) finish()
         }
 
-        viewModel.isMine.observe(this){mine->
-            if(!mine){
+        viewModel.isMine.observe(this) { mine->
+            if(!mine) {
                 binding.editButton.visibility = View.GONE
                 binding.deleteButton.visibility = View.GONE
-            }
-            else{
+            } else {
                 binding.editButton.visibility = View.VISIBLE
                 binding.deleteButton.visibility = View.VISIBLE
             }
@@ -354,11 +368,35 @@ class ExcursionActivity : AppCompatActivity() {
                 setResult(RESULT_OK)
             }
         }
+
+        binding.editButton.setOnClickListener {
+            val intent = Intent(this, CreateExcursionActivity::class.java).apply {
+                putExtra("id", viewModel.excursion.value?.id ?: -1)
+                putExtra("title", binding.excursionTitle.text.toString())
+                putExtra("description", binding.excursionDescription.text.toString())
+                putExtra("topic", binding.topicValue.text.toString())
+                putExtra("city", binding.cityValue.text.toString())
+                var count = 0
+                viewModel.excursion.value?.tags?.forEach { tag ->
+                    count++
+                    putExtra("tag$count", tag)
+                }
+                putExtra("tag_count", count)
+                count = 0
+                viewModel.photos.value?.forEach { photo ->
+                    count++
+                    putExtra("photo$count", photo.toString())
+                }
+                putExtra("photo_count", count)
+            }
+            editLauncher.launch(intent)
+        }
     }
 
-    private fun setLocation(point: Point) {
+    private fun setLocation(place: PlaceItem) {
         Log.d("setLocation", "")
         try {
+            val point = Point(place.lat, place.lon)
             map.move(
                 CameraPosition(
                     point,
@@ -369,22 +407,31 @@ class ExcursionActivity : AppCompatActivity() {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
-            setPin(point)
+            setPin(place)
         } catch (eNull: NullPointerException) {
             FirebaseCrashlytics.getInstance().recordException(eNull)
         }
     }
 
-    private fun setPin(point: Point) {
+    private fun setPin(place: PlaceItem) {
         Log.d("setPin", "")
+        val point = Point(place.lat, place.lon)
+
+        if (placemarksMap.containsKey(place.id)) {
+            Log.d("setPin", "Метка с ID ${place.id} уже существует")
+            return
+        }
 
         val imageProvider = ImageProvider.fromResource(this, R.drawable.ic_location_pin)
 
-        placemark = map.mapObjects.addPlacemark().apply {
+        val placemark = pinsLayer.addPlacemark().apply {
             val iconStyle = IconStyle().apply { scale = 0.4f }
             geometry = point
             setIcon(imageProvider, iconStyle)
         }
+        Log.d("setPin", "Добавлен пин с ID: ${place.id}")
+
+        placemarksMap[place.id] = placemark
     }
 
     private fun addNewChip(tags: List<String>) {
@@ -408,6 +455,16 @@ class ExcursionActivity : AppCompatActivity() {
                 e.printStackTrace()
                 Toast.makeText(this, "Error: " + e.message, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun translateTopic(topic: String): String {
+        return when (topic) {
+            "UNDEFINED" -> "Другая"
+            "WALKING" -> "Пешая"
+            "TRIP" -> "Путешествие"
+            "ACADEMIC" -> "Позновательная"
+            else -> "UNDEFINED"
         }
     }
 
@@ -445,24 +502,27 @@ class ExcursionActivity : AppCompatActivity() {
         binding.ratingContainer.visibility = View.VISIBLE
         binding.deleteButton.visibility = View.VISIBLE
         binding.editButton.visibility = View.VISIBLE
-        val isModerating = intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
-        if (isModerating) {
+
+        if (!isAuth) {
             binding.favoriteButton.visibility = View.GONE
             binding.ratingContainer.visibility = View.GONE
+        } else if (isModerating) {
             binding.commentButton.visibility = View.VISIBLE
             binding.approveButton.visibility = View.VISIBLE
         } else {
             binding.commentButton.visibility = View.GONE
             binding.approveButton.visibility = View.GONE
-            viewPager.visibility = View.GONE
-            indicator.visibility = View.GONE
+            binding.favoriteButton.visibility = View.VISIBLE
+            binding.ratingContainer.visibility = View.VISIBLE
         }
     }
 
     private fun drawRoute(points: List<Point>) {
+        routeLayer.clear()
+
         if (points.isNotEmpty()) {
-            routePolyline = Polyline(points)
-            map.mapObjects.addPolyline(routePolyline!!)
+            val polyline = Polyline(points)
+            routeLayer.addPolyline(polyline)
         }
     }
 

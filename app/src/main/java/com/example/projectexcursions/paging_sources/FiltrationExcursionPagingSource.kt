@@ -16,8 +16,6 @@ class FiltrationExcursionPagingSource @Inject constructor(
     private val startDate:String?,
     private val endDate:String?,
     private val tags:List<String>,
-    private val minDuration:Int?,
-    private val maxDuration:Int?,
     private val topic:String?,
     private val city:String?
 ): PagingSource<Int, ExcursionsList>() {
@@ -28,8 +26,8 @@ class FiltrationExcursionPagingSource @Inject constructor(
         Log.d("SearchPaging", "Offset: $position")
         Log.d("SearchPaging", "limit: ${params.loadSize}")
         return try {
-            val response = apiService.loadFiltrationExcursions(tags, rating, minDuration,
-                maxDuration, startDate, endDate, topic, city, offset = position, limit = params.loadSize).body()!!
+            val response = apiService.loadFiltrationExcursions(tags, rating, startDate,
+                endDate, topic, city, offset = position, limit = params.loadSize).body()!!
             val excursions = response.content
             Log.d("PagingSource", "$excursions")
             val pageInfo = response.page

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.projectexcursions.R
@@ -18,7 +19,6 @@ class NotAuthFragment : Fragment(R.layout.not_auth_fragment) {
 
     private lateinit var binding: NotAuthFragmentBinding
     private val viewModel: NotAuthViewModel by viewModels()
-
     private var prevFrag: String? = null
     private var AUTH_REQUEST_CODE: Int? = null
 
@@ -43,6 +43,7 @@ class NotAuthFragment : Fragment(R.layout.not_auth_fragment) {
 
         initCallback()
         subscribe()
+        appearance()
     }
 
     private fun initCallback() {
@@ -56,5 +57,10 @@ class NotAuthFragment : Fragment(R.layout.not_auth_fragment) {
                 requireActivity().startActivityForResult(intent, 1001)
             }
         }
+    }
+
+    private fun appearance() {
+        val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)
+        binding.notAuth.startAnimation(animation)
     }
 }

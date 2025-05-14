@@ -15,10 +15,13 @@ import com.example.projectexcursions.utilies.ApproveExcursionException
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.geometry.Point
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @HiltViewModel
 class ExcursionViewModel @Inject constructor(
@@ -36,9 +39,6 @@ class ExcursionViewModel @Inject constructor(
     private val _favorite = MutableLiveData<Boolean>()
     val favorite: LiveData<Boolean> get() = _favorite
 
-    private val _deleteExcursion = MutableLiveData<Boolean>()
-    val deleteExcursion: LiveData<Boolean> get() = _deleteExcursion
-
     private val _username = MutableLiveData<String?>()
     val username: LiveData<String?> get() = _username
 
@@ -48,14 +48,8 @@ class ExcursionViewModel @Inject constructor(
     private val _places = MutableLiveData<List<PlaceItem>>()
     val places: LiveData<List<PlaceItem>> get() = _places
 
-    private val _routeLiveData = MutableLiveData<List<Point>>(emptyList())
-    val routeLiveData: LiveData<List<Point>> get() = _routeLiveData
-
-    private val _prevPoint = MutableLiveData<Point?>()
-    val prevPoint: LiveData<Point?> get() = _prevPoint
-
-    private val _curPoint = MutableLiveData<Point?>()
-    val curPoint: LiveData<Point?> get() = _curPoint
+    private val _route = MutableLiveData<List<Point>>(emptyList())
+    val route: LiveData<List<Point>> get() = _route
 
     private val _disapproving = MutableLiveData<Boolean>()
     val disapproving: LiveData<Boolean> get() = _disapproving
@@ -96,7 +90,7 @@ class ExcursionViewModel @Inject constructor(
                 Log.d("ExcursionIsnInDB", "FetchExcursion")
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
-                Log.e("LoadExcursion", e.message!!)
+                Log.e("LoadExcursion", e.message ?: "null")
                 _excursion.value = null
             }
         }
@@ -106,7 +100,7 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = excRepository.loadPhotos(excursionId)
-                val photoUris = response.body()!!.map { Uri.parse(it.url) }
+                val photoUris = response.body()!!.map { it.url.toUri() }
                 _photos.value = photoUris
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
@@ -119,7 +113,7 @@ class ExcursionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val response = geoRepository.loadPlaces(excursionId).body()!!
-                _places.value = response
+                _places.postValue(response)
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("PLacesError", e.message.toString())
@@ -129,31 +123,29 @@ class ExcursionViewModel @Inject constructor(
 
     suspend fun getRoute() {
         try {
-            val end = curPoint.value
-            val start = prevPoint.value
-            if (end == null || start == null) {
-                Log.d("Point", "Start or end point is null")
-                return
+            val places = places.value ?: return
+            if (places.size < 2) {
+                _route.postValue(emptyList())
+            } else {
+                val fullRoute = mutableListOf<Point>()
+                withContext(Dispatchers.IO) {
+                    for (i in 0 until places.lastIndex) {
+                        val a = places[i]
+                        val b = places[i + 1]
+                        if (a.lat != b.lat && a.lon != b.lon) {
+                            val segment = geoRepository.getRoute(
+                                Point(a.lat, a.lon),
+                                Point(b.lat, b.lon)
+                            )
+                            fullRoute.addAll(segment)
+                        }
+                    }
+                }
+                _route.postValue(fullRoute)
             }
-            val route = geoRepository.getRoute(start, end)
-            _routeLiveData.postValue(route)
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("Route", "Error getting route", e)
-        }
-    }
-
-
-    fun setPoint(point: Point) {
-        if (_curPoint.value == null) {
-            _curPoint.value = point
-            Log.d("curPoint", "${point.latitude}, ${point.longitude}")
-        } else {
-            _prevPoint.value = curPoint.value
-            _curPoint.value = point
-            Log.d("Меняем точки", "true")
-            Log.d("curPoint", "${point.latitude}, ${point.longitude}")
-            Log.d("prevPoint", "${_prevPoint.value?.latitude}, ${_prevPoint.value?.longitude}")
         }
     }
 

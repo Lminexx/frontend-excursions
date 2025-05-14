@@ -7,8 +7,8 @@
     <solid
         android:color="@android:color/transparent" />
     <stroke
-        android:color="@color/a_bit_blue"
-        android:width="2sp"
+        android:color="@color/blue"
+        android:width="4px"
         />
 </shape>
 

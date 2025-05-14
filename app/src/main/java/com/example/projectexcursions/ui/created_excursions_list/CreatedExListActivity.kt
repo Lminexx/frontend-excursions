@@ -3,6 +3,8 @@ package com.example.projectexcursions.ui.created_excursions_list
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,7 +14,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
+import com.example.projectexcursions.databinding.EmptyListBinding
 import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
@@ -29,12 +33,15 @@ class CreatedExListActivity: AppCompatActivity() {
     lateinit var adapter: ExcursionAdapter
     private lateinit var errorContainer: ErrorBinding
     private lateinit var binding: ExcursionsListBinding
+    private lateinit var emptyListContainer: EmptyListBinding
+    private lateinit var animation: Animation
     private val viewModel: CreatedExListViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ExcursionsListBinding.inflate(layoutInflater)
         errorContainer = binding.errorContainer
+        emptyListContainer = binding.emptyListContainer
         setContentView(binding.root)
 
         initData()
@@ -106,19 +113,33 @@ class CreatedExListActivity: AppCompatActivity() {
 
         adapter.addLoadStateListener { loadState ->
             binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
+            val isEmptyList = adapter.itemCount == 0
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
-                    errorContainer.errorLayout.visibility = View.GONE
                     showShimmer()
                 }
+
                 is LoadState.NotLoading -> {
                     hideShimmer()
-                    errorContainer.errorLayout.visibility = View.GONE
+                    if (isEmptyList) {
+                        binding.recyclerView.visibility = View.GONE
+                        animation =
+                            AnimationUtils.loadAnimation(this, R.anim.appear_pop_up)
+                        emptyListContainer.emptyListLayout.visibility = View.VISIBLE
+                        emptyListContainer.emptyListLayout.startAnimation(animation)
+                    } else {
+                        binding.recyclerView.visibility = View.VISIBLE
+                        emptyListContainer.emptyListLayout.visibility = View.GONE
+                    }
                 }
+
                 is LoadState.Error -> {
-                    showShimmer()
+                    hideShimmer()
                     binding.recyclerView.visibility = View.GONE
+                    binding.filterButton.visibility = View.GONE
+                    animation = AnimationUtils.loadAnimation(this, R.anim.appear_pop_up)
                     errorContainer.errorLayout.visibility = View.VISIBLE
+                    errorContainer.errorLayout.startAnimation(animation)
                 }
             }
         }
@@ -145,13 +166,5 @@ class CreatedExListActivity: AppCompatActivity() {
         binding.shimmerLayout.stopShimmer()
         binding.shimmerLayout.visibility = View.GONE
         binding.recyclerView.visibility = View.VISIBLE
-    }
-
-    private val mineExcursionLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            adapter.refresh()
-        }
     }
 }

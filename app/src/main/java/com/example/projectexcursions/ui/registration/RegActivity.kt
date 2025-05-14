@@ -1,6 +1,5 @@
 package com.example.projectexcursions.ui.registration
 
-import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -13,14 +12,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityRegBinding
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.GoogleAuthProvider
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -40,14 +34,6 @@ class RegActivity: AppCompatActivity() {
 
         initCallback()
         subscribe()
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        binding.inputLogin.text.clear()
-        binding.inputPass.text.clear()
-        binding.repeatPass.text.clear()
     }
 
     private fun initCallback() {
@@ -73,7 +59,7 @@ class RegActivity: AppCompatActivity() {
                 Log.d("DataBeforeSend", "$username, $password")
                 val intent = createRegIntent(username, password, avatar, true)
                 Log.d("RegIntent", "CreateRegIntent")
-                setResult(Activity.RESULT_OK, intent)
+                setResult(RESULT_OK, intent)
                 finish()
             } else {
                 Toast.makeText(this, getString(R.string.error_reg), Toast.LENGTH_SHORT).show()
@@ -88,7 +74,6 @@ class RegActivity: AppCompatActivity() {
             binding.buttonAddAvatar.setImageURI(picture)
             binding.buttonAddAvatar.alpha = 1F
         }
-
     }
 
     private val pickImages =

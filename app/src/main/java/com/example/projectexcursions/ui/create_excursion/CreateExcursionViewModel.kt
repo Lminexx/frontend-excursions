@@ -12,6 +12,7 @@ import com.example.projectexcursions.models.CreatingExcursion
 import com.example.projectexcursions.models.Excursion
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
+import com.example.projectexcursions.models.UserInformation
 import com.example.projectexcursions.repositories.exlistrepo.ExcursionRepository
 import com.example.projectexcursions.repositories.georepo.GeoRepository
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -38,11 +39,11 @@ class CreateExcursionViewModel @Inject constructor(
     private val geoRepository: GeoRepository
 ): ViewModel() {
 
-    private val _wantComeBack = MutableLiveData<Boolean>()
-    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
-
     private val _createExcursion = MutableLiveData<Boolean>()
     val createExcursion: LiveData<Boolean> get() = _createExcursion
+
+    private val _editExcursion = MutableLiveData<Boolean>()
+    val editExcursion: LiveData<Boolean> get() = _editExcursion
 
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
@@ -70,9 +71,6 @@ class CreateExcursionViewModel @Inject constructor(
     private val _placeItems = MutableLiveData<List<PlaceItem>>()
     val placeItems: LiveData<List<PlaceItem>> get() = _placeItems
 
-    private val _deletingPlaceId = MutableLiveData<String>()
-    val deletingPLaceId: LiveData<String> get() = _deletingPlaceId
-
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
         val tempFile = File(context.cacheDir, fileName)
@@ -88,6 +86,53 @@ class CreateExcursionViewModel @Inject constructor(
             Log.e("getFileFromUri", "Error copying file from URI: $uri", e)
             FirebaseCrashlytics.getInstance().recordException(e)
             throw e
+        }
+    }
+
+    fun editExcursion(context: Context, title: String, description: String, tags:List<String>, topic:String, city: String, id:Long) {
+        Log.d("EditingExcursion", "EditingExcursion")
+        val excursion = CreatingExcursion(title, description, city, tags, topic)
+        val places = placeItems.value ?: emptyList()
+        Log.d("places", places.isNotEmpty().toString())
+        viewModelScope.launch {
+            try {
+                _editExcursion.value = false
+                val currentExcursion = excursionRepository.fetchExcursion(id).body()
+                val respondedExcursion = Excursion(
+                    id,
+                    title,
+                    description,
+                    currentExcursion?.user ?: UserInformation(0, "", ""),
+                    currentExcursion?.favorite == true,
+                    currentExcursion?.rating ?: "0".toFloat(),
+                    currentExcursion?.personalRating,
+                    tags,
+                    topic,
+                    currentExcursion?.approvedAt,
+                    city
+                )
+
+                excursionRepository.editExcursion(id, excursion)
+                excursionRepository.saveExcursionToDB(respondedExcursion)
+                geoRepository.updatePoints(places, id)
+
+                _message.value = context.getString(R.string.edit_success)
+
+                if (_selectedImages.value?.isNotEmpty() == true) {
+                    try {
+                        uploadPhotos(context, id)
+                    } catch (e: Exception) {
+                        Log.e("PhotoUploadError", "Error uploading photos: ${e.message}")
+                        FirebaseCrashlytics.getInstance().recordException(e)
+                        _message.value = "Error uploading photos: ${e.message}"
+                    }
+                }
+                _wantComeBack.value = true
+            } catch (e: Exception) {
+                _message.value = "Error: ${e.message}"
+                FirebaseCrashlytics.getInstance().recordException(e)
+                _createExcursion.value = false
+            }
         }
     }
 
@@ -129,7 +174,6 @@ class CreateExcursionViewModel @Inject constructor(
                         _message.value = "Error uploading photos: ${e.message}"
                     }
                 }
-                _wantComeBack.value = true
             } catch (e: Exception) {
                 _message.value = "Error: ${e.message}"
                 Log.e("CreatingExcursionError", e.message!!)
@@ -141,13 +185,19 @@ class CreateExcursionViewModel @Inject constructor(
 
     private suspend fun uploadPhotos(context: Context, excursionId: Long) {
         try {
-            val multipartBodyParts = _selectedImages.value?.map { uri ->
-                val file = getFileFromUri(context, uri)
-                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("files", file.name, requestFile)
+            val multipartBodyParts = _selectedImages.value?.mapNotNull { uri ->
+                if (uri.scheme == "http" || uri.scheme == "https") {
+                    Log.d("PhotoUpload", "Skipping remote URI: $uri")
+                    null
+                } else {
+                    val file = getFileFromUri(context, uri)
+                    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                    MultipartBody.Part.createFormData("files", file.name, requestFile)
+                }
             } ?: emptyList()
             val excursionIdRequest =
                 excursionId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+            println(multipartBodyParts.size)
             excursionRepository.uploadPhotos(multipartBodyParts, excursionIdRequest)
             Log.d("PhotoUpload", "Uploaded photos successfully")
             _selectedImages.postValue(emptyList())
@@ -244,8 +294,16 @@ class CreateExcursionViewModel @Inject constructor(
         _createExcursion.value = true
     }
 
+    fun clickEditExcursion(){
+        _editExcursion.value = true
+    }
+
     fun addSelectedImages(images: List<Uri>) {
         _selectedImages.value = _selectedImages.value?.plus(images)
+    }
+
+    fun addSelectedImages(image: Uri?) {
+        _selectedImages.value = _selectedImages.value?.plus(image) as List<Uri>?
     }
 
     fun updateSearchResults(results: List<SearchResult>) {
@@ -263,6 +321,21 @@ class CreateExcursionViewModel @Inject constructor(
         Log.d("PlaceItem", placeItem.name ?: "Место X")
         updatedList.add(placeItem)
         _placeItems.value = updatedList
+    }
+
+    fun loadPlaces(excursionId: Long) {
+        viewModelScope.launch {
+            try {
+                _placeItems.value=emptyList<PlaceItem>()
+                val response = geoRepository.loadPlaces(excursionId).body()!!
+                for(place in response){
+                    addPlace(place)
+                }
+            } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+                Log.e("PLacesError", e.message.toString())
+            }
+        }
     }
 
     fun deletePlace(placeId: String) {

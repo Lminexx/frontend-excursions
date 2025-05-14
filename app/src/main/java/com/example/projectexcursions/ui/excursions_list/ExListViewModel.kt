@@ -31,8 +31,6 @@ class ExListViewModel @Inject constructor(
         val startDate: String? = null,
         val endDate: String? = null,
         val tags: List<String> = emptyList(),
-        val minDuration: Int? = null,
-        val maxDuration: Int? = null,
         val topic: String? = null,
         val city: String? = null
     )
@@ -92,8 +90,6 @@ class ExListViewModel @Inject constructor(
                         filterData?.startDate,
                         filterData?.endDate,
                         filterData?.tags ?: emptyList(),
-                        filterData?.minDuration,
-                        filterData?.maxDuration,
                         filterData?.topic,
                         filterData?.city,
                     )
@@ -121,8 +117,8 @@ class ExListViewModel @Inject constructor(
         searchExcursion.value = ""
     }
 
-    fun setFiltrationData(rating: Float?, startDate:String?, endDate:String?, tags:List<String>, minDuration:Int?, maxDuration:Int?, topic:String?,city:String?){
+    fun setFiltrationData(rating: Float?, startDate:String?, endDate:String?, tags:List<String>, topic:String?,city:String?){
         _filterData.value=
-            FiltrationData(rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
+            FiltrationData(rating, startDate, endDate, tags, topic,city)
     }
 }
