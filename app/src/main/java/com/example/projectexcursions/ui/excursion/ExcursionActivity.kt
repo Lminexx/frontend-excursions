@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -33,10 +32,10 @@ import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
+import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.utilies.CustomMapView
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -45,10 +44,10 @@ import com.yandex.mapkit.geometry.Polyline
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -59,10 +58,9 @@ class ExcursionActivity : AppCompatActivity() {
     private lateinit var binding: ActivityExcursionBinding
     private lateinit var adapter: PhotoAdapter
     private lateinit var placesAdapter: PlacesAdapter
-    private var routePolyline: Polyline? = null
     private lateinit var map: Map
     private lateinit var mapView: CustomMapView
-    private lateinit var placemark: PlacemarkMapObject
+    private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
     private var isDetailedInfoVisible = false
     private lateinit var viewPager: ViewPager2
     private lateinit var indicator: SpringDotsIndicator
@@ -73,6 +71,8 @@ class ExcursionActivity : AppCompatActivity() {
             recreate()
         }
     }
+    private lateinit var pinsLayer: MapObjectCollection
+    private lateinit var routeLayer: MapObjectCollection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +81,9 @@ class ExcursionActivity : AppCompatActivity() {
         mapView = binding.mapview
         mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
+        val root = map.mapObjects
+        pinsLayer = root.addCollection()
+        routeLayer = root.addCollection()
 
         initCallback()
         initData()
@@ -226,39 +229,27 @@ class ExcursionActivity : AppCompatActivity() {
         viewModel.places.observe(this) { places ->
             try {
                 lifecycleScope.launch {
-                    for (place in places) {
-                        val point = Point(place.lat, place.lon)
-                        viewModel.setPoint(point)
-                        delay(500)
-                    }
+                    for (place in places)
+                        setLocation(place)
+                    if (places.size > 1) viewModel.getRoute()
                 }
                 placesAdapter.updatePlaces(places)
-                Log.d("PlaceItemsObserve", "true " + places[places.size - 1].name)
-            } catch (indexOutOfBound: IndexOutOfBoundsException) {
-                FirebaseCrashlytics.getInstance().recordException(indexOutOfBound)
-                Log.d("IndexOutOfBound", "хихи поймали дурачка)")
             } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
                 Log.d("Exception", e.message.toString())
             }
         }
 
-        viewModel.routeLiveData.observe(this) { points ->
-            if (!points.isNullOrEmpty()) {
-                Log.d("RouteData", points.size.toString())
-                drawRoute(points)
-            }
-        }
-
-        viewModel.curPoint.observe(this) { point ->
-            if (point != null) {
-                Log.d("nextPoint:", "observing")
-                setLocation(point)
-                if (viewModel.prevPoint.value != null) {
-                    lifecycleScope.launch {
-                        viewModel.getRoute()
-                    }
+        viewModel.route.observe(this) { points ->
+            try {
+                if (!points.isNullOrEmpty()) {
+                    Log.d("RouteData", points.size.toString())
+                    drawRoute(points)
+                } else {
+                    routeLayer.clear()
                 }
+            } catch (e: NullPointerException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
 
@@ -389,9 +380,10 @@ class ExcursionActivity : AppCompatActivity() {
         }
     }
 
-    private fun setLocation(point: Point) {
+    private fun setLocation(place: PlaceItem) {
         Log.d("setLocation", "")
         try {
+            val point = Point(place.lat, place.lon)
             map.move(
                 CameraPosition(
                     point,
@@ -402,22 +394,31 @@ class ExcursionActivity : AppCompatActivity() {
                 Animation(Animation.Type.SMOOTH, 1f),
                 null
             )
-            setPin(point)
+            setPin(place)
         } catch (eNull: NullPointerException) {
             FirebaseCrashlytics.getInstance().recordException(eNull)
         }
     }
 
-    private fun setPin(point: Point) {
+    private fun setPin(place: PlaceItem) {
         Log.d("setPin", "")
+        val point = Point(place.lat, place.lon)
+
+        if (placemarksMap.containsKey(place.id)) {
+            Log.d("setPin", "Метка с ID ${place.id} уже существует")
+            return
+        }
 
         val imageProvider = ImageProvider.fromResource(this, R.drawable.ic_location_pin)
 
-        placemark = map.mapObjects.addPlacemark().apply {
+        val placemark = pinsLayer.addPlacemark().apply {
             val iconStyle = IconStyle().apply { scale = 0.4f }
             geometry = point
             setIcon(imageProvider, iconStyle)
         }
+        Log.d("setPin", "Добавлен пин с ID: ${place.id}")
+
+        placemarksMap[place.id] = placemark
     }
 
     private fun addNewChip(tags: List<String>) {
@@ -501,9 +502,11 @@ class ExcursionActivity : AppCompatActivity() {
     }
 
     private fun drawRoute(points: List<Point>) {
+        routeLayer.clear()
+
         if (points.isNotEmpty()) {
-            routePolyline = Polyline(points)
-            map.mapObjects.addPolyline(routePolyline!!)
+            val polyline = Polyline(points)
+            routeLayer.addPolyline(polyline)
         }
     }
 

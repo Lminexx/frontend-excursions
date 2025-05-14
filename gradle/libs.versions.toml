@@ -1,6 +1,7 @@
 [versions]
 activityKtx = "1.9.3"
 agp = "8.9.2"
+blurry = "4.0.1"
 coreSplashscreen = "1.0.1"
 dotsindicator = "4.3"
 firebaseBom = "32.7.2"
@@ -35,6 +36,7 @@ shimmerVersion = "0.5.0"
 swiperefreshlayout = "1.1.0"
 circleimageview = "3.1.0"
 navigationCommonKtx = "2.8.7"
+identityJvm = "202411.1"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -49,6 +51,7 @@ androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "ro
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+blurry = { module = "jp.wasabeef:blurry", version.ref = "blurry" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 facebook-shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmerVersion" }
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }
@@ -83,6 +86,7 @@ circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circ
 glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
 androidx-navigation-common-ktx = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "navigationCommonKtx" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+identity-jvm = { group = "com.android.identity", name = "identity-jvm", version.ref = "identityJvm" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

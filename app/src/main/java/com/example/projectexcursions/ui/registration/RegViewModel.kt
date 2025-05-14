@@ -26,9 +26,6 @@ class RegViewModel @Inject constructor(
     private val _regStatus = MutableLiveData<Boolean>()
     val regStatus: LiveData<Boolean> get() = _regStatus
 
-    private val _wantComeBack = MutableLiveData<Boolean>()
-    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
-
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> get() = _username
 

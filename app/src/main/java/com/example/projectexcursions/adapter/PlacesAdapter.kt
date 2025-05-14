@@ -44,7 +44,10 @@ class PlacesAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updatePlaces(newPlaces: List<PlaceItem>) {
+        Log.d("UpdatingPlaces", "")
         places = newPlaces
+        for (place in places)
+            Log.d("places", place.name ?: "имя потеряно")
         notifyDataSetChanged()
     }
 

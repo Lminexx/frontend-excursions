@@ -250,7 +250,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="420dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -259,8 +259,9 @@
             <com.example.projectexcursions.utilies.CustomMapView
                 android:id="@+id/mapview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/map_view_pattern" />
+                android:layout_height="420dp"
+                android:background="@drawable/map_view_pattern"
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/places"
@@ -268,8 +269,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/mapview"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:layout_editor_absoluteY="530dp" />
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

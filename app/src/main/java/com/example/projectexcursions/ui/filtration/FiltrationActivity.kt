@@ -8,11 +8,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.projectexcursions.R
-import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.databinding.ActivityFilterBinding
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.max
 
 @AndroidEntryPoint
 class FiltrationActivity : AppCompatActivity() {
