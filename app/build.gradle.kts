@@ -80,6 +80,7 @@ buildTypes {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
         }
     }
 
@@ -99,6 +100,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.navigation.common.ktx)
     implementation(libs.gson)
+    implementation(libs.identity.jvm)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -130,6 +132,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.play.services.auth)
     implementation(libs.dotsindicator)
+    implementation(libs.blurry)
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
     kapt(libs.glide.compiler)

@@ -17,6 +17,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
@@ -49,12 +51,8 @@ class AuthViewModel @Inject constructor(
     private val _avatar = MutableLiveData<Uri>()
     val avatar: LiveData<Uri> get() = _avatar
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
-
     private val _role = MutableLiveData<String?>()
     val role: LiveData<String?> get() = _role
-
 
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
@@ -163,7 +161,6 @@ class AuthViewModel @Inject constructor(
     }
 
     private suspend fun uploadAvatar(context: Context, uri: Uri) {
-        _isLoading.value = true
         try {
             val file = getFileFromUri(context, uri)
             val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
@@ -200,8 +197,6 @@ class AuthViewModel @Inject constructor(
             _validationMessage.postValue("Неизвестная ошибка: ${e.message}")
             FirebaseCrashlytics.getInstance().recordException(e)
             throw e
-        } finally {
-            _isLoading.value = false
         }
     }
 
