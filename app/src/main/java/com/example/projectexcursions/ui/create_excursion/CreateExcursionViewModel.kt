@@ -187,22 +187,21 @@ class CreateExcursionViewModel @Inject constructor(
             val places = placeItems.value ?: return
             if (places.size < 2) {
                 _routeLiveData.postValue(emptyList())
-                return
-            }
-
-            val fullRoute = mutableListOf<Point>()
-            withContext(Dispatchers.IO) {
-                for (i in 0 until places.lastIndex) {
-                    val a = places[i]
-                    val b = places[i + 1]
-                    val segment = geoRepository.getRoute(
-                        Point(a.lat, a.lon),
-                        Point(b.lat, b.lon)
-                    )
-                    fullRoute.addAll(segment)
+            } else {
+                val fullRoute = mutableListOf<Point>()
+                withContext(Dispatchers.IO) {
+                    for (i in 0 until places.lastIndex) {
+                        val a = places[i]
+                        val b = places[i + 1]
+                        val segment = geoRepository.getRoute(
+                            Point(a.lat, a.lon),
+                            Point(b.lat, b.lon)
+                        )
+                        fullRoute.addAll(segment)
+                    }
                 }
+                _routeLiveData.postValue(fullRoute)
             }
-            _routeLiveData.postValue(fullRoute)
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("Route", "Error getting route", e)
@@ -261,7 +260,7 @@ class CreateExcursionViewModel @Inject constructor(
 
     fun addPlace(placeItem: PlaceItem) {
         val updatedList = _placeItems.value?.toMutableList() ?: mutableListOf()
-        Log.d("PlaceItem", placeItem.name)
+        Log.d("PlaceItem", placeItem.name ?: "Место X")
         updatedList.add(placeItem)
         _placeItems.value = updatedList
     }

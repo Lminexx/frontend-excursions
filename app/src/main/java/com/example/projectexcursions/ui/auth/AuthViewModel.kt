@@ -14,9 +14,7 @@ import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -134,6 +132,32 @@ class AuthViewModel @Inject constructor(
                 _validationMessage.value = e.localizedMessage
                 FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("LoginError", "Login error: ", e)
+            }
+        }
+    }
+
+    fun firebaseAuth(token: String) {
+        viewModelScope.launch {
+            try {
+                val response = apiService.firebaseAuth(token)
+                if (response.isSuccessful) {
+                    tokenRepository.saveToken(Token(token = response.body()!!.token))
+                    viewModelScope.launch {
+                        val cachedToken = tokenRepository.getCachedToken()
+                        val decodedToken = cachedToken?.let { tokenRepository.decodeToken(it.token) }
+                        val userRole = decodedToken?.get("role")?.asString()
+                        _role.value = userRole
+                        Log.d("UserRoleCheck1", userRole ?: "NULL")
+                        Log.d("UserRoleCheck2", _role.value!!)
+                    }
+                    _validationMessage.value = "Приятного пользования!"
+                    _loginStatus.value = true
+                } else {
+                    _validationMessage.value = "Ошибка регистрации на сервере"
+                }
+            } catch (e: Exception) {
+                Log.e("GoogleRegError", "Ошибка: ${e.message}")
+                FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
     }
