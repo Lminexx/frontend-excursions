@@ -2,7 +2,6 @@ package com.example.projectexcursions.ui.create_excursion
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -34,7 +33,6 @@ import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.utilies.CustomMapView
-import com.example.projectexcursions.utilies.ProgressBar
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
@@ -59,7 +57,6 @@ import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -159,7 +156,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         binding.places.layoutManager = LinearLayoutManager(this)
         binding.searchResultsRecycler.adapter = searchResultsAdapter
         binding.places.adapter = placesAdapter
-        progressBar = ProgressBar()
+
         if (intent.getStringExtra("title") != null) {
             binding.buttonCreateExcursion.text = "Изменить"
             binding.excursionTitle.setText(intent.getStringExtra("title"))
@@ -189,7 +186,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                     it.isClickable = true
                 }, 5000)
                 viewModel.clickCreateExcursion()
-            } else{
+            } else {
                 it.isClickable = false
                 Handler(Looper.getMainLooper()).postDelayed({
                     it.isClickable = true
@@ -304,7 +301,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                         city
                     )
                 }
-                finish()
             }
         }
 
