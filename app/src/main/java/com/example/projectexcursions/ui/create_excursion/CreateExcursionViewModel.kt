@@ -71,6 +71,9 @@ class CreateExcursionViewModel @Inject constructor(
     private val _placeItems = MutableLiveData<List<PlaceItem>>()
     val placeItems: LiveData<List<PlaceItem>> get() = _placeItems
 
+    private val _wantComeBack = MutableLiveData<Boolean>()
+    val wantComeBack: LiveData<Boolean> get() = _wantComeBack
+
     private fun getFileFromUri(context: Context, uri: Uri): File {
         val fileName = "upload_${System.currentTimeMillis()}.jpg"
         val tempFile = File(context.cacheDir, fileName)
@@ -174,6 +177,7 @@ class CreateExcursionViewModel @Inject constructor(
                         _message.value = "Error uploading photos: ${e.message}"
                     }
                 }
+                _wantComeBack.value = true
             } catch (e: Exception) {
                 _message.value = "Error: ${e.message}"
                 Log.e("CreatingExcursionError", e.message!!)

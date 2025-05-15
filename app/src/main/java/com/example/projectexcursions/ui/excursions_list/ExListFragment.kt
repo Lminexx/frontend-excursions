@@ -190,24 +190,6 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         }
     }
 
-    private val filterLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
-            val data = result.data
-            val rating = data?.getStringExtra("rating")?.toFloatOrNull()
-            val startDate = data?.getStringExtra("start_date")
-            val endDate = data?.getStringExtra("end_date")
-            val tags = data?.getStringArrayListExtra("tags") ?: emptyList()
-            val minDuration = data?.getStringExtra("min_duration")?.toIntOrNull()
-            val maxDuration = data?.getStringExtra("max_duration")?.toIntOrNull()
-            val topic = data?.getStringExtra("topic")
-            val city = data?.getStringExtra("city")
-
-            viewModel.setFiltrationData(rating, startDate, endDate, tags, minDuration, maxDuration, topic,city)
-        }
-    }
-
     private fun showShimmer() {
         binding.shimmerLayout.visibility = View.VISIBLE
         binding.shimmerLayout.startShimmer()
