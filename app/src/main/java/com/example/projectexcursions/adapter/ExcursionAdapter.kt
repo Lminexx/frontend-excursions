@@ -34,10 +34,36 @@ class ExcursionAdapter(
             if (excursionsList != null) {
                 binding.tvExcursionTitle.text = excursionsList.title
                 binding.tvExcursionDescription.text = excursionsList.description
+                binding.excursionAuthor.text = excursionsList.userName
 
-                binding.root.setOnClickListener {
-                    onExcursionClickListener?.onExcursionClick(excursionsList)
-                }
+                Glide.with(binding.userAvatar.context)
+                    .load(excursionsList.userUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.color.lighter_blue)
+                    .error(R.drawable.ic_app_v3)
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            e?.printStackTrace()
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
+                    })
+                    .into(binding.userAvatar)
 
                 Glide.with(binding.photo.context)
                     .load(excursionsList.url)
@@ -67,6 +93,10 @@ class ExcursionAdapter(
                         }
                     })
                     .into(binding.photo)
+
+                binding.root.setOnClickListener {
+                    onExcursionClickListener?.onExcursionClick(excursionsList)
+                }
             }
         }
     }
