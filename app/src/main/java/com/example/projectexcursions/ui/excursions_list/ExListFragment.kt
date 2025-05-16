@@ -39,22 +39,6 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
     private lateinit var binding: ExcursionsListBinding
     private lateinit var animation: Animation
     private val viewModel: ExListViewModel by viewModels()
-    private val filterLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) {
-            val data = result.data
-            val rating = data?.getStringExtra("rating")?.toFloatOrNull()
-            val startDate = data?.getStringExtra("start_date")
-            val endDate = data?.getStringExtra("end_date")
-            val tags = data?.getStringArrayListExtra("tags") ?: emptyList()
-            val topic = data?.getStringExtra("topic")
-            val city = data?.getStringExtra("city")
-
-
-            viewModel.setFiltrationData(rating, startDate, endDate, tags, topic,city)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -89,6 +73,10 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
 
     private fun initCallback() {
         errorContainer.retryButton.setOnClickListener {
+            adapter.retry()
+        }
+
+        emptyListContainer.retryButton.setOnClickListener {
             adapter.retry()
         }
 
@@ -187,6 +175,23 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
                     viewModel.goneToExcursion()
                 }
             }
+        }
+    }
+
+    private val filterLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val data = result.data
+            val rating = data?.getStringExtra("rating")?.toFloatOrNull()
+            val startDate = data?.getStringExtra("start_date")
+            val endDate = data?.getStringExtra("end_date")
+            val tags = data?.getStringArrayListExtra("tags") ?: emptyList()
+            val topic = data?.getStringExtra("topic")
+            val city = data?.getStringExtra("city")
+
+
+            viewModel.setFiltrationData(rating, startDate, endDate, tags, topic,city)
         }
     }
 

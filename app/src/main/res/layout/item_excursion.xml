@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -44,10 +43,39 @@
         android:ellipsize="end"
         android:scrollHorizontally="false" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userAvatar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/avatar"
+            app:srcCompat="@drawable/ic_app_v3" />
+
+        <TextView
+            android:id="@+id/excursionAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/excursion_author"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+    </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="4dp"
         android:background="@drawable/border_pattern_7"
         android:alpha="1"
         android:layout_marginHorizontal="8dp"/>
+
 </LinearLayout>
