@@ -45,6 +45,7 @@ class FavFragment : Fragment(R.layout.excursions_list) {
     ): View {
         binding = ExcursionsListBinding.inflate(inflater, container, false)
         errorContainer = binding.errorContainer
+        emptyListContainer = binding.emptyListContainer
 
         return binding.root
     }
@@ -74,8 +75,11 @@ class FavFragment : Fragment(R.layout.excursions_list) {
     }
 
     private fun initCallback(){
-
         errorContainer.retryButton.setOnClickListener {
+            adapter.retry()
+        }
+
+        emptyListContainer.retryButton.setOnClickListener {
             adapter.retry()
         }
 
