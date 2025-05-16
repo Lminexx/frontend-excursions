@@ -9,22 +9,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <include
-            android:id="@+id/errorContainer"
-            layout="@layout/error"
-            android:visibility="gone"/>
-
-        <include
-            android:id="@+id/emptyListContainer"
-            layout="@layout/empty_list"
-            android:visibility="gone"/>
-
         <SearchView
             android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:iconifiedByDefault="true"
             android:queryHint="@string/search_hint" />
+
+        <include
+            android:id="@+id/errorContainer"
+            layout="@layout/error"
+            android:visibility="gone"/>
 
         <View
             android:id="@+id/divider_view"
@@ -58,6 +53,11 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
+            <include
+                android:id="@+id/emptyListContainer"
+                layout="@layout/empty_list"
+                android:visibility="gone"/>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </LinearLayout>

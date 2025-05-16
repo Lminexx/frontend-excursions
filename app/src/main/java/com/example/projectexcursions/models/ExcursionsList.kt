@@ -8,11 +8,13 @@ import com.example.projectexcursions.net.PhotoResponse
 import com.example.projectexcursions.utilies.Converters
 import kotlinx.serialization.Serializable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.InternalSerializationApi
 
 @Parcelize
 @Serializable
 @Entity(tableName = "excursions")
 @TypeConverters(Converters::class)
+@OptIn(InternalSerializationApi::class)
 data class ExcursionsList(
     @PrimaryKey val id: Long,
     val title: String,
@@ -25,8 +27,11 @@ data class ExcursionsList(
     val topic: String,
     val approvedAt: String?=null,
     val cityName: String,
-    val photoUrl: PhotoResponse
+    val photoUrl: PhotoResponse,
+    val user: UserInformation
 ): Parcelable {
     val url: String get() = photoUrl.url
     val photoId: Long get() = photoUrl.id
+    val userName: String get() = user.username
+    val userUrl: String get() = user.url
 }
