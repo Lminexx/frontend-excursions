@@ -3,6 +3,7 @@ package com.example.projectexcursions.ui.excursion
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
@@ -16,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,10 +34,8 @@ import com.example.projectexcursions.adapter.PhotoAdapter
 import com.example.projectexcursions.adapter.PlacesAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionBinding
 import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
-import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
-import com.example.projectexcursions.ui.map.PoiBottomFragment
 import com.example.projectexcursions.utilies.CustomMapView
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -67,20 +67,13 @@ class ExcursionActivity : AppCompatActivity() {
     private lateinit var mapView: CustomMapView
     private lateinit var viewPager: ViewPager2
     private lateinit var indicator: SpringDotsIndicator
-    private val editLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            recreate()
-        }
-    }
     private lateinit var pinsLayer: MapObjectCollection
     private lateinit var routeLayer: MapObjectCollection
+    private var isAuth = false
+    private var isModerating = false
     private var isDetailedInfoVisible = false
     private val viewModel: ExcursionViewModel by viewModels()
     private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
-    private val isAuth = tokenRepo.getCachedToken() != null
-    private val isModerating = isAuth && intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,8 +89,7 @@ class ExcursionActivity : AppCompatActivity() {
         initCallback()
         initData()
         subscribe()
-
-    }
+        }
 
     override fun onStart() {
         super.onStart()
@@ -117,9 +109,8 @@ class ExcursionActivity : AppCompatActivity() {
     private fun initData() {
         val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
 
-        val isAuth = tokenRepo.getCachedToken() != null
-        if (isAuth)
-            binding
+        isAuth = tokenRepo.getCachedToken() != null
+        isModerating = isAuth && intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
 
         adapter = PhotoAdapter(this, listOf())
         viewPager = binding.viewPagerImages
@@ -228,11 +219,16 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.favorite.observe(this) { favorite ->
-            if (favorite) {
-                binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_fill)
+            val animRes = if (favorite) {
+                R.drawable.anim_fav_fill
             } else {
-                binding.favoriteButton.setBackgroundResource(R.drawable.ic_ex_fav_hollow)
+                R.drawable.anim_favorite_unfill
             }
+
+            val drawable = AppCompatResources.getDrawable(this, animRes)
+            binding.favoriteButton.setImageDrawable(drawable)
+
+            (drawable as? AnimatedVectorDrawable)?.start()
         }
 
         viewModel.photos.observe(this) { photos ->
@@ -359,14 +355,18 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         binding.deleteButton.setOnClickListener {
-            it.isClickable = false
-            Handler(Looper.getMainLooper()).postDelayed({
-                it.isClickable = true
-            }, 1000)
-            lifecycleScope.launch {
-                viewModel.deleteExcursion()
-                setResult(RESULT_OK)
-            }
+            android.app.AlertDialog.Builder(this)
+                .setTitle("Вы хотите удалить экскурсию?")
+                .setMessage("Она будет удалена безвозвратно")
+                .setPositiveButton("Да") { dialog, _ ->
+                    lifecycleScope.launch {
+                        viewModel.deleteExcursion()
+                        setResult(RESULT_OK)
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Нет") { dialog, _ -> dialog.dismiss() }
+                .show()
         }
 
         binding.editButton.setOnClickListener {
@@ -523,6 +523,14 @@ class ExcursionActivity : AppCompatActivity() {
         if (points.isNotEmpty()) {
             val polyline = Polyline(points)
             routeLayer.addPolyline(polyline)
+        }
+    }
+
+    private val editLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            recreate()
         }
     }
 
