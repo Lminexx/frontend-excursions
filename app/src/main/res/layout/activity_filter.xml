@@ -42,23 +42,22 @@
 
             <EditText
                 android:id="@+id/addTagsString"
-                android:layout_width="0dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
+                android:ems="10"
+                android:importantForAutofill="no"
                 android:inputType="text"
                 android:hint="@string/add_tag_string"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/addTagsButton"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/addTagsButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
                 android:text="@string/add_tag_button"
                 android:textColor="@color/white"
-                android:textSize="14sp"
-                android:padding="4dp"
+                android:textSize="12sp"
                 android:background="@drawable/border_pattern_2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

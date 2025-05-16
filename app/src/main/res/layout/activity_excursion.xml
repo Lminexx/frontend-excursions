@@ -289,7 +289,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/fragment_container"
+            android:id="@+id/map_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -322,7 +322,7 @@
             android:layout_marginEnd="8dp"
             android:background="#00FFFFFF"
             android:contentDescription="@string/approve"
-            app:layout_constraintTop_toBottomOf="@id/fragment_container"
+            app:layout_constraintTop_toBottomOf="@id/map_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@drawable/approve" />
@@ -334,7 +334,7 @@
             android:layout_marginVertical="16dp"
             android:background="#00FFFFFF"
             android:contentDescription="@string/pend"
-            app:layout_constraintTop_toBottomOf="@id/fragment_container"
+            app:layout_constraintTop_toBottomOf="@id/map_container"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@drawable/comment_exc" />
@@ -347,7 +347,7 @@
             android:background="#00FFFFFF"
             android:contentDescription="@string/edit_exc"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/map_container"
             app:srcCompat="@drawable/ic_edit_ex" />
 
         <ImageButton
@@ -358,7 +358,7 @@
             android:layout_marginEnd="4dp"
             android:contentDescription="@string/delete_exc"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/map_container"
             app:srcCompat="@drawable/ic_ex_del" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
