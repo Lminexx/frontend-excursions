@@ -32,6 +32,7 @@ import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
+import com.example.projectexcursions.utilies.Blur
 import com.example.projectexcursions.utilies.CustomMapView
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -687,6 +688,10 @@ class CreateExcursionActivity : AppCompatActivity() {
     private fun showImages() {
         binding.viewPagerImages.visibility = View.VISIBLE
         binding.dotsIndicator.visibility = View.VISIBLE
+    }
+
+    fun blur() {
+        Blur().blur(this, 10, 2, binding.parentLayout)
     }
 }
 //TODO сделать получение списка фото места

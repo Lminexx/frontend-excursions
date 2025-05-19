@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:id="@+id/container">
+        android:id="@+id/parent_layout">
 
         <EditText
             android:id="@+id/excursionTitle"
