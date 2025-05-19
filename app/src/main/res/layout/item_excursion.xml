@@ -43,11 +43,9 @@
         android:ellipsize="end"
         android:scrollHorizontally="false" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp">
 
@@ -56,20 +54,36 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:contentDescription="@string/avatar"
-            app:srcCompat="@drawable/ic_app_v3" />
+            app:srcCompat="@drawable/ic_app_v3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <TextView
             android:id="@+id/excursionAuthor"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/excursion_author"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:ellipsize="end"
-            android:maxLines="1" />
+            android:maxLines="1"
+            app:layout_constraintStart_toEndOf="@id/userAvatar"
+            app:layout_constraintEnd_toStartOf="@id/status"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    </LinearLayout>
+        <ImageView
+            android:id="@+id/status"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/moderation_status"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:layout_width="match_parent"

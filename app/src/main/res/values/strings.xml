@@ -92,7 +92,6 @@
         <item>Позновательная</item>
     </string-array>
     <string-array name="topics">
-        <item></item>
         <item>Другая</item>
         <item>Пешая</item>
         <item>Путешествие</item>
@@ -130,4 +129,6 @@
     <string name="so_quiet_naaah">Тут так тихо…</string>
     <string name="login">Войти</string>
     <string name="unknown_user">Пользователя не существует</string>
+    <string name="you_made_no_excursions">Вы не создали ни одной экскурсии</string>
+    <string name="moderation_status">Статус модерации</string>
 </resources>

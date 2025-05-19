@@ -19,8 +19,10 @@ import com.example.projectexcursions.databinding.ItemExcursionBinding
 import com.example.projectexcursions.models.ExcursionsList
 
 class ExcursionAdapter(
-    diffCallback: DiffUtil.ItemCallback<ExcursionsList>
-) : PagingDataAdapter<ExcursionsList, ExcursionAdapter.ExcursionViewHolder>(diffCallback) {
+    diffCallback: DiffUtil.ItemCallback<ExcursionsList>,
+    private val isMineList: Boolean = false,
+    private val shouldRate: Boolean = true
+): PagingDataAdapter<ExcursionsList, ExcursionAdapter.ExcursionViewHolder>(diffCallback) {
 
     var onExcursionClickListener: OnExcursionClickListener? = null
 
@@ -35,6 +37,12 @@ class ExcursionAdapter(
                 binding.tvExcursionTitle.text = excursionsList.title
                 binding.tvExcursionDescription.text = excursionsList.description
                 binding.excursionAuthor.text = excursionsList.userName
+                if (isMineList)
+                    if (excursionsList.moderationStatus == "APPROVED") {
+                        binding.status.setImageResource(R.drawable.approved)
+                    }
+                    else if (excursionsList.moderationStatus == "PENDING")
+                        binding.status.setImageResource(R.drawable.pending)
 
                 Glide.with(binding.userAvatar.context)
                     .load(excursionsList.userUrl)
