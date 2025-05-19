@@ -11,11 +11,12 @@
     <color name="grey">#808080</color>
     <color name="light_yellow">#FFFFCC</color>
     <color name="yellow">#FFFF00</color>
-    <color name="dark_yellow">#AAAA00</color>
+    <color name="dark_yellow">#f6e41e</color>
     <color name="lighter_blue">#FF01C5F6</color>
     <color name="blue">#FF0176ED</color>
     <color name="biryuzoviy">#FF01C5D0</color>
     <color name="white_blue">#BBDEFB</color>
     <color name="a_bit_blue">#64B5F6</color>
     <color name="red">#FF0000</color>
+    <color name="green">#00ff6e</color>
 </resources>
