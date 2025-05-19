@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
@@ -19,6 +20,7 @@ import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import com.example.projectexcursions.utilies.ExcursionsListException
+import com.example.projectexcursions.utilies.ListTypes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -28,7 +30,8 @@ import javax.inject.Inject
 class ModeratingExListActivity: AppCompatActivity() {
 
     @Inject
-    lateinit var adapter: ExcursionAdapter
+    lateinit var diffCallback: DiffUtil.ItemCallback<ExcursionsList>
+    private lateinit var adapter: ExcursionAdapter
     private lateinit var animation: Animation
     private lateinit var errorContainer: ErrorBinding
     private lateinit var binding: ExcursionsListBinding
@@ -84,7 +87,7 @@ class ModeratingExListActivity: AppCompatActivity() {
     private fun initData() {
         showShimmer()
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = adapter
+        adapter = ExcursionAdapter(diffCallback, ListTypes.MODERATING)
         binding.searchView.visibility = View.GONE
     }
 

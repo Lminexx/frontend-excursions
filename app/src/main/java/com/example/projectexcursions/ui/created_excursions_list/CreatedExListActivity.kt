@@ -22,6 +22,7 @@ import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
 import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
+import com.example.projectexcursions.utilies.ListTypes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -110,7 +111,7 @@ class CreatedExListActivity: AppCompatActivity() {
 
     private fun initData() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = ExcursionAdapter(diffCallback, true)
+        adapter = ExcursionAdapter(diffCallback, ListTypes.MINE)
         binding.recyclerView.adapter = adapter
         showShimmer()
     }
