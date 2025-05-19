@@ -1,9 +1,11 @@
 package com.example.projectexcursions.modules
 
 import android.app.Application
+import com.example.projectexcursions.OpenWorldApp
 import com.example.projectexcursions.R
 import com.example.projectexcursions.net.ApiService
 import com.example.projectexcursions.repositories.tokenrepo.TokenRepository
+import javax.net.ssl.X509TrustManager
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -20,7 +22,9 @@ import java.security.KeyStore
 import java.security.cert.CertificateFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
-import javax.net.ssl.*
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -32,80 +36,61 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         tokenRepo: TokenRepository,
-        app: Application
+        okHttpClientBuilder: OkHttpClient.Builder
     ): OkHttpClient {
+        return okHttpClientBuilder
+            .addInterceptor { chain ->
+                val token = runBlocking { tokenRepo.getToken()?.token }
+                val request = chain.request()
+                val requestBuilder = request.newBuilder()
+                if (token != null) {
+                    requestBuilder.addHeader("Authorization", token.toString())
+                }
+                chain.proceed(requestBuilder.build())
+            }
+            .build()
+    }
+
+    @Provides
+    fun provideOkHttpClientBuilder(app: Application): OkHttpClient.Builder {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        val trustManager = createUnifiedTrustManager(app)
-        val sslContext = SSLContext.getInstance("TLS").apply {
-            init(null, arrayOf<TrustManager>(trustManager), null)
-        }
-
-        return OkHttpClient.Builder()
-            .sslSocketFactory(sslContext.socketFactory, trustManager)
-            .hostnameVerifier { _, _ -> true } // Подумай об усилении позже
-            .addInterceptor(loggingInterceptor)
-            .addInterceptor { chain ->
-                val token = runBlocking { tokenRepo.getToken()?.token }
-                val request = chain.request().newBuilder().apply {
-                    if (token != null) addHeader("Authorization", token.toString())
-                }.build()
-                chain.proceed(request)
-            }
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .callTimeout(30, TimeUnit.SECONDS)
-            .build()
-    }
-
-    private fun createUnifiedTrustManager(app: Application): X509TrustManager {
         val certificateFactory = CertificateFactory.getInstance("X.509")
+
         val inputStream = app.resources.openRawResource(R.raw.server)
-        val customCert = certificateFactory.generateCertificate(inputStream)
+        val certificate = certificateFactory.generateCertificate(inputStream)
         inputStream.close()
 
-        val customKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-            load(null, null)
-            setCertificateEntry("custom", customCert)
-        }
+        val keyStoreType = KeyStore.getDefaultType()
+        val keyStore = KeyStore.getInstance(keyStoreType)
+        keyStore.load(null, null)
+        keyStore.setCertificateEntry("ca", certificate)
 
-        val customTmFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-            init(customKeyStore)
-        }
-        val customTm = customTmFactory.trustManagers.filterIsInstance<X509TrustManager>().first()
+        val tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm()
+        val trustManagerFactory = TrustManagerFactory.getInstance(tmfAlgorithm)
+        trustManagerFactory.init(keyStore)
 
-        val defaultTmFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-            init(null as KeyStore?)
-        }
-        val defaultTm = defaultTmFactory.trustManagers.filterIsInstance<X509TrustManager>().first()
+        val trustManagers = trustManagerFactory.trustManagers
+        val x509TrustManager = trustManagers[0] as X509TrustManager
 
-        return object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) {
-                try {
-                    defaultTm.checkClientTrusted(chain, authType)
-                } catch (e: Exception) {
-                    customTm.checkClientTrusted(chain, authType)
-                }
-            }
+        val sslContext = SSLContext.getInstance("SSL")
+        sslContext.init(null, arrayOf(x509TrustManager), null)
+        val sslSocketFactory = sslContext.socketFactory
 
-            override fun checkServerTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) {
-                try {
-                    defaultTm.checkServerTrusted(chain, authType)
-                } catch (e: Exception) {
-                    customTm.checkServerTrusted(chain, authType)
-                }
-            }
+        return OkHttpClient.Builder()
+            .sslSocketFactory(sslSocketFactory, x509TrustManager)
+            .hostnameVerifier(myHostNameVerifier())
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
 
-            override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> {
-                return defaultTm.acceptedIssuers + customTm.acceptedIssuers
-            }
-        }
     }
 
-    @Provides
     @Singleton
+    @Provides
     @OptIn(ExperimentalSerializationApi::class)
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val json = Json { ignoreUnknownKeys = true }
@@ -120,5 +105,9 @@ object NetworkModule {
     @Singleton
     fun provideApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
+    }
+
+    private fun myHostNameVerifier(): HostnameVerifier {
+        return HostnameVerifier { hostname, _ -> hostname == "217.71.129.139" }
     }
 }

@@ -43,4 +43,12 @@
             app:layout_constraintTop_toBottomOf="@id/placeName"
             app:layout_constraintEnd_toEndOf="parent"/>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/border_pattern_7"
+        android:alpha="1"
+        android:layout_marginHorizontal="4dp"/>
+
 </LinearLayout>

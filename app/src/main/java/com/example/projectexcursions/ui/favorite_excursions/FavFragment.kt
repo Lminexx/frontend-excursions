@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,6 +16,7 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
+import com.example.projectexcursions.databinding.EmptyListBinding
 import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
@@ -32,6 +35,8 @@ class FavFragment : Fragment(R.layout.excursions_list) {
     private val viewModel: FavViewModel by viewModels()
     private lateinit var errorContainer: ErrorBinding
     private lateinit var binding: ExcursionsListBinding
+    private lateinit var animation: Animation
+    private lateinit var emptyListContainer: EmptyListBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +45,7 @@ class FavFragment : Fragment(R.layout.excursions_list) {
     ): View {
         binding = ExcursionsListBinding.inflate(inflater, container, false)
         errorContainer = binding.errorContainer
+        emptyListContainer = binding.emptyListContainer
 
         return binding.root
     }
@@ -69,8 +75,11 @@ class FavFragment : Fragment(R.layout.excursions_list) {
     }
 
     private fun initCallback(){
-
         errorContainer.retryButton.setOnClickListener {
+            adapter.retry()
+        }
+
+        emptyListContainer.retryButton.setOnClickListener {
             adapter.retry()
         }
 
@@ -132,20 +141,30 @@ class FavFragment : Fragment(R.layout.excursions_list) {
 
         adapter.addLoadStateListener { loadState ->
             binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
+            val isEmptyList = adapter.itemCount == 0
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
-                    errorContainer.errorLayout.visibility = View.GONE
                     showShimmer()
                 }
                 is LoadState.NotLoading -> {
                     hideShimmer()
-                    errorContainer.errorLayout.visibility = View.GONE
+                    if (isEmptyList) {
+                        binding.recyclerView.visibility = View.GONE
+                        animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)
+                        emptyListContainer.emptyListLayout.visibility = View.VISIBLE
+                        emptyListContainer.emptyListLayout.startAnimation(animation)
+                    } else {
+                        binding.recyclerView.visibility = View.VISIBLE
+                        emptyListContainer.emptyListLayout.visibility = View.GONE
+                    }
                 }
                 is LoadState.Error -> {
-                    showShimmer()
+                    hideShimmer()
                     binding.recyclerView.visibility = View.GONE
+                    binding.filterButton.visibility = View.GONE
+                    animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)
                     errorContainer.errorLayout.visibility = View.VISIBLE
-                    errorContainer.errorMessage.text = LoadState.Error(ExcursionsListException()).toString()
+                    errorContainer.errorLayout.startAnimation(animation)
                 }
             }
         }
