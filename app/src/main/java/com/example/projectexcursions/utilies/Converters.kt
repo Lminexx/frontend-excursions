@@ -32,4 +32,14 @@ class Converters {
     fun toPhotoResponse(value: String): PhotoResponse {
         return json.decodeFromString(value)
     }
+
+    @TypeConverter
+    fun fromUserInformation(user: UserInformation): String {
+        return json.encodeToString(user)
+    }
+
+    @TypeConverter
+    fun toUserInformation(data: String): UserInformation {
+        return json.decodeFromString(data)
+    }
 }
