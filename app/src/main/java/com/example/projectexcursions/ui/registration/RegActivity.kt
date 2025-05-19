@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityRegBinding
+import com.example.projectexcursions.utilies.Blur
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -53,6 +54,7 @@ class RegActivity: AppCompatActivity() {
     private fun subscribe() {
         viewModel.regStatus.observe(this) { isSuccessful ->
             if (isSuccessful) {
+                blur()
                 val username = viewModel.username.value!!
                 val password = viewModel.password.value!!
                 val avatar = viewModel.avatar.value ?: resourceUri(R.drawable.ic_app_v3)
@@ -104,6 +106,10 @@ class RegActivity: AppCompatActivity() {
             type = "image/*"
         }
         pickImages.launch(intent)
+    }
+
+    fun blur() {
+        Blur().blur(this, 15, 5, binding.parentLayout)
     }
 
     companion object {

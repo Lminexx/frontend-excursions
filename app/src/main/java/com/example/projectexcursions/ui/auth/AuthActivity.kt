@@ -5,12 +5,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.registration.RegActivity
+import com.example.projectexcursions.utilies.Blur
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -159,12 +162,8 @@ class AuthActivity: AppCompatActivity() {
             }
     }
 
-    private fun blur() {
-        Blurry.with(this)
-            .radius(10)
-            .sampling(2)
-            .async()
-            .onto(binding.parentLayout)
+    fun blur() {
+        Blur().blur(this, 15, 5, binding.parentLayout)
     }
 
     companion object {
