@@ -131,4 +131,5 @@
     <string name="unknown_user">Пользователя не существует</string>
     <string name="you_made_no_excursions">Вы не создали ни одной экскурсии</string>
     <string name="moderation_status">Статус модерации</string>
+    <string name="rating_star">Звезда рейтинга</string>
 </resources>
