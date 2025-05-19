@@ -3,6 +3,7 @@ package com.example.projectexcursions.adapter
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -37,12 +38,19 @@ class ExcursionAdapter(
                 binding.tvExcursionTitle.text = excursionsList.title
                 binding.tvExcursionDescription.text = excursionsList.description
                 binding.excursionAuthor.text = excursionsList.userName
+
+                if (shouldRate)
+                    binding.rating.text = excursionsList.rating.toString()
+                else
+                    binding.ratingContainer.visibility = View.GONE
+
                 if (isMineList)
-                    if (excursionsList.moderationStatus == "APPROVED") {
+                    if (excursionsList.moderationStatus == "APPROVED")
                         binding.status.setImageResource(R.drawable.approved)
-                    }
-                    else if (excursionsList.moderationStatus == "PENDING")
+                    else if (excursionsList.moderationStatus == "PENDING") {
                         binding.status.setImageResource(R.drawable.pending)
+                        binding.ratingContainer.visibility = View.GONE
+                    }
 
                 Glide.with(binding.userAvatar.context)
                     .load(excursionsList.userUrl)
