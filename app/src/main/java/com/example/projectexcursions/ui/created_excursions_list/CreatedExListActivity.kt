@@ -1,25 +1,26 @@
 package com.example.projectexcursions.ui.created_excursions_list
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.SearchView
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projectexcursions.R
 import com.example.projectexcursions.adapter.ExcursionAdapter
-import com.example.projectexcursions.databinding.EmptyListBinding
+import com.example.projectexcursions.databinding.EmptyMineListBinding
 import com.example.projectexcursions.databinding.ErrorBinding
 import com.example.projectexcursions.databinding.ExcursionsListBinding
 import com.example.projectexcursions.models.ExcursionsList
+import com.example.projectexcursions.ui.create_excursion.CreateExcursionActivity
 import com.example.projectexcursions.ui.excursion.ExcursionActivity.Companion.createExcursionActivityIntent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -30,10 +31,11 @@ import javax.inject.Inject
 class CreatedExListActivity: AppCompatActivity() {
 
     @Inject
-    lateinit var adapter: ExcursionAdapter
+    lateinit var diffCallback: DiffUtil.ItemCallback<ExcursionsList>
+    private lateinit var adapter: ExcursionAdapter
     private lateinit var errorContainer: ErrorBinding
     private lateinit var binding: ExcursionsListBinding
-    private lateinit var emptyListContainer: EmptyListBinding
+    private lateinit var emptyMineListContainer: EmptyMineListBinding
     private lateinit var animation: Animation
     private val viewModel: CreatedExListViewModel by viewModels()
 
@@ -41,12 +43,18 @@ class CreatedExListActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ExcursionsListBinding.inflate(layoutInflater)
         errorContainer = binding.errorContainer
-        emptyListContainer = binding.emptyListContainer
+        emptyMineListContainer = binding.emptyMineListContainer
         setContentView(binding.root)
 
         initData()
         initCallback()
         subscribe()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        adapter.refresh()
     }
 
     override fun onDestroy() {
@@ -55,6 +63,10 @@ class CreatedExListActivity: AppCompatActivity() {
     }
 
     private fun initCallback() {
+        emptyMineListContainer.createButton.setOnClickListener {
+            viewModel.createExcursion()
+        }
+
         errorContainer.retryButton.setOnClickListener {
             adapter.retry()
         }
@@ -98,11 +110,18 @@ class CreatedExListActivity: AppCompatActivity() {
 
     private fun initData() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = ExcursionAdapter(diffCallback, true)
         binding.recyclerView.adapter = adapter
         showShimmer()
     }
 
     private fun subscribe() {
+        viewModel.wantCreate.observe(this) { wantCreate ->
+            if (wantCreate) {
+                startActivity(Intent(this, CreateExcursionActivity::class.java))
+            }
+        }
+
         lifecycleScope.launch {
             viewModel.createdExcursions.collectLatest { pagingData ->
                 Log.d("excursions", "$pagingData")
@@ -125,11 +144,11 @@ class CreatedExListActivity: AppCompatActivity() {
                         binding.recyclerView.visibility = View.GONE
                         animation =
                             AnimationUtils.loadAnimation(this, R.anim.appear_pop_up)
-                        emptyListContainer.emptyListLayout.visibility = View.VISIBLE
-                        emptyListContainer.emptyListLayout.startAnimation(animation)
+                        emptyMineListContainer.emptyMineListLayout.visibility = View.VISIBLE
+                        emptyMineListContainer.emptyMineListLayout.startAnimation(animation)
                     } else {
                         binding.recyclerView.visibility = View.VISIBLE
-                        emptyListContainer.emptyListLayout.visibility = View.GONE
+                        emptyMineListContainer.emptyMineListLayout.visibility = View.GONE
                     }
                 }
 

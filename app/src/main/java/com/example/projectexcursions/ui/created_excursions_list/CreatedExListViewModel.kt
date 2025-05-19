@@ -28,6 +28,9 @@ class CreatedExListViewModel @Inject constructor(
     private val _goToExcursion = MutableLiveData<Boolean>()
     val goToExcursion: LiveData<Boolean> get() = _goToExcursion
 
+    private val _wantCreate = MutableLiveData(false)
+    val wantCreate: LiveData<Boolean> get() = _wantCreate
+
     private val isSearching = MutableStateFlow(false)
 
     private val searchExcursion = MutableStateFlow("")
@@ -72,5 +75,9 @@ class CreatedExListViewModel @Inject constructor(
     fun clickExcursion(excursionsList: ExcursionsList) {
         selectedExcursionsList = excursionsList
         _goToExcursion.value = true
+    }
+
+    fun createExcursion() {
+        _wantCreate.value = true
     }
 }

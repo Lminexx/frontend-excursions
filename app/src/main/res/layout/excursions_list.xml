@@ -58,6 +58,11 @@
                 android:id="@+id/emptyListContainer"
                 layout="@layout/empty_list"
                 android:visibility="gone"/>
+
+            <include
+                android:id="@+id/emptyMineListContainer"
+                layout="@layout/empty_mine_list"
+                android:visibility="gone"/>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </LinearLayout>
