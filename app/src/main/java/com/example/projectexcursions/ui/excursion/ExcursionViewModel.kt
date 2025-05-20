@@ -36,7 +36,7 @@ class ExcursionViewModel @Inject constructor(
     private val _excursion = MutableLiveData<Excursion?>()
     val excursion: LiveData<Excursion?> = _excursion
 
-    private val _favorite = MutableLiveData<Boolean>()
+    private val _favorite = MutableLiveData(false)
     val favorite: LiveData<Boolean> get() = _favorite
 
     private val _username = MutableLiveData<String?>()
