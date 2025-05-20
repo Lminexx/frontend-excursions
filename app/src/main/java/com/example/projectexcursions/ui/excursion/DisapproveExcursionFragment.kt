@@ -53,17 +53,9 @@ class DisapproveExcursionFragment : BottomSheetDialogFragment() {
     }
 
     private fun initCallback() {
-        binding.btnSendBack.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.excursionPended(id)
-            }
-        }
 
-        binding.btnReject.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.excursionRejected(id)
-            }
-        }
+
+
     }
 
     companion object {

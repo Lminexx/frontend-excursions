@@ -42,6 +42,12 @@ class RegActivity: AppCompatActivity() {
         subscribe()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        progressBar.dialog?.takeIf { it.isShowing }?.dismiss()
+        unblur()
+    }
+
     private fun initCallback() {
         binding.buttReg.setOnClickListener {
             val login = binding.inputLogin.text.toString().trim()
