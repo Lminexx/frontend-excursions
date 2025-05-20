@@ -133,4 +133,6 @@
     <string name="moderation_status">Статус модерации</string>
     <string name="rating_star">Звезда рейтинга</string>
     <string name="status">Статус</string>
+    <string name="wait">Подождите</string>
+    <string name="no_avatar">Выберите аватар</string>
 </resources>

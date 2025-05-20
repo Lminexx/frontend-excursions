@@ -5,12 +5,16 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectexcursions.databinding.ActivityAuthBinding
 import com.example.projectexcursions.ui.registration.RegActivity
+import com.example.projectexcursions.utilies.Blur
+import com.example.projectexcursions.utilies.CustomProgressBar
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -30,6 +34,7 @@ class AuthActivity: AppCompatActivity() {
     lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binding: ActivityAuthBinding
     private val viewModel: AuthViewModel by viewModels()
+    private val progressBar = CustomProgressBar()
 
     private val REG_REQUEST_CODE = 1002
 
@@ -53,12 +58,16 @@ class AuthActivity: AppCompatActivity() {
     private fun subscribe() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
+                blur()
+                progressBar.show(this)
                 val prevFrag = intent.getStringExtra("prev_frag")
                 Log.d("AuthActivity", "Success auth, prev_frag: $prevFrag")
                 val role = viewModel.role.value
                 val resultIntent = createAuthResultIntent(isAuthSuccess = true, isModerator = role == "MODERATOR" || role == "ADMIN")
                 resultIntent.putExtra("prev_frag", prevFrag)
                 setResult(RESULT_OK, resultIntent)
+                progressBar.dialog.dismiss()
+                unblur()
                 finish()
             }
         }
@@ -107,7 +116,6 @@ class AuthActivity: AppCompatActivity() {
             val isReg = data?.getBooleanExtra(RegActivity.EXTRA_REG_STATUS, false) == true
             Log.d("DataNaN?", "$data")
             if (isReg) {
-                blur()
                 Log.d("RegIntent", "GetRegIntent")
                 val username = data.getStringExtra(RegActivity.EXTRA_REG_USERNAME)
                 val password = data.getStringExtra(RegActivity.EXTRA_REG_PASSWORD)
@@ -141,11 +149,12 @@ class AuthActivity: AppCompatActivity() {
     }
 
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
-        blur()
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    blur()
+                    progressBar.show(this)
                     val user = firebaseAuth.currentUser
                     user?.getIdToken(true)
                         ?.addOnSuccessListener { result ->
@@ -159,12 +168,12 @@ class AuthActivity: AppCompatActivity() {
             }
     }
 
-    private fun blur() {
-        Blurry.with(this)
-            .radius(10)
-            .sampling(2)
-            .async()
-            .onto(binding.parentLayout)
+    fun blur() {
+        Blur().blur(this, 12, 3, binding.parentLayout)
+    }
+
+    fun unblur() {
+        Blur().unblur(binding.parentLayout)
     }
 
     companion object {

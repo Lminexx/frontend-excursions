@@ -32,8 +32,8 @@ class RegViewModel @Inject constructor(
     private val _password = MutableLiveData<String>()
     val password: LiveData<String> get() = _password
 
-    private val _avatar = MutableLiveData<Uri>()
-    val avatar: LiveData<Uri> get() = _avatar
+    private val _avatar = MutableLiveData<Uri?>()
+    val avatar: LiveData<Uri?> get() = _avatar
 
     fun validateAndRegister(context: Context, login: String, password: String, repeatPassword: String) {
         when {
@@ -41,6 +41,7 @@ class RegViewModel @Inject constructor(
             password.isBlank() -> _message.value = context.getString(R.string.error_enter_password)
             repeatPassword.isBlank() -> _message.value = context.getString(R.string.repeat_password)
             password != repeatPassword -> _message.value = context.getString(R.string.pass_not_same)
+            avatar.value == null -> _message.value = context.getString(R.string.no_avatar)
             else -> {
                 _username.value = login
                 _password.value = password
