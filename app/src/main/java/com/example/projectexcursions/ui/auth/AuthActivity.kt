@@ -55,6 +55,12 @@ class AuthActivity: AppCompatActivity() {
         binding.inputPass.text.clear()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        progressBar.dialog?.takeIf { it.isShowing }?.dismiss()
+        unblur()
+    }
+
     private fun subscribe() {
         viewModel.loginStatus.observe(this) { successAuth ->
             if (successAuth) {
@@ -162,6 +168,10 @@ class AuthActivity: AppCompatActivity() {
                             Log.d("FirebaseToken", token ?: "ZeroToken")
                             if (token != null) viewModel.firebaseAuth(token)
                         }
+                        ?.addOnFailureListener(this) {
+                        progressBar.dialog?.dismiss()
+                        unblur()
+                    }
                 } else {
                     Toast.makeText(this, "Firebase auth failed", Toast.LENGTH_SHORT).show()
                 }

@@ -73,6 +73,10 @@ class ModeratingExListActivity: AppCompatActivity() {
             adapter.retry()
         }
 
+        emptyListContainer.retryButton.setOnClickListener {
+            adapter.refresh()
+        }
+
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener{
             override fun onExcursionClick(excursionsList: ExcursionsList) {
                 viewModel.clickExcursion(excursionsList)
@@ -86,8 +90,9 @@ class ModeratingExListActivity: AppCompatActivity() {
 
     private fun initData() {
         showShimmer()
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = ExcursionAdapter(diffCallback, ListTypes.MODERATING)
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
         binding.searchView.visibility = View.GONE
     }
 

@@ -77,7 +77,7 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         }
 
         emptyListContainer.retryButton.setOnClickListener {
-            adapter.retry()
+            adapter.refresh()
         }
 
         adapter.onExcursionClickListener = object : ExcursionAdapter.OnExcursionClickListener {

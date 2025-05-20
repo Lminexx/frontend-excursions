@@ -71,6 +71,7 @@ class ExcursionActivity : AppCompatActivity() {
     private lateinit var routeLayer: MapObjectCollection
     private var isAuth = false
     private var isModerating = false
+    private var excursionId: Long = 0L
     private var isDetailedInfoVisible = false
     private val viewModel: ExcursionViewModel by viewModels()
     private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
@@ -89,7 +90,7 @@ class ExcursionActivity : AppCompatActivity() {
         initCallback()
         initData()
         subscribe()
-        }
+    }
 
     override fun onStart() {
         super.onStart()
@@ -107,7 +108,7 @@ class ExcursionActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun initData() {
-        val excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
+        excursionId = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
 
         isAuth = tokenRepo.getCachedToken() != null
         isModerating = isAuth && intent.getBooleanExtra(EXTRA_IS_MODERATING, false)
@@ -266,11 +267,6 @@ class ExcursionActivity : AppCompatActivity() {
             if (disapproving) {
                 val id = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
                 if (id != -1L) {
-                    val disapproveExcursionFrag = DisapproveExcursionFragment.newInstance(id)
-                    disapproveExcursionFrag.show(
-                        supportFragmentManager,
-                        "DisapproveExcursionFragment"
-                    )
                 }
             } else finish()
             Log.d("disapproving", disapproving.toString())
@@ -293,6 +289,18 @@ class ExcursionActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun initCallback() {
+        binding.btnSendBack.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.excursionPended(excursionId)
+            }
+        }
+
+        binding.btnReject.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.excursionRejected(excursionId)
+            }
+        }
+
         binding.favoriteButton.setOnClickListener {
             it.isClickable = false
             Handler(Looper.getMainLooper()).postDelayed({
@@ -323,9 +331,8 @@ class ExcursionActivity : AppCompatActivity() {
             }
         }
 
-        binding.commentButton.setOnClickListener { viewModel.disapprove() }
 
-        binding.approveButton.setOnClickListener {
+        binding.btnApprove.setOnClickListener {
             it.isClickable = false
             Handler(Looper.getMainLooper()).postDelayed({
                 it.isClickable = true
@@ -479,8 +486,7 @@ class ExcursionActivity : AppCompatActivity() {
         indicator.visibility = View.GONE
         binding.mapview.visibility = View.GONE
         binding.places.visibility = View.GONE
-        binding.approveButton.visibility = View.GONE
-        binding.commentButton.visibility = View.GONE
+        binding.moderatingBtnsContainer.visibility = View.GONE
         binding.ratingContainer.visibility = View.GONE
         binding.detailedInfoHeader.visibility = View.GONE
         binding.deleteButton.visibility = View.GONE
@@ -494,27 +500,22 @@ class ExcursionActivity : AppCompatActivity() {
         binding.authorContainer.visibility = View.VISIBLE
         binding.excursionDescription.visibility = View.VISIBLE
         binding.favoriteButton.visibility = View.VISIBLE
-        viewPager.visibility = View.VISIBLE
-        indicator.visibility = View.VISIBLE
         binding.mapview.visibility = View.VISIBLE
         binding.places.visibility = View.VISIBLE
         binding.detailedInfoHeader.visibility = View.VISIBLE
         binding.ratingContainer.visibility = View.VISIBLE
         binding.deleteButton.visibility = View.VISIBLE
         binding.editButton.visibility = View.VISIBLE
+        viewPager.visibility = View.VISIBLE
+        indicator.visibility = View.VISIBLE
 
         if (!isAuth) {
             binding.favoriteButton.visibility = View.GONE
-            binding.ratingContainer.visibility = View.GONE
+            binding.ratingContainer.isClickable = false
         } else if (isModerating) {
-            binding.commentButton.visibility = View.VISIBLE
-            binding.approveButton.visibility = View.VISIBLE
-        } else {
-            binding.commentButton.visibility = View.GONE
-            binding.approveButton.visibility = View.GONE
-            binding.favoriteButton.visibility = View.VISIBLE
-            binding.ratingContainer.visibility = View.VISIBLE
-        }
+            binding.moderatingBtnsContainer.visibility = View.VISIBLE
+            binding.ratingContainer.isClickable = false
+        } else binding.moderatingBtnsContainer.visibility = View.GONE
     }
 
     private fun drawRoute(points: List<Point>) {
