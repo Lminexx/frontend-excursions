@@ -21,6 +21,16 @@
             layout="@layout/error"
             android:visibility="gone"/>
 
+        <include
+            android:id="@+id/emptyListContainer"
+            layout="@layout/empty_list"
+            android:visibility="gone"/>
+
+        <include
+            android:id="@+id/emptyMineListContainer"
+            layout="@layout/empty_mine_list"
+            android:visibility="gone"/>
+
         <View
             android:id="@+id/divider_view"
             android:layout_width="match_parent"
@@ -53,16 +63,6 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-
-            <include
-                android:id="@+id/emptyListContainer"
-                layout="@layout/empty_list"
-                android:visibility="gone"/>
-
-            <include
-                android:id="@+id/emptyMineListContainer"
-                layout="@layout/empty_mine_list"
-                android:visibility="gone"/>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </LinearLayout>

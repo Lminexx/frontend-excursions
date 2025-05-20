@@ -10,12 +10,16 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityRegBinding
 import com.example.projectexcursions.utilies.Blur
+import com.example.projectexcursions.utilies.CustomProgressBar
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -27,6 +31,7 @@ class RegActivity: AppCompatActivity() {
     lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binding: ActivityRegBinding
     private val viewModel: RegViewModel by viewModels()
+    private val progressBar = CustomProgressBar()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,14 +60,20 @@ class RegActivity: AppCompatActivity() {
         viewModel.regStatus.observe(this) { isSuccessful ->
             if (isSuccessful) {
                 blur()
+                progressBar.show(this)
                 val username = viewModel.username.value!!
                 val password = viewModel.password.value!!
                 val avatar = viewModel.avatar.value ?: resourceUri(R.drawable.ic_app_v3)
                 Log.d("DataBeforeSend", "$username, $password")
-                val intent = createRegIntent(username, password, avatar, true)
-                Log.d("RegIntent", "CreateRegIntent")
-                setResult(RESULT_OK, intent)
-                finish()
+                lifecycleScope.launch {
+                    delay(1000)
+                    val intent = createRegIntent(username, password, avatar, true)
+                    Log.d("RegIntent", "CreateRegIntent")
+                    setResult(RESULT_OK, intent)
+                    progressBar.dialog.dismiss()
+                    unblur()
+                    finish()
+                }
             } else {
                 Toast.makeText(this, getString(R.string.error_reg), Toast.LENGTH_SHORT).show()
             }
@@ -109,7 +120,11 @@ class RegActivity: AppCompatActivity() {
     }
 
     fun blur() {
-        Blur().blur(this, 15, 5, binding.parentLayout)
+        Blur().blur(this, 12, 3, binding.parentLayout)
+    }
+
+    fun unblur() {
+        Blur().unblur(binding.parentLayout)
     }
 
     companion object {

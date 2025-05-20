@@ -139,24 +139,31 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         adapter.addLoadStateListener { loadState ->
             binding.swipeRefresh.isRefreshing = loadState.source.refresh is LoadState.Loading
             val isEmptyList = adapter.itemCount == 0
+            Log.d("ItemCount", adapter.itemCount.toString())
             when (loadState.source.refresh) {
                 is LoadState.Loading -> {
+                    Log.i("LoadState", "Loading")
                     showShimmer()
                 }
                 is LoadState.NotLoading -> {
                     hideShimmer()
+                    Log.i("LoadState", "NotLoading")
+                    Log.i("IsEmpty", isEmptyList.toString())
                     if (isEmptyList) {
+                        Log.i("StartAnim", "emptyList")
                         binding.recyclerView.visibility = View.GONE
                         animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)
                         emptyListContainer.emptyListLayout.visibility = View.VISIBLE
                         emptyListContainer.emptyListLayout.startAnimation(animation)
+                        Log.i("EndAnim", "emptyList")
                     } else {
-                        binding.recyclerView.visibility = View.VISIBLE
                         emptyListContainer.emptyListLayout.visibility = View.GONE
+                        binding.recyclerView.visibility = View.VISIBLE
                     }
                 }
                 is LoadState.Error -> {
                     hideShimmer()
+                    Log.i("LoadState", "Error")
                     binding.recyclerView.visibility = View.GONE
                     binding.filterButton.visibility = View.GONE
                     animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)

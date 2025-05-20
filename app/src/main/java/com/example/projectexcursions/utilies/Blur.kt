@@ -13,4 +13,8 @@ class Blur() {
             .async()
             .onto(viewGroup)
     }
+
+    fun unblur(viewGroup: ViewGroup) {
+        Blurry.delete(viewGroup)
+    }
 }
