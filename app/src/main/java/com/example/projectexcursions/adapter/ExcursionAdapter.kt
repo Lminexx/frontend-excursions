@@ -3,6 +3,7 @@ package com.example.projectexcursions.adapter
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -17,9 +18,11 @@ import com.bumptech.glide.request.target.Target
 import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ItemExcursionBinding
 import com.example.projectexcursions.models.ExcursionsList
+import com.example.projectexcursions.utilies.ListTypes
 
 class ExcursionAdapter(
-    diffCallback: DiffUtil.ItemCallback<ExcursionsList>
+    diffCallback: DiffUtil.ItemCallback<ExcursionsList>,
+    private val listType: ListTypes = ListTypes.DEFAULT
 ) : PagingDataAdapter<ExcursionsList, ExcursionAdapter.ExcursionViewHolder>(diffCallback) {
 
     var onExcursionClickListener: OnExcursionClickListener? = null
@@ -31,72 +34,74 @@ class ExcursionAdapter(
     inner class ExcursionViewHolder(private val binding: ItemExcursionBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(excursionsList: ExcursionsList?) {
-            if (excursionsList != null) {
-                binding.tvExcursionTitle.text = excursionsList.title
-                binding.tvExcursionDescription.text = excursionsList.description
-                binding.excursionAuthor.text = excursionsList.userName
+            if (excursionsList == null) return
 
-                Glide.with(binding.userAvatar.context)
-                    .load(excursionsList.userUrl)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.color.lighter_blue)
-                    .error(R.drawable.ic_app_v3)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            e?.printStackTrace()
-                            return false
-                        }
+            binding.tvExcursionTitle.text = excursionsList.title
+            binding.tvExcursionDescription.text = excursionsList.description
+            binding.excursionAuthor.text = excursionsList.userName
 
-                        override fun onResourceReady(
-                            resource: Drawable,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
-                    })
-                    .into(binding.userAvatar)
-
-                Glide.with(binding.photo.context)
-                    .load(excursionsList.url)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.color.lighter_blue)
-                    .error(R.drawable.ic_app_v3)
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            e?.printStackTrace()
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
-                    })
-                    .into(binding.photo)
-
-                binding.root.setOnClickListener {
-                    onExcursionClickListener?.onExcursionClick(excursionsList)
+            when (listType) {
+                ListTypes.DEFAULT -> {
+                    binding.ratingContainer.visibility = View.VISIBLE
+                    binding.rating.text = excursionsList.rating.toString()
                 }
+                ListTypes.MODERATING -> {
+                    binding.statusContainer.visibility = View.GONE
+                    binding.ratingContainer.visibility = View.GONE
+                }
+                ListTypes.MINE -> {
+                    binding.statusContainer.visibility = View.VISIBLE
+                    when (excursionsList.moderationStatus) {
+                        "APPROVED" -> {
+                            binding.ratingContainer.visibility = View.VISIBLE
+                            binding.rating.text = excursionsList.rating.toString()
+                            binding.status.setImageResource(R.drawable.approved)
+                            binding.statusDescription.text = "Принята"
+                        }
+                        "PENDING" -> {
+                            binding.status.setImageResource(R.drawable.pending)
+                            binding.statusDescription.text = "На рассмотрении"
+                        }
+                    }
+                }
+            }
+
+            Glide.with(binding.userAvatar.context)
+                .load(excursionsList.userUrl)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.color.lighter_blue)
+                .error(R.drawable.ic_app_v3)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean
+                    ) = false
+
+                    override fun onResourceReady(
+                        resource: Drawable, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean
+                    ) = false
+                })
+                .into(binding.userAvatar)
+
+            Glide.with(binding.photo.context)
+                .load(excursionsList.url)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .placeholder(R.color.lighter_blue)
+                .error(R.drawable.ic_app_v3)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean
+                    ) = false
+
+                    override fun onResourceReady(
+                        resource: Drawable, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean
+                    ) = false
+                })
+                .into(binding.photo)
+
+            binding.root.setOnClickListener {
+                onExcursionClickListener?.onExcursionClick(excursionsList)
             }
         }
     }

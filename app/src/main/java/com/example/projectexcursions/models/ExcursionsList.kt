@@ -28,7 +28,8 @@ data class ExcursionsList(
     val approvedAt: String?=null,
     val cityName: String,
     val photoUrl: PhotoResponse,
-    val user: UserInformation
+    val user: UserInformation,
+    val moderationStatus: String
 ): Parcelable {
     val url: String get() = photoUrl.url
     val photoId: Long get() = photoUrl.id

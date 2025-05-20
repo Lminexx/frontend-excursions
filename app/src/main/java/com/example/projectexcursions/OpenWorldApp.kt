@@ -37,6 +37,10 @@ class OpenWorldApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        applicationScope.launch {
+            excRepository.deleteAllExcursionsFromExcursion()
+        }
+
         FirebaseApp.initializeApp(this)
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
         Log.d("YandexMap", "API Key: ${BuildConfig.MAPKIT_API_KEY}")
@@ -67,14 +71,6 @@ class OpenWorldApp : Application() {
                 Toast.makeText(applicationContext, e.message ?: "Unknown error", Toast.LENGTH_SHORT)
                     .show()
             }
-        }
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-
-        applicationScope.launch {
-            excRepository.deleteAllExcursionsFromExcursion()
         }
     }
 }

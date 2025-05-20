@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cb678252bdb68654858ea7b7a7fe6eaf",
+    "identityHash": "f7bc1f516cdc1f4d802fc3e1d44f13e0",
     "entities": [
       {
         "tableName": "excursions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `userId` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL, `tags` TEXT NOT NULL, `topic` TEXT NOT NULL, `approvedAt` TEXT, `cityName` TEXT NOT NULL, `photoUrl` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `userId` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, `rating` REAL NOT NULL, `personalRating` REAL, `tags` TEXT NOT NULL, `topic` TEXT NOT NULL, `approvedAt` TEXT, `cityName` TEXT NOT NULL, `photoUrl` TEXT NOT NULL, `user` TEXT NOT NULL, `moderationStatus` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -77,6 +77,18 @@
           {
             "fieldPath": "photoUrl",
             "columnName": "photoUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user",
+            "columnName": "user",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "moderationStatus",
+            "columnName": "moderationStatus",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -212,7 +224,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cb678252bdb68654858ea7b7a7fe6eaf')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f7bc1f516cdc1f4d802fc3e1d44f13e0')"
     ]
   }
 }
