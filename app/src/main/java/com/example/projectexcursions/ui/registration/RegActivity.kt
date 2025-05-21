@@ -15,20 +15,13 @@ import com.example.projectexcursions.R
 import com.example.projectexcursions.databinding.ActivityRegBinding
 import com.example.projectexcursions.utilies.Blur
 import com.example.projectexcursions.utilies.CustomProgressBar
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegActivity: AppCompatActivity() {
 
-    @Inject
-    lateinit var googleSignInClient: GoogleSignInClient
-    @Inject
-    lateinit var firebaseAuth: FirebaseAuth
     private lateinit var binding: ActivityRegBinding
     private val viewModel: RegViewModel by viewModels()
     private val progressBar = CustomProgressBar()
@@ -126,7 +119,7 @@ class RegActivity: AppCompatActivity() {
     }
 
     fun blur() {
-        Blur().blur(this, 12, 3, binding.parentLayout)
+        Blur().blur(this, 10, 5, binding.parentLayout)
     }
 
     fun unblur() {
