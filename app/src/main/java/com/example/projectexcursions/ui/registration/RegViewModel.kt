@@ -60,8 +60,10 @@ class RegViewModel @Inject constructor(
                     val response = apiService.registerUser(user)
                     Log.d("RegistrationResponse", "Response: $response")
                     if (response.isSuccessful) {
-                        _message.value = response.message()
-                        _regStatus.value = true
+                        if (response.message() != "") {
+                            _message.value = response.message()
+                            _regStatus.value = true
+                        } else _regStatus.value = true
                     }
                 } else {
                     _message.value = context.getString(R.string.lang_error)
