@@ -44,7 +44,7 @@ class CustomGlideModule : AppGlideModule() {
             )
         )
     }
-    
+
     @SuppressLint("TrulyRandom")
     fun OkHttpClient.Builder.disableCertPathValidation(): OkHttpClient.Builder {
         val sslContext = SSLContext.getInstance("SSL")
