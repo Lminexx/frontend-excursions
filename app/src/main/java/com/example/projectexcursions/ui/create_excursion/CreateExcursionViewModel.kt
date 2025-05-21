@@ -23,6 +23,7 @@ import com.yandex.mapkit.location.LocationListener
 import com.yandex.mapkit.location.LocationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -211,7 +212,7 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>, city: String): Boolean {
+    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>, city: String, photos: List<Uri>): Boolean {
         when {
             title.isBlank() -> {
                 _message.value = context.getString(R.string.empty_title)
@@ -228,10 +229,16 @@ class CreateExcursionViewModel @Inject constructor(
                 return false
             }
 
-            city.isEmpty()->{
-                _message.value=context.getString(R.string.empty_city_name)
+            city.isEmpty() -> {
+                _message.value = context.getString(R.string.empty_city_name)
                 return false
             }
+
+            photos.isEmpty() -> {
+                _message.value = context.getString(R.string.empty_photos)
+                return false
+            }
+
             else -> return true
         }
     }
@@ -241,7 +248,7 @@ class CreateExcursionViewModel @Inject constructor(
             val places = placeItems.value ?: return
             if (places.size < 2) {
                 _routeLiveData.postValue(emptyList())
-            } else {
+            } else if (places.size <= 12) {
                 val fullRoute = mutableListOf<Point>()
                 withContext(Dispatchers.IO) {
                     for (i in 0 until places.lastIndex) {
@@ -255,6 +262,8 @@ class CreateExcursionViewModel @Inject constructor(
                     }
                 }
                 _routeLiveData.postValue(fullRoute)
+            } else {
+                _message.value = "Выберите менее 12 мест"
             }
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)

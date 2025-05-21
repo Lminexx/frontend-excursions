@@ -252,8 +252,8 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.editExcursion.observe(this) { wannaEdit ->
             if (wannaEdit) {
-                /*blur()
-                progressBar.show(this)*/
+                blur()
+                progressBar.show(this)
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
@@ -267,7 +267,8 @@ class CreateExcursionActivity : AppCompatActivity() {
                 }
                 val city = binding.cityName.text.toString()
                 val topic = translateTopic(binding.topic.selectedItem.toString())
-                if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
+                val photos = viewModel.selectedImages.value ?: emptyList()
+                if (viewModel.isExcursionCorrect(this, title, description, places, city, photos)) {
                     viewModel.editExcursion(
                         this@CreateExcursionActivity,
                         title,
@@ -277,19 +278,19 @@ class CreateExcursionActivity : AppCompatActivity() {
                         city,
                         intent.getLongExtra("id", -1)
                     )
-                    /*progressBar.dialog.dismiss()
-                    unblur()*/
+                    progressBar.dialog.dismiss()
+                    unblur()
                 } else {
-                    /*progressBar.dialog.dismiss()
-                    unblur()*/
+                    progressBar.dialog.dismiss()
+                    unblur()
                 }
             }
         }
 
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
-                /*blur()
-                progressBar.show(this)*/
+                blur()
+                progressBar.show(this)
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
@@ -303,7 +304,8 @@ class CreateExcursionActivity : AppCompatActivity() {
                 }
                 val city = binding.cityName.text.toString()
                 val topic = translateTopic(binding.topic.selectedItem.toString())
-                if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
+                val photos = viewModel.selectedImages.value ?: emptyList()
+                if (viewModel.isExcursionCorrect(this, title, description, places, city, photos)) {
                     viewModel.createExcursion(
                         this@CreateExcursionActivity,
                         title,
@@ -312,11 +314,11 @@ class CreateExcursionActivity : AppCompatActivity() {
                         topic,
                         city
                     )
-                    /*progressBar.dialog.dismiss()
-                    unblur()*/
+                    progressBar.dialog.dismiss()
+                    unblur()
                 } else {
-                    /*progressBar.dialog.dismiss()
-                    unblur()*/
+                    progressBar.dialog.dismiss()
+                    unblur()
                 }
             }
         }
