@@ -56,15 +56,6 @@ class PlacesAdapter(
     inner class PlacesViewHolder(val binding: ItemPlacesBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val photoAdapter = PhotoAdapter(context, emptyList())
-
-        init {
-            binding.placePhoto.apply {
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-                adapter = photoAdapter
-            }
-        }
-
         fun bind(placeItem: PlaceItem) {
             binding.placeName.text = placeItem.name
         }
