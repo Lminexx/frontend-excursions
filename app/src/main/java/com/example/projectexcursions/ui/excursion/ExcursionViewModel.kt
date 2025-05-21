@@ -51,9 +51,6 @@ class ExcursionViewModel @Inject constructor(
     private val _route = MutableLiveData<List<Point>>(emptyList())
     val route: LiveData<List<Point>> get() = _route
 
-    private val _disapproving = MutableLiveData<Boolean>()
-    val disapproving: LiveData<Boolean> get() = _disapproving
-
     private val _approve = MutableLiveData<Boolean>()
     val approve: LiveData<Boolean> get() = _approve
 
@@ -62,6 +59,9 @@ class ExcursionViewModel @Inject constructor(
 
     private val _isMine = MutableLiveData<Boolean>()
     val isMine: LiveData<Boolean> get() = _isMine
+
+    private val _rating = MutableLiveData<Float>()
+    val rating: LiveData<Float> get() = _rating
 
     init {
         if (tokenRepository.getCachedToken() != null)
@@ -156,10 +156,6 @@ class ExcursionViewModel @Inject constructor(
         _username.value = name
     }
 
-    fun disapprove() {
-        _disapproving.value = true
-    }
-
     fun fav() {
         _favorite.value = true
     }
@@ -193,22 +189,15 @@ class ExcursionViewModel @Inject constructor(
 
     fun isMine() {
         _excursion.value?.let { currentExcursion ->
-            _isMine.value = currentExcursion.user.username==_username.value
+            _isMine.value = currentExcursion.user.username == _username.value
         }
     }
 
-
-    suspend fun updateRating(rating: Float): Float {
-        val excursionId = _excursion.value?.id ?: return 0.0f
-        return try {
+    suspend fun updateRating(rating: Float) {
+        val excursionId = _excursion.value?.id ?: 0L
+        try {
             val response = excRepository.uploadRating(excursionId, rating).body()!!
-            _excursion.postValue(
-                _excursion.value?.copy(
-                    rating = response.ratingAVG,
-                    personalRating = rating
-                )
-            )
-            response.ratingAVG
+            _rating.postValue(response.ratingAVG)
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("UpdateRating", "Error updating rating for excursion $excursionId", e)
@@ -234,18 +223,15 @@ class ExcursionViewModel @Inject constructor(
 
     suspend fun excursionPended(id: Long) {
         excRepository.changeExcursionStatus(id, "PENDING")
-        _disapproving.postValue(false)
     }
 
     suspend fun excursionRejected(id: Long) {
         excRepository.changeExcursionStatus(id, "REJECTED")
-        _disapproving.postValue(false)
     }
 
     suspend fun excursionApproved() {
         val id = excursion.value?.id ?: throw ApproveExcursionException()
         excRepository.changeExcursionStatus(id, "APPROVED")
-        _disapproving.postValue(false)
     }
 
     suspend fun checkAuthStatus(): Boolean {

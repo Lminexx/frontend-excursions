@@ -76,6 +76,7 @@
         android:src="@drawable/ic_filter"
         android:layout_gravity="bottom|end"
         android:elevation="16dp"
+        android:visibility="gone"
         app:backgroundTint="@color/lighter_blue"
         app:layout_anchor="@id/swipeRefresh" />
 
