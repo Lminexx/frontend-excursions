@@ -88,6 +88,8 @@ class AuthActivity: AppCompatActivity() {
 
         viewModel.wantComeBack.observe(this) { wannaComeBack ->
             if (wannaComeBack) {
+                progressBar.dialog.dismiss()
+                unblur()
                 finish()
             }
         }

@@ -136,4 +136,9 @@
     <string name="wait">Подождите</string>
     <string name="no_avatar">Выберите аватар</string>
     <string name="excursion_menu">Меню экскурсии</string>
+    <string name="you_have_no_fav_exc">Вам не понравилась ни одна экскурсия D:</string>
+    <string name="come_to_list">К списку экскурсий</string>
+    <string name="enter_placename">Введите название</string>
+    <string name="unknown_place">Неизвестное место</string>
+    <string name="enter_name">Подтвердить имя</string>
 </resources>

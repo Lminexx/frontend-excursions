@@ -27,15 +27,39 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <EditText
+            android:id="@+id/enterName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:importantForAutofill="auto"
+            android:autofillHints="@string/unknown_place"
+            android:ellipsize="end"
+            android:inputType="text"
+            android:maxLines="2"
+            android:hint="@string/enter_placename"
+            android:fontFamily="@font/app_font2"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+
+        <ImageButton
+            android:id="@+id/approveName"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/enter_name"
+            android:src="@drawable/approve"
+            android:visibility="gone" />
+
         <ImageButton
             android:id="@+id/deletePlace"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="8dp"
             android:contentDescription="@string/delete_place"
-            android:src="@drawable/ic_ex_del"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/placeName" />
+            android:src="@drawable/ic_ex_del" />
     </LinearLayout>
 
     <View

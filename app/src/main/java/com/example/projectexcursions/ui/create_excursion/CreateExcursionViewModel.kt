@@ -361,6 +361,16 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
+    fun updatePlaceName(placeId: String, newName: String) {
+        _placeItems.value = _placeItems.value
+            ?.map { item ->
+                if (item.id == placeId)
+                    item.copy(name = newName)
+                else
+                    item
+            }
+    }
+
     fun getId(i:Int): String {
         return geoRepository.getRandomId(i)
     }

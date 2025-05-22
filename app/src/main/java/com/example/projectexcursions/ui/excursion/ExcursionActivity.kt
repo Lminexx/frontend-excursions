@@ -137,7 +137,9 @@ class ExcursionActivity : AppCompatActivity() {
             onDeleteClick = { placeId ->
                 Log.d("DeletePlace", "нельзя!")
             },
-            isCreating = false,
+            onApproveClick = { placeId, newName ->
+                Log.d("Надо доработать UI)", "")
+            },
             places = emptyList()
         )
 
@@ -273,8 +275,6 @@ class ExcursionActivity : AppCompatActivity() {
 
         viewModel.isMine.observe(this) { mine ->
             isMine = mine
-            binding.menuButton.visibility = View.VISIBLE
-            binding.ratingBar.isClickable = false
         }
 
         viewModel.rating.observe(this) { rating ->
@@ -524,21 +524,17 @@ class ExcursionActivity : AppCompatActivity() {
         viewPager.visibility = View.VISIBLE
         indicator.visibility = View.VISIBLE
 
-        if (isMine && isModerating) {
-            binding.menuButton.visibility = View.VISIBLE
-            binding.ratingBar.isClickable = false
-        } else if (isMine) {
-            binding.menuButton.visibility = View.VISIBLE
-            binding.ratingBar.isClickable = false
-        } else if (isModerating) {
-            binding.moderatingBtnsContainer.visibility = View.VISIBLE
-            binding.ratingBar.isClickable = false
-        } else if (!isAuth) {
-            binding.favoriteButton.visibility = View.GONE
-            binding.ratingBar.isClickable = false
-        } else {
-            binding.moderatingBtnsContainer.visibility = View.GONE
-        }
+        val showMenuBtn = isMine
+        Log.d("DBG", "menuButton should be visible? $showMenuBtn")
+        binding.menuButton.visibility =
+            if (showMenuBtn) View.VISIBLE else View.GONE
+
+        binding.moderatingBtnsContainer.visibility =
+            if (isModerating && !isMine) View.VISIBLE else View.GONE
+
+        binding.favoriteButton.visibility = if (isAuth) View.VISIBLE else View.GONE
+
+        binding.ratingBar.isEnabled = isAuth && !isMine && !isModerating
     }
 
     private fun drawRoute(points: List<Point>) {
