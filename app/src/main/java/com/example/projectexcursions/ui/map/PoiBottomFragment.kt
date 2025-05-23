@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
@@ -17,20 +18,19 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import androidx.core.view.isVisible
-import androidx.core.view.isGone
 
-private const val COLLAPSED_HEIGHT = 228
+private const val COLLAPSED_HEIGHT = 242
 
 @AndroidEntryPoint
 class PoiBottomFragment : BottomSheetDialogFragment() {
+    private lateinit var binding: PlacesBottomSheetBinding
 
     private lateinit var animation: Animation
-    private lateinit var binding: PlacesBottomSheetBinding
     private var poiName: String? = null
     private var poiDesc: String? = null
     private var poiAddress: String? = null
-    private val viewModel: MapViewModel by activityViewModels()
     override fun getTheme() = R.style.AppBottomSheetDialogTheme
+    private val viewModel: MapViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,8 +70,10 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
                     "desc: $poiDesc")
 
             binding.poiName.text = poiName
+            binding.poiAddressCollapsed.text = poiAddress
             binding.poiAddressExpanded.text = poiAddress
             binding.poiDescExpanded.text = poiDesc
+            binding.poiDescCollapsed.text = poiDesc
 
             behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {}
