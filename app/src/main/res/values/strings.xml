@@ -141,4 +141,5 @@
     <string name="enter_placename">Введите название</string>
     <string name="unknown_place">Неизвестное место</string>
     <string name="enter_name">Подтвердить имя</string>
+    <string name="end_route">Завершить маршрут</string>
 </resources>
