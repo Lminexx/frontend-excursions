@@ -294,7 +294,8 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val city = binding.cityName.text.toString()
                 val topic = translateTopic(binding.topic.selectedItem.toString())
                 val selected = viewModel.selectedImages.value ?: emptyList()
-                val existing = viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
+                val existing =
+                    viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
                 val images = selected + existing
                 if (viewModel.isExcursionCorrect(this, title, description, places, city, images)) {
                     viewModel.editExcursion(
@@ -329,7 +330,8 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val city = binding.cityName.text.toString()
                 val topic = translateTopic(binding.topic.selectedItem.toString())
                 val selected = viewModel.selectedImages.value ?: emptyList()
-                val existing = viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
+                val existing =
+                    viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
                 val images = selected + existing
                 if (viewModel.isExcursionCorrect(this, title, description, places, city, images)) {
                     viewModel.editExcursion(
