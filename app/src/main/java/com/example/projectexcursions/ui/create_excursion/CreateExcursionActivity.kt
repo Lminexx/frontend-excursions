@@ -191,6 +191,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         if (intent.getStringExtra("title") != null) {
             binding.buttonCreateExcursion.text = "Изменить"
             binding.excursionTitle.setText(intent.getStringExtra("title"))
+            println(binding.excursionTitle.toString())
             binding.excursionDescription.setText(intent.getStringExtra("description"))
             binding.topic.setSelection(
                 (binding.topic.adapter as ArrayAdapter<String>).getPosition(
@@ -278,8 +279,7 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.editExcursion.observe(this) { wannaEdit ->
             if (wannaEdit) {
-              lifecycleScope.launch {
-                    delay(2000)
+
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
@@ -307,15 +307,13 @@ class CreateExcursionActivity : AppCompatActivity() {
                         city,
                         intent.getLongExtra("id", -1)
                     )
-                }
+
                 }
             }
         }
 
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
-              lifecycleScope.launch {
-                    delay(2000)
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
@@ -334,18 +332,17 @@ class CreateExcursionActivity : AppCompatActivity() {
                     viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
                 val images = selected + existing
                 if (viewModel.isExcursionCorrect(this@CreateExcursionActivity, title, description, places, city, images)) {
-                    viewModel.editExcursion(
+                    viewModel.createExcursion(
                         this@CreateExcursionActivity,
                         title,
                         description,
                         chipTexts,
                         topic,
-                        city,
-                        intent.getLongExtra("id", -1)
+                        city
                     )
                 }
                 }
-            }
+
         }
 
         viewModel.routeLiveData.observe(this) { points ->

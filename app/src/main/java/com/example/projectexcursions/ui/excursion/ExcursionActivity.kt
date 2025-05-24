@@ -161,7 +161,6 @@ class ExcursionActivity : AppCompatActivity() {
 
         viewModel.excursion.observe(this) { excursion ->
             if (excursion != null) {
-                hideShimmer()
                 binding.excursionTitle.text = excursion.title
                 binding.excursionAuthor.text = excursion.user.username
                 binding.excursionDescription.text = excursion.description
@@ -223,6 +222,7 @@ class ExcursionActivity : AppCompatActivity() {
                     .show()
             }
             viewModel.isMine()
+            hideShimmer()
         }
 
         viewModel.favorite.observe(this) { favorite ->
@@ -325,6 +325,7 @@ class ExcursionActivity : AppCompatActivity() {
                 if (fromUser) {
                     viewModel.updateRating(rating)
                     binding.myExcursionRating.text = rating.toString()
+                    binding.myRatingText.visibility = View.VISIBLE
                 }
             }
         }
@@ -458,7 +459,7 @@ class ExcursionActivity : AppCompatActivity() {
                     R.id.editButton -> {
                         val intent = Intent(this@ExcursionActivity, CreateExcursionActivity::class.java).apply {
                             putExtra("id", viewModel.excursion.value?.id ?: -1)
-                            putExtra("title", binding.excursionTitle.toString())
+                            putExtra("title", binding.excursionTitle.text.toString())
                             putExtra("description", binding.excursionDescription.text.toString())
                             putExtra("topic", binding.topicValue.text.toString())
                             putExtra("city", binding.cityValue.text.toString())
