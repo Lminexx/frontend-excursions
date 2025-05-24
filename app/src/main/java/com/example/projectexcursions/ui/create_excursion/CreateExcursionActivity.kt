@@ -18,7 +18,6 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -33,9 +32,7 @@ import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
-import com.example.projectexcursions.utilies.Blur
 import com.example.projectexcursions.utilies.CustomMapView
-import com.example.projectexcursions.utilies.CustomProgressBar
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
@@ -79,6 +76,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var indicator: SpringDotsIndicator
     private val viewModel: CreateExcursionViewModel by viewModels()
     private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
+    private var photoPermission = false
 
     private val REQUEST_CODE_PERMISSION = 1003
 
@@ -94,6 +92,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         routeLayer = root.addCollection()
 
         checkPermissions()
+        checkPhotoPermissions()
         initData()
         initCallback()
         subscribe()
@@ -192,13 +191,13 @@ class CreateExcursionActivity : AppCompatActivity() {
                 it.isClickable = false
                 Handler(Looper.getMainLooper()).postDelayed({
                     it.isClickable = true
-                }, 5000)
+                }, 300)
                 viewModel.clickCreateExcursion()
             } else {
                 it.isClickable = false
                 Handler(Looper.getMainLooper()).postDelayed({
                     it.isClickable = true
-                }, 5000)
+                }, 300)
                 viewModel.clickEditExcursion()
             }
         }
@@ -206,7 +205,10 @@ class CreateExcursionActivity : AppCompatActivity() {
         binding.excursionDescription.movementMethod = ScrollingMovementMethod()
 
         binding.buttonSelectImage.setOnClickListener {
-            checkPermissionsAndProceed()
+            if (photoPermission)
+                openImagePicker()
+            else
+                checkPhotoPermissions()
         }
 
         map.addTapListener(geoObjectTapListener())
@@ -407,7 +409,7 @@ class CreateExcursionActivity : AppCompatActivity() {
             }
         }
 
-    private fun checkPermissionsAndProceed() {
+    private fun checkPhotoPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
                 != PackageManager.PERMISSION_GRANTED
@@ -417,7 +419,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.READ_MEDIA_IMAGES), REQUEST_CODE_PERMISSION
                 )
             } else {
-                openImagePicker()
+                photoPermission = true
             }
         } else {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -428,7 +430,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSION
                 )
             } else {
-                openImagePicker()
+                photoPermission = true
             }
         }
     }
@@ -488,19 +490,6 @@ class CreateExcursionActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         }
         pickImages.launch(intent)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openImagePicker()
-            } else {
-                Toast.makeText(this, "Разрешение не предоставлено", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     private fun setLocation(place: PlaceItem) {
@@ -733,21 +722,9 @@ class CreateExcursionActivity : AppCompatActivity() {
                 viewModel.getUserPosition()
             }, 750)
         } else {
-            AlertDialog.Builder(this)
-                .setTitle("Нет разрешений")
-                .setMessage("Выдать разрешения для карты? Это необходимо для более удобного пользования")
-                .setPositiveButton("Да") { dialog, _ ->
-                    ActivityCompat.requestPermissions(this,
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                        REQUEST_CODE_PERMISSION)
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Нет >:|") { _, _ ->
-                    finish()
-                }
-                .setCancelable(false)
-                .show()
-            Log.d("Permissions Denied", "no(((")
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                REQUEST_CODE_PERMISSION)
         }
     }
 }
