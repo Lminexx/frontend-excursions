@@ -239,6 +239,8 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.photos.observe(this) { photos ->
+            viewPager.visibility = View.VISIBLE
+            indicator.visibility = View.VISIBLE
             adapter.updatePhotos(photos)
         }
 
@@ -521,8 +523,9 @@ class ExcursionActivity : AppCompatActivity() {
         binding.places.visibility = View.VISIBLE
         binding.detailedInfoHeader.visibility = View.VISIBLE
         binding.ratingContainer.visibility = View.VISIBLE
-        viewPager.visibility = View.VISIBLE
-        indicator.visibility = View.VISIBLE
+        binding.deleteButton.visibility = View.VISIBLE
+        binding.editButton.visibility = View.VISIBLE
+
 
         val showMenuBtn = isMine
         Log.d("DBG", "menuButton should be visible? $showMenuBtn")
