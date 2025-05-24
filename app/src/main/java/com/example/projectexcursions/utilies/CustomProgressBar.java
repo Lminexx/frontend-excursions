@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +55,7 @@ public final class CustomProgressBar {
 
     @SuppressLint("SetTextI18n")
     public void setProgressDialog(Context context, String message) {
+        Log.d("ProgressDialog", "start");
         int padding = 30;
         LinearLayout ll = new LinearLayout(context);
         ll.setOrientation(LinearLayout.HORIZONTAL);
