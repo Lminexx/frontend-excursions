@@ -523,8 +523,6 @@ class ExcursionActivity : AppCompatActivity() {
         binding.places.visibility = View.VISIBLE
         binding.detailedInfoHeader.visibility = View.VISIBLE
         binding.ratingContainer.visibility = View.VISIBLE
-        binding.deleteButton.visibility = View.VISIBLE
-        binding.editButton.visibility = View.VISIBLE
 
 
         val showMenuBtn = isMine

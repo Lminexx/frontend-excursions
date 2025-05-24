@@ -297,7 +297,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val existing =
                     viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
                 val images = selected + existing
-                if (viewModel.isExcursionCorrect(this, title, description, places, city, images)) {
+                if (viewModel.isExcursionCorrect(this@CreateExcursionActivity, title, description, places, city, images)) {
                     viewModel.editExcursion(
                         this@CreateExcursionActivity,
                         title,
@@ -313,7 +313,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.createExcursion.observe(this) { wannaCreate ->
-            if (wannaEdit) {
+            if (wannaCreate) {
               lifecycleScope.launch {
                     delay(2000)
                 val title = binding.excursionTitle.text.toString().trim()
@@ -333,7 +333,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val existing =
                     viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
                 val images = selected + existing
-                if (viewModel.isExcursionCorrect(this, title, description, places, city, images)) {
+                if (viewModel.isExcursionCorrect(this@CreateExcursionActivity, title, description, places, city, images)) {
                     viewModel.editExcursion(
                         this@CreateExcursionActivity,
                         title,
