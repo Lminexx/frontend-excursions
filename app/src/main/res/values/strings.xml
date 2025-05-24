@@ -67,7 +67,8 @@
     <string name="make_path">Построить маршрут</string>
     <string name="smechno">Жена отправляет мужа-программиста в магазин: - Купи батон хлеба, если будут яйца - возьми десяток. Муж возвращается из магазина с десятью батонами. - Ты зачем столько хлеба купил? - Так ведь яйца были...</string>
     <string name="add_place">Добавить место</string>
-    <string name="delete_place">delete_place</string>
+    <string name="delete_place">Удалить точку</string>
+    <string name="delete_photo">Удалить фото</string>
     <string name="empty_route">Маршрут пуст</string>
     <string name="empty_photos">Добавьте фото</string>
     <string name="rating_description">Рейтинг экскурсии</string>
@@ -85,7 +86,7 @@
     <string name="empty_city_name">Название города не заполненно</string>
     <string name="topic_string">Выберите тематику экскурсии</string>
     <string-array name="topics_filter">
-        <item></item>
+        <item>Все тематики</item>
         <item>Другая</item>
         <item>Пешая</item>
         <item>Путешествие</item>
@@ -135,4 +136,5 @@
     <string name="status">Статус</string>
     <string name="wait">Подождите</string>
     <string name="no_avatar">Выберите аватар</string>
+    <string name="empty_images">Фото не выбраны</string>
 </resources>

@@ -134,4 +134,12 @@ interface ApiService {
         @Query("excursionId") excursionId: Long,
         @Body places: List<PlaceItem>
     )
+
+    @Multipart
+    @POST("excursion/update/photos")
+    suspend fun deletePhotos(
+        @Part("excursionId") excursionId: RequestBody,
+        @Part files: List<MultipartBody.Part>,
+        @Part("forRemoval") forRemoval: List<Long>
+    )
 }

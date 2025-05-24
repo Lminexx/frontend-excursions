@@ -45,10 +45,12 @@ class ExcursionAdapter(
                     binding.ratingContainer.visibility = View.VISIBLE
                     binding.rating.text = excursionsList.rating.toString()
                 }
+
                 ListTypes.MODERATING -> {
                     binding.statusContainer.visibility = View.GONE
                     binding.ratingContainer.visibility = View.GONE
                 }
+
                 ListTypes.MINE -> {
                     binding.statusContainer.visibility = View.VISIBLE
                     when (excursionsList.moderationStatus) {
@@ -58,6 +60,7 @@ class ExcursionAdapter(
                             binding.status.setImageResource(R.drawable.approved)
                             binding.statusDescription.text = "Принята"
                         }
+
                         "PENDING" -> {
                             binding.status.setImageResource(R.drawable.pending)
                             binding.statusDescription.text = "На рассмотрении"
@@ -74,11 +77,18 @@ class ExcursionAdapter(
                 .error(R.drawable.ic_app_v3)
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
-                        e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
                     ) = false
 
                     override fun onResourceReady(
-                        resource: Drawable, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean
+                        resource: Drawable,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
                     ) = false
                 })
                 .into(binding.userAvatar)
@@ -91,14 +101,23 @@ class ExcursionAdapter(
                 .error(R.drawable.ic_app_v3)
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
-                        e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
                     ) = false
 
                     override fun onResourceReady(
-                        resource: Drawable, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean
+                        resource: Drawable,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
                     ) = false
                 })
                 .into(binding.photo)
+
+
 
             binding.root.setOnClickListener {
                 onExcursionClickListener?.onExcursionClick(excursionsList)

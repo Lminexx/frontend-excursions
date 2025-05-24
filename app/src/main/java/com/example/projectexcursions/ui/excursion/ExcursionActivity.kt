@@ -233,6 +233,8 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.photos.observe(this) { photos ->
+            viewPager.visibility = View.VISIBLE
+            indicator.visibility = View.VISIBLE
             adapter.updatePhotos(photos)
         }
 
@@ -506,8 +508,6 @@ class ExcursionActivity : AppCompatActivity() {
         binding.ratingContainer.visibility = View.VISIBLE
         binding.deleteButton.visibility = View.VISIBLE
         binding.editButton.visibility = View.VISIBLE
-        viewPager.visibility = View.VISIBLE
-        indicator.visibility = View.VISIBLE
 
         if (!isAuth) {
             binding.favoriteButton.visibility = View.GONE

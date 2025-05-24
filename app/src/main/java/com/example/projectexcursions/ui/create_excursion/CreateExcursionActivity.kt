@@ -148,9 +148,32 @@ class CreateExcursionActivity : AppCompatActivity() {
         )
 
         adapter = PhotoAdapter(this, listOf())
+        adapter.showDeleteButton(true)
+        adapter.onDeleteClick(onDeleteClick = { position ->
+            val newList = adapter.getPhotoList().toMutableList()
+            newList.removeAt(position)
+            if (newList.isEmpty()) {
+                binding.viewPagerImages.visibility = View.GONE
+                binding.dotsIndicator.visibility = View.GONE
+            }
+            viewModel.images.value?.let {
+                if (position < it.size) {
+                    val forRemoveId = viewModel.images.value?.get(position)?.id ?: -1
+                    viewModel.addForRemoval(forRemoveId)
+                    viewModel.updateImages(forRemoveId)
+                }
+            }
+
+            viewModel.images.value?.let {
+                if (position >= it.size) {
+                    viewModel.updateSelectedImages(newList.drop(it.size))
+                }
+            }
+        })
 
         viewPager = binding.viewPagerImages
         viewPager.adapter = adapter
+
 
         indicator = binding.dotsIndicator
         indicator.setViewPager2(viewPager)
@@ -173,9 +196,7 @@ class CreateExcursionActivity : AppCompatActivity() {
             for (i in 1..intent.getIntExtra("tag_count", 0)) {
                 addNewChip(intent.getStringExtra("tag$i").toString())
             }
-            for (i in 1..intent.getIntExtra("photo_count", 0)) {
-                viewModel.addSelectedImages(intent.getStringExtra("photo$i")?.toUri())
-            }
+            viewModel.loadPhotos(intent.getLongExtra("id", -1))
             viewModel.loadPlaces(intent.getLongExtra("id", -1))
         }
     }
@@ -252,8 +273,6 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.editExcursion.observe(this) { wannaEdit ->
             if (wannaEdit) {
-                /*blur()
-                progressBar.show(this)*/
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
@@ -267,7 +286,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                 }
                 val city = binding.cityName.text.toString()
                 val topic = translateTopic(binding.topic.selectedItem.toString())
-                if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
+                val selected = viewModel.selectedImages.value ?: emptyList()
+                val existing = viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
+                val images = selected + existing
+                if (viewModel.isExcursionCorrect(this, title, description, places, city, images)) {
                     viewModel.editExcursion(
                         this@CreateExcursionActivity,
                         title,
@@ -288,8 +310,6 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
-                /*blur()
-                progressBar.show(this)*/
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
@@ -303,7 +323,10 @@ class CreateExcursionActivity : AppCompatActivity() {
                 }
                 val city = binding.cityName.text.toString()
                 val topic = translateTopic(binding.topic.selectedItem.toString())
-                if (viewModel.isExcursionCorrect(this, title, description, places, city)) {
+                val selected = viewModel.selectedImages.value ?: emptyList()
+                val existing = viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
+                val images = selected + existing
+                if (viewModel.isExcursionCorrect(this, title, description, places, city, images)) {
                     viewModel.createExcursion(
                         this@CreateExcursionActivity,
                         title,
@@ -335,9 +358,10 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.selectedImages.observe(this) { selectedImages ->
-            if (selectedImages.isNotEmpty()) {
+            if (selectedImages.isNotEmpty() || viewModel.images.value?.isNotEmpty() == true) {
                 showImages()
-                adapter.updatePhotos(selectedImages)
+                adapter.updatePhotos((viewModel.images.value?.map { photo -> photo.url.toUri() }
+                    ?: emptyList()) + selectedImages)
             }
         }
 
@@ -358,7 +382,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     placesAdapter.updatePlaces(placeItems)
                     viewModel.getRoute()
-                    for (place in placeItems){
+                    for (place in placeItems) {
                         setLocation(place)
                     }
                 }
@@ -371,6 +395,14 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.message.observe(this) { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+
+
+        viewModel.images.observe(this) { photos ->
+            if (photos.isNotEmpty() || viewModel.selectedImages.value?.isNotEmpty() == true) {
+                showImages()
+                adapter.updatePhotos(photos.map { photo -> photo.url.toUri() })
+            }
         }
     }
 
