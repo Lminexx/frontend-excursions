@@ -33,6 +33,7 @@ import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.utilies.CustomMapView
+import com.example.projectexcursions.utilies.CustomProgressBar
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
@@ -74,6 +75,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var routeLayer: MapObjectCollection
     private lateinit var viewPager: ViewPager2
     private lateinit var indicator: SpringDotsIndicator
+    private val progressBar = CustomProgressBar()
     private val viewModel: CreateExcursionViewModel by viewModels()
     private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
     private var photoPermission = false
@@ -259,8 +261,9 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.editExcursion.observe(this) { wannaEdit ->
             if (wannaEdit) {
+                progressBar.setProgressDialog(this, "Редактируем...")
                 lifecycleScope.launch {
-                    delay(2000)
+                    delay(500)
                     val title = binding.excursionTitle.text.toString().trim()
                     val description = binding.excursionDescription.text.toString().trim()
                     val places = viewModel.placeItems.value ?: emptyList()
@@ -295,13 +298,14 @@ class CreateExcursionActivity : AppCompatActivity() {
                         )
                     }
                 }
+                progressBar.dialog.dismiss()
             }
         }
 
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
+                progressBar.setProgressDialog(this, "Создаём...")
                 lifecycleScope.launch {
-                    delay(2000)
                     val title = binding.excursionTitle.text.toString().trim()
                     val description = binding.excursionDescription.text.toString().trim()
                     val places = viewModel.placeItems.value ?: emptyList()
@@ -335,6 +339,7 @@ class CreateExcursionActivity : AppCompatActivity() {
                         )
                     }
                 }
+                progressBar.dialog.dismiss()
             }
         }
 
