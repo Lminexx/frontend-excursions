@@ -59,7 +59,6 @@ interface ExcursionRepository {
 
     suspend fun loadPhotos(id: Long): Response<List<PhotoResponse>>
 
-
     suspend fun uploadRating(id:Long, rating: Float): Response<RatingResponse>
 
     suspend fun changeExcursionStatus(id: Long, status: String)
@@ -67,4 +66,6 @@ interface ExcursionRepository {
     suspend fun loadModeratingExcursions(offset: Int, limit: Int, status: String): Response<ModeratingExcursionsResponse>
 
     suspend fun editExcursion(id: Long, editingExcursion: CreatingExcursion)
+
+    suspend fun deletePhotos(id: RequestBody, photos: List<MultipartBody.Part>, forRemoval: List<Long>)
 }

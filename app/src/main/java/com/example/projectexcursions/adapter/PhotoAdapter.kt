@@ -21,6 +21,9 @@ import com.example.projectexcursions.utilies.FullScreenPhotoActivity
 class PhotoAdapter(private val context: Context, private var photoList: List<Uri>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private var showDeleteButton = false
+    private lateinit var onDeleteClick: ((Int) -> Unit)
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemPhotoBinding.inflate(LayoutInflater.from(context), parent, false)
         return PhotoViewHolder(binding)
@@ -29,11 +32,15 @@ class PhotoAdapter(private val context: Context, private var photoList: List<Uri
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val imageUri = photoList[position]
         val photoHolder = holder as PhotoViewHolder
-        photoHolder.bind(imageUri)
+        photoHolder.bind(imageUri, showDeleteButton)
 
         holder.itemView.setOnClickListener {
             val intent = FullScreenPhotoActivity.createIntent(context, photoList, position)
             context.startActivity(intent)
+        }
+
+        photoHolder.binding.deletePhoto.setOnClickListener {
+            onDeleteClick.invoke(position)
         }
     }
 
@@ -47,9 +54,22 @@ class PhotoAdapter(private val context: Context, private var photoList: List<Uri
         notifyDataSetChanged()
     }
 
-    inner class PhotoViewHolder(private val binding: ItemPhotoBinding) :
+    fun showDeleteButton(showButton: Boolean) {
+        showDeleteButton = showButton
+    }
+
+    fun onDeleteClick(onDeleteClick: ((Int) -> Unit)){
+        this.onDeleteClick=onDeleteClick
+    }
+
+    fun getPhotoList():List<Uri>{
+        return photoList
+    }
+
+    inner class PhotoViewHolder(val binding: ItemPhotoBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(imageUri: Uri) {
+        fun bind(imageUri: Uri, showDelete: Boolean) {
+            binding.deletePhoto.visibility = if (showDelete) ViewGroup.VISIBLE else ViewGroup.GONE
             Glide.with(binding.imageView.context)
                 .load(imageUri)
                 .transition(DrawableTransitionOptions.withCrossFade())

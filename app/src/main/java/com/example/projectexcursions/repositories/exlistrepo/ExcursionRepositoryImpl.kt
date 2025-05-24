@@ -150,5 +150,7 @@ class ExcursionRepositoryImpl @Inject constructor(
         return apiService.editExcursion(id, editingExcursion)
     }
 
-
+    override suspend fun deletePhotos(id: RequestBody, photos: List<MultipartBody.Part>, forRemoval: List<Long>){
+        return apiService.deletePhotos(id, photos, forRemoval)
+    }
 }
