@@ -18,6 +18,7 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -59,6 +60,7 @@ import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -77,7 +79,6 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var indicator: SpringDotsIndicator
     private val viewModel: CreateExcursionViewModel by viewModels()
     private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
-    private val progressBar = CustomProgressBar()
 
     private val REQUEST_CODE_PERMISSION = 1003
 
@@ -92,6 +93,7 @@ class CreateExcursionActivity : AppCompatActivity() {
         pinsLayer = root.addCollection()
         routeLayer = root.addCollection()
 
+        checkPermissions()
         initData()
         initCallback()
         subscribe()
@@ -142,6 +144,9 @@ class CreateExcursionActivity : AppCompatActivity() {
                 placemarksMap.remove(placeId)
                 Log.d("placemarksMap", "Содержит ключи: ${placemarksMap.keys}")
                 Log.d("onDeleteClick", placeId)
+            },
+            onApproveClick = { placeId, newName ->
+                viewModel.updatePlaceName(placeId, newName)
             },
             isCreating = true,
             places = emptyList()
@@ -273,6 +278,8 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.editExcursion.observe(this) { wannaEdit ->
             if (wannaEdit) {
+              lifecycleScope.launch {
+                    delay(2000)
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
@@ -299,17 +306,15 @@ class CreateExcursionActivity : AppCompatActivity() {
                         city,
                         intent.getLongExtra("id", -1)
                     )
-                    /*progressBar.dialog.dismiss()
-                    unblur()*/
-                } else {
-                    /*progressBar.dialog.dismiss()
-                    unblur()*/
+                }
                 }
             }
         }
 
         viewModel.createExcursion.observe(this) { wannaCreate ->
-            if (wannaCreate) {
+            if (wannaEdit) {
+              lifecycleScope.launch {
+                    delay(2000)
                 val title = binding.excursionTitle.text.toString().trim()
                 val description = binding.excursionDescription.text.toString().trim()
                 val places = viewModel.placeItems.value ?: emptyList()
@@ -327,19 +332,16 @@ class CreateExcursionActivity : AppCompatActivity() {
                 val existing = viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
                 val images = selected + existing
                 if (viewModel.isExcursionCorrect(this, title, description, places, city, images)) {
-                    viewModel.createExcursion(
+                    viewModel.editExcursion(
                         this@CreateExcursionActivity,
                         title,
                         description,
                         chipTexts,
                         topic,
-                        city
+                        city,
+                        intent.getLongExtra("id", -1)
                     )
-                    /*progressBar.dialog.dismiss()
-                    unblur()*/
-                } else {
-                    /*progressBar.dialog.dismiss()
-                    unblur()*/
+                }
                 }
             }
         }
@@ -738,12 +740,34 @@ class CreateExcursionActivity : AppCompatActivity() {
         binding.dotsIndicator.visibility = View.VISIBLE
     }
 
-    fun blur() {
-        Blur().blur(this, 10, 2, binding.parentLayout)
-    }
-
-    fun unblur() {
-        Blur().unblur(binding.parentLayout)
+    private fun checkPermissions() {
+        Log.d("checkPermissions","ACCESS_FINE_LOCATION = ${Manifest.permission.ACCESS_FINE_LOCATION}, \n" +
+                "ACCESS_COARSE_LOCATION = ${Manifest.permission.ACCESS_COARSE_LOCATION}")
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Permissions Granted", "YEES")
+            Handler(Looper.getMainLooper()).postDelayed({
+                viewModel.getUserPosition()
+            }, 750)
+        } else {
+            AlertDialog.Builder(this)
+                .setTitle("Нет разрешений")
+                .setMessage("Выдать разрешения для карты? Это необходимо для более удобного пользования")
+                .setPositiveButton("Да") { dialog, _ ->
+                    ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                        REQUEST_CODE_PERMISSION)
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Нет >:|") { _, _ ->
+                    finish()
+                }
+                .setCancelable(false)
+                .show()
+            Log.d("Permissions Denied", "no(((")
+        }
     }
 }
 //TODO сделать получение списка фото места

@@ -6,7 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.projectexcursions.R
@@ -15,18 +17,20 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import androidx.core.view.isVisible
 
-private const val COLLAPSED_HEIGHT = 228
+private const val COLLAPSED_HEIGHT = 242
 
 @AndroidEntryPoint
 class PoiBottomFragment : BottomSheetDialogFragment() {
     private lateinit var binding: PlacesBottomSheetBinding
 
-    private val viewModel: MapViewModel by activityViewModels()
-    override fun getTheme() = R.style.AppBottomSheetDialogTheme
+    private lateinit var animation: Animation
     private var poiName: String? = null
-    private var poiAddress: String? = null
     private var poiDesc: String? = null
+    private var poiAddress: String? = null
+    override fun getTheme() = R.style.AppBottomSheetDialogTheme
+    private val viewModel: MapViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,8 +38,10 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = PlacesBottomSheetBinding.inflate(inflater, container, false)
+        animation = AnimationUtils.loadAnimation(requireContext(), R.anim.appear_pop_up)
 
         initCallback()
+        subscribe()
 
         return binding.root
     }
@@ -83,7 +89,7 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
                                 layoutExpanded.visibility = View.VISIBLE
                             }
 
-                            if (slideOffset < 0.5 && binding.layoutExpanded.visibility == View.VISIBLE) {
+                            if (slideOffset < 0.5 && binding.layoutExpanded.isVisible) {
                                 layoutCollapsed.visibility = View.VISIBLE
                                 layoutExpanded.visibility = View.INVISIBLE
                             }
@@ -97,18 +103,39 @@ class PoiBottomFragment : BottomSheetDialogFragment() {
     private fun initCallback() {
         binding.makePath.setOnClickListener {
             lifecycleScope.launch {
-                if (viewModel.routeFinished.value == true) {
-                    Log.d("routeFinished", viewModel.routeFinished.value.toString())
-                    viewModel.getRoute()
-                } else {
-                    val dialog = AlertDialog.Builder(requireContext())
-                        .setMessage("Завершите текущий маршрут")
-                        .setPositiveButton("Завершить") { dialog, _ ->
-                            dialog.dismiss()
-                            viewModel.endRoute()
-                        }
-                        .create()
-                    dialog.show()
+                Log.d("routeFinished", viewModel.routeFinished.value.toString())
+                viewModel.getRoute()
+            }
+        }
+
+        binding.closePath.setOnClickListener {
+            val dialog = AlertDialog.Builder(requireContext())
+                .setMessage("Завершить текущий маршрут?")
+                .setPositiveButton("Да") { dialog, _ ->
+                    dialog.dismiss()
+                    viewModel.endRoute()
+                }
+                .setNegativeButton("Нет") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+            dialog.show()
+        }
+    }
+
+    fun subscribe() {
+        viewModel.routeFinished.observe(viewLifecycleOwner) { finished ->
+            if (finished) {
+                if (binding.makePath.isGone) {
+                    binding.closePath.visibility = View.GONE
+                    binding.makePath.visibility = View.VISIBLE
+                    binding.makePath.startAnimation(animation)
+                }
+            } else {
+                if (binding.closePath.isGone) {
+                    binding.makePath.visibility = View.GONE
+                    binding.closePath.visibility = View.VISIBLE
+                    binding.closePath.startAnimation(animation)
                 }
             }
         }

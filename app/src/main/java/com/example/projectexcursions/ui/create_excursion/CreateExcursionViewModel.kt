@@ -25,6 +25,7 @@ import com.yandex.mapkit.location.LocationListener
 import com.yandex.mapkit.location.LocationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -263,14 +264,8 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun isExcursionCorrect(
-        context: Context,
-        title: String,
-        description: String,
-        places: List<PlaceItem>,
-        city: String,
-        images: List<Uri>
-    ): Boolean {
+
+    fun isExcursionCorrect(context: Context, title: String, description: String, places: List<PlaceItem>, city: String, photos: List<Uri>): Boolean {
         when {
             title.isBlank() -> {
                 _message.value = context.getString(R.string.empty_title)
@@ -292,8 +287,8 @@ class CreateExcursionViewModel @Inject constructor(
                 return false
             }
 
-            images.isEmpty() ->{
-                _message.value=context.getString(R.string.empty_images)
+            photos.isEmpty() -> {
+                _message.value = context.getString(R.string.empty_photos)
                 return false
             }
 
@@ -306,7 +301,7 @@ class CreateExcursionViewModel @Inject constructor(
             val places = placeItems.value ?: return
             if (places.size < 2) {
                 _routeLiveData.postValue(emptyList())
-            } else {
+            } else if (places.size <= 12) {
                 val fullRoute = mutableListOf<Point>()
                 withContext(Dispatchers.IO) {
                     for (i in 0 until places.lastIndex) {
@@ -320,6 +315,8 @@ class CreateExcursionViewModel @Inject constructor(
                     }
                 }
                 _routeLiveData.postValue(fullRoute)
+            } else {
+                _message.value = "Выберите менее 12 мест"
             }
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
@@ -426,7 +423,17 @@ class CreateExcursionViewModel @Inject constructor(
         }
     }
 
-    fun getId(i: Int): String {
+    fun updatePlaceName(placeId: String, newName: String) {
+        _placeItems.value = _placeItems.value
+            ?.map { item ->
+                if (item.id == placeId)
+                    item.copy(name = newName)
+                else
+                    item
+            }
+    }
+
+    fun getId(i:Int): String {
         return geoRepository.getRandomId(i)
     }
 

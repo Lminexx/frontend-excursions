@@ -71,7 +71,6 @@ class ExcursionAdapter(
 
             Glide.with(binding.userAvatar.context)
                 .load(excursionsList.userUrl)
-                .transition(DrawableTransitionOptions.withCrossFade())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.color.lighter_blue)
                 .error(R.drawable.ic_app_v3)

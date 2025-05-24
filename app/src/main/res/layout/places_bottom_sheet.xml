@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/parent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:fillViewport="true"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
@@ -90,9 +90,24 @@
                     android:layout_height="60dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    android:background="@drawable/border_pattern_1"
+                    android:background="@drawable/border_pattern_8"
                     android:textColor="@color/blue"
+                    android:elevation="4dp"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/make_path"/>
+
+                <Button
+                    android:id="@+id/close_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/border_pattern_3"
+                    android:textColor="@color/white"
+                    android:visibility="gone"
+                    android:elevation="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/end_route"/>
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

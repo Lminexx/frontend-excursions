@@ -65,6 +65,12 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         binding.shimmerLayout.stopShimmer()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        adapter.refresh()
+    }
+
     private fun initData() {
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
@@ -206,7 +212,6 @@ class ExListFragment : Fragment(R.layout.excursions_list) {
         binding.shimmerLayout.visibility = View.VISIBLE
         binding.shimmerLayout.startShimmer()
         binding.recyclerView.visibility = View.GONE
-        binding.filterButton.visibility = View.GONE
     }
 
     private fun hideShimmer() {

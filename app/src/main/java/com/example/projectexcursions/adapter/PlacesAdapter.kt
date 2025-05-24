@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectexcursions.databinding.ItemPlacesBinding
@@ -15,9 +16,10 @@ class PlacesAdapter(
     private val context: Context,
     private val onItemClick: (PlaceItem) -> Unit,
     private val onDeleteClick: (String) -> Unit,
-    private val isCreating: Boolean,
+    private val onApproveClick: (placeId: String, newName: String) -> Unit,
+    private val isCreating: Boolean = false,
     private var places: List<PlaceItem>
-) : RecyclerView.Adapter<PlacesAdapter.PlacesViewHolder>() {
+): RecyclerView.Adapter<PlacesAdapter.PlacesViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlacesViewHolder {
         val binding = ItemPlacesBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -30,15 +32,49 @@ class PlacesAdapter(
 
         holder.itemView.setOnClickListener { onItemClick(placeItem) }
 
-        if (placeItem.name == null)
-            holder.binding.placeName.text = "Имя потеряно"
-        else
-            holder.binding.placeName.text = placeItem.name
-
         if (isCreating) {
-            holder.binding.deletePlace.setOnClickListener{ onDeleteClick(placeItem.id) }
+            holder.binding.deletePlace.visibility = View.VISIBLE
+
+            holder.binding.deletePlace.setOnClickListener {
+                onDeleteClick(placeItem.id)
+            }
+            holder.binding.approveName.setOnClickListener {
+                val entered = holder.binding.enterName.text.toString().trim()
+                if (entered.isNotEmpty()) {
+                    onApproveClick(placeItem.id, entered)
+
+                    holder.binding.placeName.text = entered
+                    holder.binding.placeName.visibility = View.VISIBLE
+                    holder.binding.enterName.visibility = View.GONE
+                    holder.binding.approveName.visibility = View.GONE
+                } else {
+                    Toast.makeText(
+                        holder.itemView.context,
+                        "Введите имя", Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            val name = placeItem.name
+            val isUnknown = name == null || name == "Неизвестное место"
+
+            if (isUnknown) {
+                holder.binding.placeName.visibility = View.GONE
+                holder.binding.enterName.visibility = View.VISIBLE
+                holder.binding.approveName.visibility = View.VISIBLE
+            } else {
+                holder.binding.placeName.visibility = View.VISIBLE
+                holder.binding.placeName.text = name
+                holder.binding.enterName.visibility = View.GONE
+            }
+
         } else {
             holder.binding.deletePlace.visibility = View.GONE
+            holder.binding.enterName.visibility = View.GONE
+
+            val displayName = placeItem.name ?: "Имя потеряно"
+            holder.binding.placeName.visibility = View.VISIBLE
+            holder.binding.placeName.text = displayName
         }
     }
 
@@ -55,15 +91,6 @@ class PlacesAdapter(
 
     inner class PlacesViewHolder(val binding: ItemPlacesBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
-        private val photoAdapter = PhotoAdapter(context, emptyList())
-
-        init {
-            binding.placePhoto.apply {
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-                adapter = photoAdapter
-            }
-        }
 
         fun bind(placeItem: PlaceItem) {
             binding.placeName.text = placeItem.name

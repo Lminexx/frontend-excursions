@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -9,9 +12,23 @@ plugins {
     id("com.google.firebase.crashlytics")
 }
 
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+
+val keystoreProperties = Properties()
+
+keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+
 android {
     namespace = "com.example.projectexcursions"
     compileSdk = 34
+    signingConfigs {
+        create("config") {
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
     defaultConfig {
         applicationId = "com.example.projectexcursions"
         minSdk = 28
@@ -50,6 +67,8 @@ buildTypes {
             isMinifyEnabled = true
             isShrinkResources = true
             isDebuggable = false
+            enableAndroidTestCoverage = false
+            signingConfig = signingConfigs.getByName("config")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -81,10 +100,19 @@ buildTypes {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            excludes += "dexopt/*"
+            excludes += "assets/dexopt/**"
+            excludes += "baselineProfiles/**"
+            excludes += "**/*.prof"
+            excludes += "**/*.profm"
         }
     }
 
     buildToolsVersion = "34.0.0"
+}
+
+configurations.all {
+    exclude(group = "androidx.profileinstaller", module = "profileinstaller")
 }
 
 dependencies {

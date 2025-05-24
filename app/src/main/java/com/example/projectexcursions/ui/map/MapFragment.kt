@@ -23,7 +23,6 @@ import com.example.projectexcursions.adapter.SearchResultsAdapter
 import com.example.projectexcursions.databinding.FragmentMapBinding
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.repositories.pointrepo.PointRepositoryImpl
-import com.example.projectexcursions.ui.map.PoiBottomFragment
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -43,9 +42,11 @@ import com.yandex.mapkit.search.SearchManagerType
 import com.yandex.mapkit.search.SearchOptions
 import com.yandex.mapkit.search.SearchType
 import com.yandex.mapkit.search.Session
+import com.yandex.mapkit.search.ToponymObjectMetadata
 import com.yandex.runtime.Error
 import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.jvm.java
 
 @AndroidEntryPoint
 
@@ -146,7 +147,6 @@ class MapFragment: Fragment(R.layout.fragment_map) {
                 search(newText)
                 return true
             }
-
         })
 
         binding.searchView.setOnCloseListener {
@@ -298,21 +298,29 @@ class MapFragment: Fragment(R.layout.fragment_map) {
     }
 
     private fun search(query: String?) {
-        val searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
-        val searchOptions = SearchOptions().apply {
+        if (query.isNullOrBlank()) return
+
+        val searchManager = SearchFactory
+            .getInstance()
+            .createSearchManager(SearchManagerType.ONLINE)
+
+        val options = SearchOptions().apply {
             searchTypes = SearchType.BIZ.value
             resultPageSize = 10
         }
 
-        val searchSessionListener = object : Session.SearchListener {
+        val listener = object : Session.SearchListener {
             override fun onSearchResponse(response: Response) {
-                val searchResults = response.collection.children.mapNotNull { result ->
-                    val point = result.obj?.geometry?.firstOrNull()?.point
-                    val name = result.obj?.name ?: return@mapNotNull null
-                    val id = viewModel.getId()
-                    SearchResult(id, name, point!!)
+                val results = response.collection.children.mapNotNull { item ->
+                    val obj = item.obj ?: return@mapNotNull null
+                    val point = obj.geometry.firstOrNull()?.point ?: return@mapNotNull null
+                    SearchResult(
+                        id = viewModel.getId(),
+                        name = obj.name.toString(),
+                        point = point
+                    )
                 }
-                viewModel.updateSearchResults(searchResults)
+                viewModel.updateSearchResults(results)
             }
 
             override fun onSearchError(error: Error) {
@@ -320,71 +328,75 @@ class MapFragment: Fragment(R.layout.fragment_map) {
             }
         }
 
-        if (!query.isNullOrEmpty()) {
-            val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
-            searchManager.submit(query, visibleRegion, searchOptions, searchSessionListener)
-        }
+        val visibleRegion = VisibleRegionUtils.toPolygon(map.visibleRegion)
+        searchManager.submit(query, visibleRegion, options, listener)
     }
 
     private val geoObjectTapListener = GeoObjectTapListener { event ->
-        if (pointRepository.getCachedStart()!=null && pointRepository.getCachedEnd()!=null)
+        if (pointRepository.getCachedStart() != null && pointRepository.getCachedEnd() != null) {
             pointRepository.deleteCachedPoints()
-        val geoObject = event.geoObject
-        Log.d("GeoObject", "Тап по объекту: ${geoObject.name ?: "Без имени"}")
-        val point = geoObject.geometry.firstOrNull()?.point
-
-        if (point != null) {
-            map.move(
-                CameraPosition(point, 17.0f, 0.0f, 0.0f),
-                Animation(Animation.Type.SMOOTH, 1f),
-                null
-            )
         }
 
-        var address = ""
+        val geoObject = event.geoObject
+        val point = geoObject.geometry.firstOrNull()?.point
+        if (point == null) {
+            Toast.makeText(requireContext(), "Не удалось определить координаты объекта", Toast.LENGTH_SHORT).show()
+            return@GeoObjectTapListener true
+        }
+
+        map.move(
+            CameraPosition(point, 17f, 0f, 0f),
+            Animation(Animation.Type.SMOOTH, 1f),
+            null
+        )
+        Log.d("GeoObject", "Тап по объекту: ${geoObject.name.orEmpty()}")
+
+        geoObject.metadataContainer
+            .getItem(GeoObjectSelectionMetadata::class.java)
+            ?.also { map.selectGeoObject(it) }
+            ?: Log.d("GeoObject", "Метаданные для подсветки отсутствуют")
+
         val name = geoObject.name ?: "Неизвестное место"
         val description = geoObject.descriptionText ?: "Нет описания"
-        val metadata = geoObject.metadataContainer.getItem(GeoObjectSelectionMetadata::class.java)
 
-        if (metadata != null) {
-            map.selectGeoObject(metadata)
-            Log.d("GeoObject", "Выбран объект с ID: ${metadata.objectId}")
-        } else {
-            Log.e("GeoObject", "Метаданные умерли(((")
-        }
+        val searchManager = SearchFactory
+            .getInstance()
+            .createSearchManager(SearchManagerType.ONLINE)
 
-        val searchManager = SearchFactory.getInstance().createSearchManager(SearchManagerType.ONLINE)
-        val searchOptions = SearchOptions().apply {
-            searchTypes = SearchType.BIZ.value
+        val options = SearchOptions().apply {
+            searchTypes = SearchType.GEO.value
             resultPageSize = 1
+            geometry = false
         }
 
-        val searchSessionListener = object: Session.SearchListener {
-            override fun onSearchResponse(response: Response) {
-                val result = response.collection.children.firstOrNull()
-                address = result?.obj?.name ?: "Тут все взорвали, ниче нет"
+        searchManager.submit(
+            point,
+            map.cameraPosition.zoom.toInt(),
+            options,
+            object : Session.SearchListener {
+                override fun onSearchResponse(response: Response) {
+                    val toponym = response.collection.children.firstOrNull()?.obj
+                    val address = toponym
+                        ?.metadataContainer
+                        ?.getItem(ToponymObjectMetadata::class.java)
+                        ?.address
+                        ?.formattedAddress
+                        ?: "Адрес не найден"
 
-                val latitude = point!!.latitude
-                val longitude = point.longitude
+                    Log.d("GeoObject", "Адрес: $address")
+                    viewModel.setEndPoint(point)
 
-                Log.d("point", point.equals(null).toString())
-                Log.d("longitude", longitude.toString())
-                Log.d("latitude", latitude.toString())
+                    PoiBottomFragment
+                        .newInstance(name, address, description, true)
+                        .show(parentFragmentManager, "PoiBottomFragment")
+                }
 
-                viewModel.setEndPoint(point)
-
-                val bottomSheetFragment = PoiBottomFragment.newInstance(name, address, description, true)
-                bottomSheetFragment.show(parentFragmentManager, "PoiBottomFragment")
+                override fun onSearchError(error: Error) {
+                    Log.e("GeoObject", "Ошибка геокодирования: $error")
+                    Toast.makeText(requireContext(), "Не удалось получить адрес", Toast.LENGTH_SHORT).show()
+                }
             }
-
-            override fun onSearchError(p0: Error) {
-                Log.e("GeoObject", "Ошибка поиска адреса")
-                Toast.makeText(requireContext(), "Ошибка получения адреса", Toast.LENGTH_SHORT).show()            }
-        }
-
-        searchManager.submit(point!!, 1, searchOptions, searchSessionListener)
-
-        Log.d("GeoObject", "Название: $name, Описание: $description")
+        )
 
         return@GeoObjectTapListener true
     }
@@ -442,4 +454,3 @@ class MapFragment: Fragment(R.layout.fragment_map) {
         return geoObjectTapListener
     }
 }
-/* TODO надо прописать CameraListener, чтобы обновлялся поиск */

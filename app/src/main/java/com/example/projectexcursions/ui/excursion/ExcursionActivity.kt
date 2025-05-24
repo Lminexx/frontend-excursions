@@ -12,12 +12,15 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,16 +63,17 @@ class ExcursionActivity : AppCompatActivity() {
 
     @Inject
     lateinit var tokenRepo: TokenRepository
-    private lateinit var binding: ActivityExcursionBinding
     private lateinit var adapter: PhotoAdapter
     private lateinit var placesAdapter: PlacesAdapter
+    private lateinit var binding: ActivityExcursionBinding
     private lateinit var map: Map
-    private lateinit var mapView: CustomMapView
     private lateinit var viewPager: ViewPager2
+    private lateinit var mapView: CustomMapView
     private lateinit var indicator: SpringDotsIndicator
     private lateinit var pinsLayer: MapObjectCollection
     private lateinit var routeLayer: MapObjectCollection
     private var isAuth = false
+    private var isMine = false
     private var isModerating = false
     private var excursionId: Long = 0L
     private var isDetailedInfoVisible = false
@@ -83,9 +87,9 @@ class ExcursionActivity : AppCompatActivity() {
         mapView = binding.mapview
         mapView.parentScrollView = binding.root
         map = mapView.mapWindow.map
-        val root = map.mapObjects
-        pinsLayer = root.addCollection()
-        routeLayer = root.addCollection()
+        val mapRoot = map.mapObjects
+        pinsLayer = mapRoot.addCollection()
+        routeLayer = mapRoot.addCollection()
 
         initCallback()
         initData()
@@ -133,7 +137,9 @@ class ExcursionActivity : AppCompatActivity() {
             onDeleteClick = { placeId ->
                 Log.d("DeletePlace", "нельзя!")
             },
-            isCreating = false,
+            onApproveClick = { placeId, newName ->
+                Log.d("Надо доработать UI)", "")
+            },
             places = emptyList()
         )
 
@@ -265,32 +271,25 @@ class ExcursionActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.disapproving.observe(this) { disapproving ->
-            if (disapproving) {
-                val id = intent.getLongExtra(EXTRA_EXCURSION_ID, -1)
-                if (id != -1L) {
-                }
-            } else finish()
-            Log.d("disapproving", disapproving.toString())
-        }
-
         viewModel.approve.observe(this) { approved ->
             if (approved) finish()
         }
 
-        viewModel.isMine.observe(this) { mine->
-            if(!mine) {
-                binding.editButton.visibility = View.GONE
-                binding.deleteButton.visibility = View.GONE
-            } else {
-                binding.editButton.visibility = View.VISIBLE
-                binding.deleteButton.visibility = View.VISIBLE
-            }
+        viewModel.isMine.observe(this) { mine ->
+            isMine = mine
+        }
+
+        viewModel.rating.observe(this) { rating ->
+            binding.excursionRating.text = rating.toString()
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun initCallback() {
+        binding.menuButton.setOnClickListener { view ->
+            showMenu(view)
+        }
+
         binding.btnSendBack.setOnClickListener {
             lifecycleScope.launch {
                 viewModel.excursionPended(excursionId)
@@ -322,17 +321,13 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         binding.ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
-            if (fromUser) {
-                lifecycleScope.launch {
-                    val newAverageRating = viewModel.updateRating(rating)
-                    Log.d("ratingValue", newAverageRating.toString())
-                    binding.excursionRating.text = newAverageRating.toString()
-                    binding.myRatingText.alpha = 1F
+            lifecycleScope.launch {
+                if (fromUser) {
+                    viewModel.updateRating(rating)
                     binding.myExcursionRating.text = rating.toString()
                 }
             }
         }
-
 
         binding.btnApprove.setOnClickListener {
             it.isClickable = false
@@ -361,44 +356,6 @@ class ExcursionActivity : AppCompatActivity() {
                 .rotation(if (isDetailedInfoVisible) 180f else 0f)
                 .setDuration(200)
                 .start()
-        }
-
-        binding.deleteButton.setOnClickListener {
-            android.app.AlertDialog.Builder(this)
-                .setTitle("Вы хотите удалить экскурсию?")
-                .setMessage("Она будет удалена безвозвратно")
-                .setPositiveButton("Да") { dialog, _ ->
-                    lifecycleScope.launch {
-                        viewModel.deleteExcursion()
-                        setResult(RESULT_OK)
-                    }
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Нет") { dialog, _ -> dialog.dismiss() }
-                .show()
-        }
-
-        binding.editButton.setOnClickListener {
-            val intent = Intent(this, CreateExcursionActivity::class.java).apply {
-                putExtra("id", viewModel.excursion.value?.id ?: -1)
-                putExtra("title", binding.excursionTitle.text.toString())
-                putExtra("description", binding.excursionDescription.text.toString())
-                putExtra("topic", binding.topicValue.text.toString())
-                putExtra("city", binding.cityValue.text.toString())
-                var count = 0
-                viewModel.excursion.value?.tags?.forEach { tag ->
-                    count++
-                    putExtra("tag$count", tag)
-                }
-                putExtra("tag_count", count)
-                count = 0
-                viewModel.photos.value?.forEach { photo ->
-                    count++
-                    putExtra("photo$count", photo.toString())
-                }
-                putExtra("photo_count", count)
-            }
-            editLauncher.launch(intent)
         }
     }
 
@@ -467,6 +424,67 @@ class ExcursionActivity : AppCompatActivity() {
         }
     }
 
+    private fun showMenu(view: View) {
+        PopupMenu(this, view).apply {
+            menuInflater.inflate(R.menu.excursion_menu, menu)
+            try {
+                val fieldMPopup = javaClass.getDeclaredField("mPopup")
+                fieldMPopup.isAccessible = true
+                val mPop = fieldMPopup.get(this)
+                mPop.javaClass
+                    .getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                    .invoke(mPop, true)
+            } catch (e: Exception) {
+                Log.e("MenuError", e.message.toString())
+                FirebaseCrashlytics.getInstance().recordException(e)
+            }
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.deleteButton -> {
+                        android.app.AlertDialog.Builder(this@ExcursionActivity)
+                            .setTitle("Вы хотите удалить экскурсию?")
+                            .setMessage("Она будет удалена безвозвратно")
+                            .setPositiveButton("Да") { dialog, _ ->
+                                lifecycleScope.launch {
+                                    viewModel.deleteExcursion()
+                                    setResult(RESULT_OK)
+                                }
+                                dialog.dismiss()
+                            }
+                            .setNegativeButton("Нет") { dialog, _ -> dialog.dismiss() }
+                            .show()
+                        true
+                    }
+                    R.id.editButton -> {
+                        val intent = Intent(this@ExcursionActivity, CreateExcursionActivity::class.java).apply {
+                            putExtra("id", viewModel.excursion.value?.id ?: -1)
+                            putExtra("title", binding.excursionTitle.toString())
+                            putExtra("description", binding.excursionDescription.text.toString())
+                            putExtra("topic", binding.topicValue.text.toString())
+                            putExtra("city", binding.cityValue.text.toString())
+                            var count = 0
+                            viewModel.excursion.value?.tags?.forEach { tag ->
+                                count++
+                                putExtra("tag$count", tag)
+                            }
+                            putExtra("tag_count", count)
+                            count = 0
+                            viewModel.photos.value?.forEach { photo ->
+                                count++
+                                putExtra("photo$count", photo.toString())
+                            }
+                            putExtra("photo_count", count)
+                        }
+                        editLauncher.launch(intent)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            show()
+        }
+    }
+
     private fun translateTopic(topic: String): String {
         return when (topic) {
             "UNDEFINED" -> "Другая"
@@ -491,8 +509,7 @@ class ExcursionActivity : AppCompatActivity() {
         binding.moderatingBtnsContainer.visibility = View.GONE
         binding.ratingContainer.visibility = View.GONE
         binding.detailedInfoHeader.visibility = View.GONE
-        binding.deleteButton.visibility = View.GONE
-        binding.editButton.visibility = View.GONE
+        binding.menuButton.visibility = View.GONE
     }
 
     private fun hideShimmer() {
@@ -509,13 +526,18 @@ class ExcursionActivity : AppCompatActivity() {
         binding.deleteButton.visibility = View.VISIBLE
         binding.editButton.visibility = View.VISIBLE
 
-        if (!isAuth) {
-            binding.favoriteButton.visibility = View.GONE
-            binding.ratingContainer.isClickable = false
-        } else if (isModerating) {
-            binding.moderatingBtnsContainer.visibility = View.VISIBLE
-            binding.ratingContainer.isClickable = false
-        } else binding.moderatingBtnsContainer.visibility = View.GONE
+
+        val showMenuBtn = isMine
+        Log.d("DBG", "menuButton should be visible? $showMenuBtn")
+        binding.menuButton.visibility =
+            if (showMenuBtn) View.VISIBLE else View.GONE
+
+        binding.moderatingBtnsContainer.visibility =
+            if (isModerating && !isMine) View.VISIBLE else View.GONE
+
+        binding.favoriteButton.visibility = if (isAuth) View.VISIBLE else View.GONE
+
+        binding.ratingBar.isEnabled = isAuth && !isMine && !isModerating
     }
 
     private fun drawRoute(points: List<Point>) {

@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "596243648831-e2hv8ohog6oqjnnos0p2h7j6lporo0mk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.projectexcursions",
+            "certificate_hash": "20c7d04757dc52bf15fd3d4da0e87ab3b215dd25"
+          }
+        },
+        {
+          "client_id": "596243648831-s5mfiq8s4deu7modullvgr97f70biftn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.projectexcursions",
+            "certificate_hash": "535170e2eda59663c87e04f971cf82f8c7d97bd5"
+          }
+        },
+        {
           "client_id": "596243648831-n94ipknkjdbm2b5legjsdkc6fo15ghs0.apps.googleusercontent.com",
           "client_type": 3
         }
