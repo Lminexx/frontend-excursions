@@ -79,7 +79,6 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var indicator: SpringDotsIndicator
     private val viewModel: CreateExcursionViewModel by viewModels()
     private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
-    private val progressBar = CustomProgressBar()
 
     private val REQUEST_CODE_PERMISSION = 1003
 
@@ -258,8 +257,6 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.editExcursion.observe(this) { wannaEdit ->
             if (wannaEdit) {
-                blur()
-                progressBar.show(this)
                 lifecycleScope.launch {
                     delay(2000)
                     val title = binding.excursionTitle.text.toString().trim()
@@ -294,11 +291,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                             city,
                             intent.getLongExtra("id", -1)
                         )
-                        progressBar.dialog.dismiss()
-                        unblur()
-                    } else {
-                        progressBar.dialog.dismiss()
-                        unblur()
                     }
                 }
             }
@@ -306,8 +298,6 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
-                blur()
-                progressBar.show(this)
                 lifecycleScope.launch {
                     delay(2000)
                     val title = binding.excursionTitle.text.toString().trim()
@@ -341,11 +331,6 @@ class CreateExcursionActivity : AppCompatActivity() {
                             topic,
                             city
                         )
-                        progressBar.dialog.dismiss()
-                        unblur()
-                    } else {
-                        progressBar.dialog.dismiss()
-                        unblur()
                     }
                 }
             }
@@ -734,14 +719,6 @@ class CreateExcursionActivity : AppCompatActivity() {
     private fun showImages() {
         binding.viewPagerImages.visibility = View.VISIBLE
         binding.dotsIndicator.visibility = View.VISIBLE
-    }
-
-    fun blur() {
-        Blur().blur(this, 10, 2, binding.parentLayout)
-    }
-
-    fun unblur() {
-        Blur().unblur(binding.parentLayout)
     }
 
     private fun checkPermissions() {
