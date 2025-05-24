@@ -169,9 +169,9 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.cityValue.text = excursion.cityName
                 addNewChip(excursion.tags)
                 if (excursion.personalRating == null) {
-                    binding.myRatingText.alpha = 0.0F
+                    binding.myRatingText.visibility = View.GONE
                 } else {
-                    binding.myRatingText.alpha = 1F
+                    binding.myRatingText.visibility = View.VISIBLE
                     binding.myExcursionRating.text = excursion.personalRating.toString()
                     binding.ratingBar.rating = excursion.personalRating
                 }
@@ -280,7 +280,14 @@ class ExcursionActivity : AppCompatActivity() {
         }
 
         viewModel.rating.observe(this) { rating ->
-            binding.excursionRating.text = rating.toString()
+            if (rating == null) {
+                binding.myRatingText.visibility = View.GONE
+            } else {
+                binding.excursionRating.text = rating.toString()
+                binding.myRatingText.visibility = View.VISIBLE
+                binding.myExcursionRating.text = rating.toString()
+                binding.ratingBar.rating = rating
+            }
         }
     }
 

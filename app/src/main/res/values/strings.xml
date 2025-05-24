@@ -23,7 +23,7 @@
     <string name="create_excursion">Создать экскурсию</string>
     <string name="user">Юзер</string>
     <string name="log_out">Выйти</string>
-    <string name="lang_error">Используйте латинский алфавит!</string>
+    <string name="lang_error">Используйте латинский или русский алфавит!</string>
     <string name="repeat_login">Повторите логин</string>
     <string name="pass_not_same">Пароли не совпадают</string>
     <string name="user_registered">Пользователь зарегистрирован</string>
@@ -137,10 +137,12 @@
     <string name="wait">Подождите</string>
     <string name="no_avatar">Выберите аватар</string>
     <string name="excursion_menu">Меню экскурсии</string>
-    <string name="you_have_no_fav_exc">Вам не понравилась ни одна экскурсия D:</string>
+    <string name="you_have_no_fav_exc">Вам не избрали ни одной экскурсии D:</string>
     <string name="come_to_list">К списку экскурсий</string>
     <string name="enter_placename">Введите название</string>
     <string name="unknown_place">Неизвестное место</string>
     <string name="enter_name">Подтвердить имя</string>
     <string name="end_route">Завершить маршрут</string>
+    <string name="reg_success">Регистрация успешна!!!</string>
+    <string name="short_password">Пароль должен быть не менее 8 символов!</string>
 </resources>

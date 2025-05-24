@@ -33,6 +33,7 @@ import com.example.projectexcursions.databinding.ActivityExcursionCreateBinding
 import com.example.projectexcursions.models.PlaceItem
 import com.example.projectexcursions.models.SearchResult
 import com.example.projectexcursions.utilies.CustomMapView
+import com.example.projectexcursions.utilies.CustomProgressBar
 import com.google.android.material.chip.Chip
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
@@ -74,6 +75,7 @@ class CreateExcursionActivity : AppCompatActivity() {
     private lateinit var routeLayer: MapObjectCollection
     private lateinit var viewPager: ViewPager2
     private lateinit var indicator: SpringDotsIndicator
+    private val progressBar = CustomProgressBar()
     private val viewModel: CreateExcursionViewModel by viewModels()
     private val placemarksMap = mutableMapOf<String, PlacemarkMapObject>()
     private var photoPermission = false
@@ -281,70 +283,86 @@ class CreateExcursionActivity : AppCompatActivity() {
 
         viewModel.editExcursion.observe(this) { wannaEdit ->
             if (wannaEdit) {
-
-                val title = binding.excursionTitle.text.toString().trim()
-                val description = binding.excursionDescription.text.toString().trim()
-                val places = viewModel.placeItems.value ?: emptyList()
-                val tags = binding.tagsChips
-                val chipTexts = mutableListOf<String>()
-                for (i in 0 until tags.childCount) {
-                    val chip = tags.getChildAt(i) as? Chip
-                    chip?.let {
-                        chipTexts.add(it.text.toString())
+                progressBar.setProgressDialog(this, "Редактируем...")
+                lifecycleScope.launch {
+                    delay(500)
+                    val title = binding.excursionTitle.text.toString().trim()
+                    val description = binding.excursionDescription.text.toString().trim()
+                    val places = viewModel.placeItems.value ?: emptyList()
+                    val tags = binding.tagsChips
+                    val chipTexts = mutableListOf<String>()
+                    for (i in 0 until tags.childCount) {
+                        val chip = tags.getChildAt(i) as? Chip
+                        chip?.let {
+                            chipTexts.add(it.text.toString())
+                        }
+                    }
+                    val city = binding.cityName.text.toString()
+                    val topic = translateTopic(binding.topic.selectedItem.toString())
+                    val photos = viewModel.selectedImages.value ?: emptyList()
+                    if (viewModel.isExcursionCorrect(
+                            this@CreateExcursionActivity,
+                            title,
+                            description,
+                            places,
+                            city,
+                            photos
+                        )
+                    ) {
+                        viewModel.editExcursion(
+                            this@CreateExcursionActivity,
+                            title,
+                            description,
+                            chipTexts,
+                            topic,
+                            city,
+                            intent.getLongExtra("id", -1)
+                        )
                     }
                 }
-                val city = binding.cityName.text.toString()
-                val topic = translateTopic(binding.topic.selectedItem.toString())
-                val selected = viewModel.selectedImages.value ?: emptyList()
-                val existing =
-                    viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
-                val images = selected + existing
-                if (viewModel.isExcursionCorrect(this@CreateExcursionActivity, title, description, places, city, images)) {
-                    viewModel.editExcursion(
-                        this@CreateExcursionActivity,
-                        title,
-                        description,
-                        chipTexts,
-                        topic,
-                        city,
-                        intent.getLongExtra("id", -1)
-                    )
-
-                }
+                progressBar.dialog.dismiss()
             }
         }
 
         viewModel.createExcursion.observe(this) { wannaCreate ->
             if (wannaCreate) {
-                val title = binding.excursionTitle.text.toString().trim()
-                val description = binding.excursionDescription.text.toString().trim()
-                val places = viewModel.placeItems.value ?: emptyList()
-                val tags = binding.tagsChips
-                val chipTexts = mutableListOf<String>()
-                for (i in 0 until tags.childCount) {
-                    val chip = tags.getChildAt(i) as? Chip
-                    chip?.let {
-                        chipTexts.add(it.text.toString())
+                progressBar.setProgressDialog(this, "Создаём...")
+                lifecycleScope.launch {
+                    val title = binding.excursionTitle.text.toString().trim()
+                    val description = binding.excursionDescription.text.toString().trim()
+                    val places = viewModel.placeItems.value ?: emptyList()
+                    val tags = binding.tagsChips
+                    val chipTexts = mutableListOf<String>()
+                    for (i in 0 until tags.childCount) {
+                        val chip = tags.getChildAt(i) as? Chip
+                        chip?.let {
+                            chipTexts.add(it.text.toString())
+                        }
+                    }
+                    val city = binding.cityName.text.toString()
+                    val topic = translateTopic(binding.topic.selectedItem.toString())
+                    val photos = viewModel.selectedImages.value ?: emptyList()
+                    if (viewModel.isExcursionCorrect(
+                            this@CreateExcursionActivity,
+                            title,
+                            description,
+                            places,
+                            city,
+                            photos
+                        )
+                    ) {
+                        viewModel.createExcursion(
+                            this@CreateExcursionActivity,
+                            title,
+                            description,
+                            chipTexts,
+                            topic,
+                            city
+                        )
                     }
                 }
-                val city = binding.cityName.text.toString()
-                val topic = translateTopic(binding.topic.selectedItem.toString())
-                val selected = viewModel.selectedImages.value ?: emptyList()
-                val existing =
-                    viewModel.images.value?.map { photo -> photo.url.toUri() } ?: emptyList()
-                val images = selected + existing
-                if (viewModel.isExcursionCorrect(this@CreateExcursionActivity, title, description, places, city, images)) {
-                    viewModel.createExcursion(
-                        this@CreateExcursionActivity,
-                        title,
-                        description,
-                        chipTexts,
-                        topic,
-                        city
-                    )
-                }
-                }
-
+                progressBar.dialog.dismiss()
+            }
         }
 
         viewModel.routeLiveData.observe(this) { points ->
@@ -746,4 +764,3 @@ class CreateExcursionActivity : AppCompatActivity() {
         }
     }
 }
-//TODO сделать получение списка фото места

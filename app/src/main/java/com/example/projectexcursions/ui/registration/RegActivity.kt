@@ -73,8 +73,6 @@ class RegActivity: AppCompatActivity() {
                     unblur()
                     finish()
                 }
-            } else {
-                Toast.makeText(this, getString(R.string.error_reg), Toast.LENGTH_SHORT).show()
             }
         }
 

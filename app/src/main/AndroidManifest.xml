@@ -12,7 +12,7 @@
     <application
         android:name=".OpenWorldApp"
         android:label="@string/app_name"
-        android:icon="@drawable/ic_app_v3"
+        android:icon="@drawable/ic_app_v1"
         android:allowBackup="true"
         android:requestLegacyExternalStorage="true"
         android:dataExtractionRules="@xml/data_extraction_rules"

@@ -61,9 +61,14 @@ class RegViewModel @Inject constructor(
                     Log.d("RegistrationResponse", "Response: $response")
                     if (response.isSuccessful) {
                         if (response.message() != "") {
-                            _message.value = response.message()
+                            _message.value = context.getString(R.string.reg_success)
                             _regStatus.value = true
                         } else _regStatus.value = true
+                    } else {
+                        if (password.length < 8) {
+                            _message.value = context.getString(R.string.short_password)
+                            _regStatus.value = false
+                        }
                     }
                 } else {
                     _message.value = context.getString(R.string.lang_error)
@@ -76,7 +81,7 @@ class RegViewModel @Inject constructor(
     }
 
     private fun isInputLangValid(input: String): Boolean {
-        val regex = "^[a-zA-Z0-9!@#\$%^&*()_+{}\\[\\]:;<>,.?~\\-=\\s]*\$".toRegex()
+        val regex = "^[a-zA-Z0-9А-Яа-яЁё!@#\$%^&*()_+{}\\[\\]:;<>,.?~\\-=\\s]*\$".toRegex()
         return regex.matches(input)
     }
 
