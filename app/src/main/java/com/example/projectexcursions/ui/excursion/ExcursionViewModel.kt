@@ -63,6 +63,9 @@ class ExcursionViewModel @Inject constructor(
     private val _rating = MutableLiveData<Float>()
     val rating: LiveData<Float> get() = _rating
 
+    private val _myRating = MutableLiveData<Float>()
+    val myRating: LiveData<Float> get() = _myRating
+
     init {
         if (tokenRepository.getCachedToken() != null)
             getUsername()
@@ -198,6 +201,7 @@ class ExcursionViewModel @Inject constructor(
         try {
             val response = excRepository.uploadRating(excursionId, rating).body()!!
             _rating.postValue(response.ratingAVG)
+            _myRating.postValue(rating)
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)
             Log.e("UpdateRating", "Error updating rating for excursion $excursionId", e)

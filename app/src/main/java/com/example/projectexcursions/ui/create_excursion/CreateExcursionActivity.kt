@@ -206,6 +206,7 @@ class CreateExcursionActivity : AppCompatActivity() {
             viewModel.loadPhotos(intent.getLongExtra("id", -1))
             viewModel.loadPlaces(intent.getLongExtra("id", -1))
         }
+        binding.buttonCreateExcursion.isClickable = true
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -213,15 +214,9 @@ class CreateExcursionActivity : AppCompatActivity() {
         binding.buttonCreateExcursion.setOnClickListener {
             if (intent.getStringExtra("title") == null) {
                 it.isClickable = false
-                Handler(Looper.getMainLooper()).postDelayed({
-                    it.isClickable = true
-                }, 300)
                 viewModel.clickCreateExcursion()
             } else {
                 it.isClickable = false
-                Handler(Looper.getMainLooper()).postDelayed({
-                    it.isClickable = true
-                }, 300)
                 viewModel.clickEditExcursion()
             }
         }

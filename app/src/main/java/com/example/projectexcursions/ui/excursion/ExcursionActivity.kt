@@ -284,6 +284,13 @@ class ExcursionActivity : AppCompatActivity() {
                 binding.myRatingText.visibility = View.GONE
             } else {
                 binding.excursionRating.text = rating.toString()
+            }
+        }
+
+        viewModel.myRating.observe(this) { rating ->
+            if (rating == null) {
+                binding.myRatingText.visibility = View.GONE
+            } else {
                 binding.myRatingText.visibility = View.VISIBLE
                 binding.myExcursionRating.text = rating.toString()
                 binding.ratingBar.rating = rating
@@ -299,12 +306,14 @@ class ExcursionActivity : AppCompatActivity() {
 
         binding.btnSendBack.setOnClickListener {
             lifecycleScope.launch {
+                Toast.makeText(this@ExcursionActivity, "Экскурсия отправлена на доработку", Toast.LENGTH_SHORT).show()
                 viewModel.excursionPended(excursionId)
             }
         }
 
         binding.btnReject.setOnClickListener {
             lifecycleScope.launch {
+                Toast.makeText(this@ExcursionActivity, "Экскурсия отклонена", Toast.LENGTH_SHORT).show()
                 viewModel.excursionRejected(excursionId)
             }
         }
@@ -345,6 +354,7 @@ class ExcursionActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     viewModel.excursionApproved()
+                    Toast.makeText(this@ExcursionActivity, "Экскурсия утверждена", Toast.LENGTH_SHORT).show()
                     finish()
                 } catch (e: ApproveExcursionException) {
                     FirebaseCrashlytics.getInstance().recordException(e)
