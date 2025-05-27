@@ -459,7 +459,7 @@ class ExcursionActivity : AppCompatActivity() {
                     R.id.deleteButton -> {
                         android.app.AlertDialog.Builder(this@ExcursionActivity)
                             .setTitle("Вы хотите удалить экскурсию?")
-                            .setMessage("Она будет удалена безвозвратно")
+                            .setMessage("Она будет удалена безвозвратно.")
                             .setPositiveButton("Да") { dialog, _ ->
                                 lifecycleScope.launch {
                                     viewModel.deleteExcursion()
