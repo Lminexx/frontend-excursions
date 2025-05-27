@@ -301,7 +301,7 @@ class CreateExcursionViewModel @Inject constructor(
             val places = placeItems.value ?: return
             if (places.size < 2) {
                 _routeLiveData.postValue(emptyList())
-            } else if (places.size <= 12) {
+            } else if (places.size <= 7) {
                 val fullRoute = mutableListOf<Point>()
                 withContext(Dispatchers.IO) {
                     for (i in 0 until places.lastIndex) {
@@ -316,7 +316,7 @@ class CreateExcursionViewModel @Inject constructor(
                 }
                 _routeLiveData.postValue(fullRoute)
             } else {
-                _message.value = "Выберите менее 12 мест"
+                _message.value = "Выберите менее 7 мест"
             }
         } catch (e: Exception) {
             FirebaseCrashlytics.getInstance().recordException(e)

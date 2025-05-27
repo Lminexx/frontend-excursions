@@ -306,6 +306,7 @@ class ExcursionActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 Toast.makeText(this@ExcursionActivity, "Экскурсия отправлена на доработку", Toast.LENGTH_SHORT).show()
                 viewModel.excursionPended(excursionId)
+                finish()
             }
         }
 
@@ -313,6 +314,7 @@ class ExcursionActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 Toast.makeText(this@ExcursionActivity, "Экскурсия отклонена", Toast.LENGTH_SHORT).show()
                 viewModel.excursionRejected(excursionId)
+                finish()
             }
         }
 
